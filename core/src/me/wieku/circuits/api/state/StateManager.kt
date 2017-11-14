@@ -15,7 +15,7 @@ class StateManager(private val managerSize: Int) {
 		output[index] = 0
 	}
 
-	fun merge() = System.arraycopy(output, 0, input, 0, managerSize)
+	fun swap() = System.arraycopy(output, 0, input, 0, lastIndex)
 
 	operator fun invoke(): State = if(indexPool.isEmpty()) State(lastIndex++, this) else State(indexPool.poll(), this)
 
