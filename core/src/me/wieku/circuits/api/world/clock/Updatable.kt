@@ -5,5 +5,5 @@ interface Updatable<out T:Number> {
 	interface ByTick:Updatable<Long>
 	interface ByDelta:Updatable<Float>
 
-	fun <T> update(tickNumber: T)
+	fun <T> update(value: T)
 }
