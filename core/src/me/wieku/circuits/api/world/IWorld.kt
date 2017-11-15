@@ -6,8 +6,7 @@ import me.wieku.circuits.utils.math.Vector2i
 
 interface IWorld {
 
-
-	fun update()
+	fun update(tick: Long)
 	fun updateNeighboursOf(pos: Vector2i)
 	fun getStateManager() : StateManager
 }
