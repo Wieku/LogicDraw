@@ -118,4 +118,18 @@ class Vector2i(var x: Int, var y: Int) {
 	fun sub(num: Int): Vector2i {
 		return sub(num, num)
 	}
+
+
+	operator fun plus(vec: Vector2i) = Vector2i(x + vec.x, y + vec.y)
+
+	operator fun plusAssign(vec: Vector2i) { add(vec) }
+
+	operator fun minus(vec: Vector2i) = Vector2i(x - vec.x, y - vec.y)
+
+	operator fun minusAssign(vec: Vector2i) { sub(vec) }
+
+	operator fun times(vec: Vector2i): Int = dot(vec)
+
+	operator fun not() = Vector2i(-x, -y)
+
 }
