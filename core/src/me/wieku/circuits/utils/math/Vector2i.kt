@@ -6,7 +6,6 @@ class Vector2i(var x: Int, var y: Int) {
 
 	constructor(old: Vector2i) : this(old.x, old.y)
 
-
 	operator fun set(x: Int, y: Int): Vector2i {
 		this.x = x
 		this.y = y
