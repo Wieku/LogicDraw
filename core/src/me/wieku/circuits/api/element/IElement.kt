@@ -13,5 +13,5 @@ interface IElement {
 	fun getState(): State
 
 	fun onPlace(world: IWorld)
-	fun onNeighbourChange(world: IWorld, x: Int, y: Int)
+	fun onNeighbourChange(world: IWorld, pos: Vector2i)
 }

@@ -5,6 +5,8 @@ import me.wieku.circuits.api.state.StateManager
 
 interface IWorld {
 
-	fun updateNeighboursOf(element: BasicElement)
+
+	fun update()
+	fun updateNeighboursOf(pos: Vector2i)
 	fun getStateManager() : StateManager
 }
