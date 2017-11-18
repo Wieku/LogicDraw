@@ -1,9 +1,9 @@
 package me.wieku.circuits.api.world.clock
 
-interface Updatable<out T:Number> {
+interface Updatable<in T:Number> {
 
 	interface ByTick:Updatable<Long>
 	interface ByDelta:Updatable<Float>
 
-	fun <T> update(value: T)
+	fun update(value: T)
 }

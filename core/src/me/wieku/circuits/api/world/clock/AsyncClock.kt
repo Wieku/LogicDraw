@@ -1,70 +1,62 @@
 package me.wieku.circuits.api.world.clock
 
-class AsyncClock(private val updatable: Updatable<Number>, tickRate: Int) {
-	private var sleepTime: Long = 0
+import java.util.concurrent.Executors
+import java.util.concurrent.ScheduledExecutorService
+import java.util.concurrent.ScheduledFuture
+import java.util.concurrent.TimeUnit
+
+class AsyncClock (private val updatable: Updatable<*>, tickRate: Int)  {
+	private var sleepTime: Long = 1000000000L/tickRate
+
 	private var tickRate: Int = tickRate
 	set (value) {
 		if(tickRate<0) IllegalStateException("Tick Rate has to be positive")
 		sleepTime = 1000000000L/value
 	}
 
-	var thread: Thread? = null
 	var currentTPS: Float = 0f
-	var delta: Boolean = false
-	var running: Boolean = false
 
-	var currentTick: Long = 0
+	private var task:ScheduledFuture<*>? = null
+	private var delta: Boolean = false
+	private var currentTick: Long = 0
 
+	@Suppress("UNCHECKED_CAST")
 	fun start() {
-		prepareThread()
-		running = true
-		thread!!.start()
+		if(task != null && !task!!.isCancelled) IllegalStateException("AsyncClock is already running!")
+
+		var lastCheck = System.nanoTime()
+		var timeCheck = 0L
+		var tempTPS = 0L
+		task = executor.scheduleAtFixedRate({
+
+			var updateTime = System.nanoTime() - lastCheck
+			lastCheck = System.nanoTime()
+
+			timeCheck+=updateTime
+
+			++tempTPS
+
+			if(timeCheck>=1000000000) {
+				currentTPS = tempTPS.toFloat()
+				tempTPS = 0
+				timeCheck = 0
+			}
+
+			(updatable as Updatable<Number>).update(if (delta) updateTime / 1000000000f else currentTick)
+
+			++currentTick
+
+		}, 0, sleepTime, TimeUnit.NANOSECONDS)
 	}
 
 	fun stop() {
-		if(!running || thread == null || thread?.state == Thread.State.TERMINATED) return
-		running = false
-
-		thread!!.join()
+		task?.cancel(false)
 	}
 
 	fun getTPS() = currentTPS
 
-	private fun prepareThread() {
-		if(thread != null) {
-			stop()
-		}
-
-		thread = Thread({
-			var currentTime = System.nanoTime()
-			var checkTime: Long = 0
-			var checkTicks: Long = 0
-			while(running) {
-
-				var now = System.nanoTime()
-				var updateTime = now - currentTime
-				currentTime = now
-
-				checkTime+= updateTime
-				++checkTicks
-
-				//TODO: More precise real TPS measuring
-				if(checkTime>= 1000000000L) {
-					currentTPS = checkTicks.toFloat()
-					checkTime = 0
-					checkTicks = 0
-				}
-
-				updatable.update(if(delta) updateTime/1000000000f else currentTick)
-
-				++currentTick
-
-				var sleepTime = (currentTime-System.nanoTime()+sleepTime)
-				var sleepTimeMs = sleepTime/1000000L
-				if(sleepTime>0)
-					Thread.sleep(sleepTimeMs, (sleepTime-sleepTimeMs).toInt())
-			}
-		})
+	companion object {
+		val executor: ScheduledExecutorService = Executors.newScheduledThreadPool(5)
 	}
 
 	init {
