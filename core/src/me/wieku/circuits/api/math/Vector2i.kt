@@ -37,6 +37,9 @@ class Vector2i(var x: Int, var y: Int) {
 		return set(this.x - x, this.y - y)
 	}
 
+	private fun signum(value: Int): Int = if(value<0) -1 else (if(value > 0) 1 else 0)
+
+	fun sig(): Vector2i = set(signum(x), signum(y))
 
 	fun scl(amount: Float): Vector2i {
 		return set((x * amount).toInt(), (y * amount).toInt())
