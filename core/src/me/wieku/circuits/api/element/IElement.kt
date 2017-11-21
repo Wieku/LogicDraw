@@ -1,14 +1,13 @@
 package me.wieku.circuits.api.element
 
-import com.badlogic.gdx.graphics.Color
 import me.wieku.circuits.api.state.State
 import me.wieku.circuits.api.world.IWorld
-import me.wieku.circuits.utils.math.Vector2i
+import me.wieku.circuits.api.math.Vector2i
 
 interface IElement {
 
-	fun getIdleColor(): Color
-	fun getActiveColor(): Color
+	fun getIdleColor(): Int
+	fun getActiveColor(): Int
 
 	fun setState(state: State)
 	fun getState(): State

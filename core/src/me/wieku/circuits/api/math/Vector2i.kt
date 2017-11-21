@@ -1,4 +1,4 @@
-package me.wieku.circuits.utils.math
+package me.wieku.circuits.api.math
 
 class Vector2i(var x: Int, var y: Int) {
 

@@ -7,7 +7,6 @@ import java.util.concurrent.TimeUnit
 
 class AsyncClock (private val updatable: Updatable<*>, tickRate: Int)  {
 	private var sleepTime: Long = 1000000000L/tickRate
-
 	private var tickRate: Int = tickRate
 	set (value) {
 		if(tickRate<0) IllegalStateException("Tick Rate has to be positive")
@@ -16,7 +15,7 @@ class AsyncClock (private val updatable: Updatable<*>, tickRate: Int)  {
 
 	var currentTPS: Float = 0f
 
-	private var task:ScheduledFuture<*>? = null
+	private var task: ScheduledFuture<*>? = null
 	private var delta: Boolean = false
 	private var currentTick: Long = 0
 
