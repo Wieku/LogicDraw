@@ -4,6 +4,8 @@ enum class Axis {
 
 	HORIZONTAL,
 	VERTICAL,
-	UNKNOWN
+	UNKNOWN;
+
+	companion object fun getAxis(from: Vector2i, to: Vector2i) = Direction.getDirection(from, to).axis
 
 }

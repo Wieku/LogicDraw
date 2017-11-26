@@ -10,7 +10,9 @@ interface IElement {
 	fun setState(state: State, axis: Axis)
 	fun getState(axis: Axis): State
 
-	fun onPlace(position: Vector2i, world: IWorld)
+	fun getPosition(): Vector2i
+
+	fun onPlace(world: IWorld)
 	fun onNeighbourChange(position: Vector2i, world: IWorld)
 
 	fun getIdleColor(): Int

@@ -81,6 +81,7 @@ class Vector2i(var x: Int, var y: Int) {
 		return Math.sqrt((x * x + y * y).toDouble()).toInt()
 	}
 
+	fun isInBounds(boundX0: Int, boundY0:Int, boundX1: Int, boundY1: Int) = x >= boundX0 && y >= boundY0 && x <= boundX1 && y <= boundY1
 
 	fun copy(): Vector2i {
 		return Vector2i(this)
