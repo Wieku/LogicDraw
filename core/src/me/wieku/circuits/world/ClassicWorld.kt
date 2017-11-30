@@ -16,6 +16,7 @@ class ClassicWorld(private val width: Int, private val height: Int):IWorld {
 
 	override fun update(tick: Long) {
 		tickables.entries.forEach { it.value.update(tick) }
+		manager.swap()
 	}
 
 	override fun getElement(position: Vector2i) = if(position.isInBounds(0, 0, width - 1, height - 1)) map[position.x][position.y] else null

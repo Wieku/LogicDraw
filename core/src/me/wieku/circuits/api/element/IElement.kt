@@ -17,4 +17,5 @@ interface IElement {
 
 	fun getIdleColor(): Int
 	fun getActiveColor(): Int
+	fun getColor(): Int
 }

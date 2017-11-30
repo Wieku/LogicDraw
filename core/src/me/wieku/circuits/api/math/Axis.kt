@@ -6,6 +6,7 @@ enum class Axis {
 	VERTICAL,
 	UNKNOWN;
 
-	companion object fun getAxis(from: Vector2i, to: Vector2i) = Direction.getDirection(from, to).axis
-
+	companion object {
+		fun getAxis(from: Vector2i, to: Vector2i) = Direction.getDirection(from, to).axis
+	}
 }
