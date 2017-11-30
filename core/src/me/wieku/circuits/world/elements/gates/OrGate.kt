@@ -6,14 +6,14 @@ import me.wieku.circuits.api.math.Vector2i
 import me.wieku.circuits.api.state.State
 import me.wieku.circuits.api.world.IWorld
 
-class NorGate(pos: Vector2i): BasicGate(pos) {
+class OrGate(pos: Vector2i): BasicGate(pos) {
 
 	private lateinit var state: State
 
 	override fun update(tick: Long) {
-		var calc = true
+		var calc = false
 		for(i in 0 until inputs.size)
-			calc = calc && !inputs[i].isActive()
+			calc = calc || inputs[i].isActive()
 
 		if(state.isActive() != calc) {
 			state.setActive(calc)
@@ -26,9 +26,9 @@ class NorGate(pos: Vector2i): BasicGate(pos) {
 		state = world.getStateManager()()
 	}
 
-	override fun getIdleColor(): Int = 0xFFD600
+	override fun getIdleColor(): Int = 0xF57F17
 
-	override fun getActiveColor(): Int = 0xFFEA00
+	override fun getActiveColor(): Int = 0xF9A825
 
 	override fun getColor(): Int = if (state.isActive()) getActiveColor() else getIdleColor()
 
