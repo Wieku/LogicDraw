@@ -50,7 +50,7 @@ class Wire(pos: Vector2i): BasicWire(pos) {
 
 	override fun getActiveColor(): Int = 0xD50000
 
-	override fun getColor(): Int = if(state.isActive()) getActiveColor() else getIdleColor()
+	override fun getColor(): Int = if(state.isActiveD()) getActiveColor() else getIdleColor()
 
 	override fun setState(state: State, axis: Axis) {}
 

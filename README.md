@@ -3,6 +3,8 @@ Circuits is the logic gates simulator
 ## Elements
 |Element|Idle color|Active color|
 |-------|----------|------------|
+|Wire|![](https://placehold.it/15/7F0000/000000?text=+)|![](https://placehold.it/15/D50000/000000?text=+)|
+|Cross|![](https://placehold.it/15/757575/000000?text=+)|![](https://placehold.it/15/9E9E9E/000000?text=+)|
 |Or gate|![](https://placehold.it/15/F57F17/000000?text=+)|![](https://placehold.it/15/F9A825/000000?text=+)|
 |Nor gate|![](https://placehold.it/15/FFD600/000000?text=+)|![](https://placehold.it/15/FFEA00/000000?text=+)|
 |And gate|![](https://placehold.it/15/00BFA5/000000?text=+)|![](https://placehold.it/15/1DE9B6/000000?text=+)|
