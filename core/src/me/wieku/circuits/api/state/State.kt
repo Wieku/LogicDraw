@@ -2,7 +2,8 @@ package me.wieku.circuits.api.state
 
 open class State(private val id: Int, private val manager: StateManager) {
 
-	private var holders: Int = 0
+	var holders: Int = 0
+	private set
 
 	fun setActive(value: Boolean) { manager[id] = value }
 
