@@ -30,7 +30,7 @@ class OrGate(pos: Vector2i): BasicGate(pos) {
 
 	override fun getActiveColor(): Int = 0xF9A825
 
-	override fun getColor(): Int = if (state.isActive()) getActiveColor() else getIdleColor()
+	override fun getColor(): Int = if (state.isActiveD()) getActiveColor() else getIdleColor()
 
 	override fun setState(state: State, axis: Axis) {}
 

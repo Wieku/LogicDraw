@@ -19,7 +19,9 @@ class StateManager(private val managerSize: Int) {
 
 	operator fun invoke(): State = if(indexPool.isEmpty()) State(lastIndex++, this) else State(indexPool.poll(), this)
 
-	operator fun get(index: Int):Boolean = input[index] > 0
+	operator fun get(index: Int) = input[index] > 0
+
+	fun getDirty(index: Int) = output[index] > 0
 
 	operator fun set(index: Int, value: Boolean) {
 		output[index] = if(value) 1 else 0
