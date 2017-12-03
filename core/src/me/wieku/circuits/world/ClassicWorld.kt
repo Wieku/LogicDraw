@@ -1,11 +1,15 @@
 package me.wieku.circuits.world
 
+import me.wieku.circuits.api.element.BasicElement
 import me.wieku.circuits.api.element.IElement
 import me.wieku.circuits.api.element.ITickable
 import me.wieku.circuits.api.math.Direction
 import me.wieku.circuits.api.math.Vector2i
 import me.wieku.circuits.api.state.StateManager
 import me.wieku.circuits.api.world.IWorld
+import me.wieku.circuits.world.elements.Input
+import me.wieku.circuits.world.elements.Wire
+import me.wieku.circuits.world.elements.gates.NorGate
 import java.util.*
 
 class ClassicWorld(private val width: Int, private val height: Int):IWorld {
@@ -13,10 +17,28 @@ class ClassicWorld(private val width: Int, private val height: Int):IWorld {
 	private val manager: StateManager = StateManager(width*height)
 	private val map: Array<Array<IElement?>> = Array(width) { Array<IElement?>(height) {null} }
 	private val tickables: HashMap<Vector2i, ITickable> = HashMap()
+	private val classes: HashMap<String, Class<out BasicElement>> = HashMap()
+	init {
+		classes.put("Wire", Wire::class.java)
+		classes.put("Input", Input::class.java)
+		classes.put("Nor", NorGate::class.java)
+	}
+
 
 	override fun update(tick: Long) {
 		tickables.entries.forEach { it.value.update(tick) }
 		manager.swap()
+	}
+
+	override fun placeElement(position: Vector2i, name: String) {
+		if(classes.containsKey(name)) {
+			var el:BasicElement = classes[name]!!.getConstructor(Vector2i::class.java).newInstance(position)
+			map[position.x][position.y] = el
+			el.onPlace(this)
+			if(el is ITickable) tickables.put(position, el)
+		} else {
+			println("[ERROR} Element doesn't exist!")
+		}
 	}
 
 	override fun getElement(position: Vector2i) = if(position.isInBounds(0, 0, width - 1, height - 1)) map[position.x][position.y] else null
@@ -39,4 +61,6 @@ class ClassicWorld(private val width: Int, private val height: Int):IWorld {
 	}
 
 	override fun getStateManager(): StateManager = manager
+
+	operator fun get(x:Int, y:Int) = map[x][y]
 }

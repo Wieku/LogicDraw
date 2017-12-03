@@ -27,11 +27,14 @@ class Input(pos: Vector2i):BasicInput(pos) {
 	}
 
 	override fun onPlace(world: IWorld) {
+		intSt = world.getStateManager()()
 		updateI(world)
+		world.updateNeighboursOf(pos)
 	}
 
 	override fun onNeighbourChange(position: Vector2i, world: IWorld) {
 		updateI(world)
+		//world.updateNeighboursOf(pos)
 	}
 
 	private fun updateI(world: IWorld) {
@@ -50,7 +53,7 @@ class Input(pos: Vector2i):BasicInput(pos) {
 
 	override fun getActiveColor(): Int = 0x0277BD
 
-	override fun getColor(): Int = if(intSt.isActive()) getActiveColor() else getIdleColor()
+	override fun getColor(): Int = if(isActive()) getActiveColor() else getIdleColor()
 
 	override fun setState(state: State, axis: Axis) {}
 

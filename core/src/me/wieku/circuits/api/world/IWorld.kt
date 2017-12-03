@@ -8,6 +8,7 @@ interface IWorld {
 
 	fun update(tick: Long)
 
+	fun placeElement(position:Vector2i, name:String)
 	fun getElement(position: Vector2i): IElement?
 	fun getNeighboursOf(element: IElement): Array<IElement>
 	fun getNeighboursOf(element: IElement, consumer: (IElement) -> Unit)
