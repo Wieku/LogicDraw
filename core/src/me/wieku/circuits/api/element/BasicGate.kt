@@ -11,6 +11,7 @@ abstract class BasicGate(pos: Vector2i): BasicElement(pos),ITickable {
 
 	private val outputs = ArrayList<BasicWire>()
 	private val axes = ArrayList<Axis>()
+	protected var dirty = true
 
 	override fun onPlace(world: IWorld) {
 		updateIO(world)
@@ -18,6 +19,7 @@ abstract class BasicGate(pos: Vector2i): BasicElement(pos),ITickable {
 
 	override fun onNeighbourChange(position: Vector2i, world: IWorld) {
 		updateIO(world)
+		dirty = true
 	}
 
 	protected fun setOut(value: Boolean) {

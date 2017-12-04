@@ -9,7 +9,7 @@ import me.wieku.circuits.api.state.StateManager
 import me.wieku.circuits.api.world.IWorld
 import me.wieku.circuits.world.elements.Input
 import me.wieku.circuits.world.elements.Wire
-import me.wieku.circuits.world.elements.gates.NorGate
+import me.wieku.circuits.world.elements.gates.*
 import java.util.*
 
 class ClassicWorld(private val width: Int, private val height: Int):IWorld {
@@ -17,11 +17,17 @@ class ClassicWorld(private val width: Int, private val height: Int):IWorld {
 	private val manager: StateManager = StateManager(width*height)
 	private val map: Array<Array<IElement?>> = Array(width) { Array<IElement?>(height) {null} }
 	private val tickables: HashMap<Vector2i, ITickable> = HashMap()
-	private val classes: HashMap<String, Class<out BasicElement>> = HashMap()
+	val classes: HashMap<String, Class<out BasicElement>> = HashMap()
+
 	init {
 		classes.put("Wire", Wire::class.java)
 		classes.put("Input", Input::class.java)
+		classes.put("Or", OrGate::class.java)
 		classes.put("Nor", NorGate::class.java)
+		classes.put("And", AndGate::class.java)
+		classes.put("Nand", NandGate::class.java)
+		classes.put("Xor", XorGate::class.java)
+		classes.put("Xnor", XnorGate::class.java)
 	}
 
 
@@ -31,6 +37,8 @@ class ClassicWorld(private val width: Int, private val height: Int):IWorld {
 	}
 
 	override fun placeElement(position: Vector2i, name: String) {
+		if(!position.isInBounds(0, 0, 9, 9)) return
+		if(map[position.x][position.y] != null) return
 		if(classes.containsKey(name)) {
 			var el:BasicElement = classes[name]!!.getConstructor(Vector2i::class.java).newInstance(position)
 			map[position.x][position.y] = el

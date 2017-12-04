@@ -15,9 +15,11 @@ class NorGate(pos: Vector2i): BasicGate(pos) {
 		for(i in 0 until inputs.size)
 			calc = calc && !inputs[i].isActive()
 
-		if(state.isActive() != calc) {
+
+		if(dirty || state.isActive() != calc) {
 			state.setActive(calc)
 			setOut(calc)
+			dirty = false
 		}
 	}
 
