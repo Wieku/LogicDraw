@@ -31,11 +31,11 @@ class StateManager(private val managerSize: Int) {
 		output[index] = if(value) 1 else 0
 	}
 
-	private fun bytefill(array: ByteArray, lastIndex: Int, value: Byte) {
+	private fun bytefill(array: ByteArray, length: Int, value: Byte) {
 		array[0] = value
 
-		for(i in 1..lastIndex) {
-			System.arraycopy(array, 0, array, i, lastIndex)
+		for(i in 1 until length) {
+			System.arraycopy(array, 0, array, i, if((length - i) < i) length - i else i)
 		}
 	}
 }
