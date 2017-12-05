@@ -61,7 +61,6 @@ class MapManipulator(val world:ClassicWorld, val camera: OrthographicCamera, val
 
 	override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
 		if(stage.touchDown(screenX, screenY, pointer, button)) return true
-		println("dwagrgre")
 		processTouch(screenX, screenY, pointer, false)
 		return false
 	}

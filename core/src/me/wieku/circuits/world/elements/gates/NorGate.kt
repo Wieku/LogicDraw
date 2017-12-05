@@ -29,6 +29,7 @@ class NorGate(pos: Vector2i): BasicGate(pos) {
 	}
 
 	override fun onRemove(world: IWorld) {
+		setOut(false)
 		state.unregister()
 	}
 
