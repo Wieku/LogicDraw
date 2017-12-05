@@ -5,7 +5,11 @@ open class State(private val id: Int, private val manager: StateManager) {
 	var holders: Int = 0
 	private set
 
-	fun setActive(value: Boolean) { manager[id] = value }
+	fun setActive(value: Boolean) {
+		if(manager.used[id] > 0 && !value) return
+		manager[id] = value
+		manager.used[id] = 1
+	}
 
 	fun isActive() = manager[id]
 
