@@ -21,27 +21,19 @@ import me.wieku.circuits.world.ClassicWorld
 
 class Main : ApplicationAdapter(), Updatable.ByTick {
 
-	lateinit var ticker:AsyncClock
-	var world = ClassicWorld(10, 10)
-	var time = System.nanoTime()
-	var tick:Long = 0
-	override fun update(value: Long) {
-		world.update(value)
-		if(System.nanoTime()-time >= 1000000000) {
-			println(value-tick)
-			tick = value
-			time = System.nanoTime()
-		}
-	}
+	private lateinit var mainClock:AsyncClock
+	private var world = ClassicWorld(20, 20)
+	private var tickrate = 0L
 
-	lateinit var renderer: ShapeRenderer
-	lateinit var camera: OrthographicCamera
-	lateinit var stage: Stage
-	lateinit var menuButton: ImageButton
+	private lateinit var manipulator: MapManipulator
+
+	private lateinit var renderer: ShapeRenderer
+	private lateinit var camera: OrthographicCamera
+	private lateinit var stage: Stage
+	private lateinit var menuButton: ImageButton
+
+	private lateinit var elementTable: Table
 	private var tableShow: Boolean = true
-	lateinit var elementTable: Table
-
-	lateinit var manipulator: MapManipulator
 
 	override fun create() {
 		renderer = ShapeRenderer()
@@ -49,10 +41,11 @@ class Main : ApplicationAdapter(), Updatable.ByTick {
 		stage = Stage(ScreenViewport())
 		manipulator = MapManipulator(world, camera, stage)
 
-		camera.zoom = if(stage.width > stage.height) (10f/stage.height) else (10f/stage.width)
-		stage.viewport.update(Gdx.graphics.width, Gdx.graphics.height, true)
+		camera.zoom = if(stage.width > stage.height) (world.height.toFloat()/stage.height) else (world.width.toFloat()/stage.width)
+
 		menuButton = StripeButton(Color.DARK_GRAY, Color.LIGHT_GRAY, 30)
 		stage.addActor(menuButton)
+
 		elementTable = Table(Color(0x1f1f1faf))
 		elementTable.top().left()
 
@@ -77,25 +70,33 @@ class Main : ApplicationAdapter(), Updatable.ByTick {
 		}
 		stage.addActor(elementTable)
 
-		ticker = AsyncClock(this, 10)
-		ticker.start()
-
 		Gdx.input.inputProcessor = manipulator
+
+		mainClock = AsyncClock(this, 1000)
+		mainClock.start()
 	}
 
-	var color = Color()
+	private var color = Color()
+	private var delta1 = 0f
 	override fun render() {
 		Gdx.gl.glClearColor(0.1f, 0.1f, 0.1f, 1f)
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+
+		delta1+=Gdx.graphics.deltaTime
+		if(delta1>=1f) {
+			var fps = Gdx.graphics.framesPerSecond
+			Gdx.graphics.setTitle("Circuits (tickrate: $tickrate) (fps:$fps)")
+			delta1 = 0f
+		}
 
 		camera.update()
 		renderer.projectionMatrix = camera.combined
 		renderer.begin(ShapeRenderer.ShapeType.Filled)
 		renderer.color = Color.BLACK
-		renderer.rect(0f, 0f, 10f, 10f)
-		for(x in 0 until 10) {
-			for(y in 0 until 10) {
-				var el = world[x, y]
+		renderer.rect(0f, 0f, world.width.toFloat(), world.height.toFloat())
+		for(x in 0 until world.width) {
+			for(y in 0 until world.height) {
+				val el = world[x, y]
 				if(el != null) {
 					color.set((el.getColor().shl(8)) + 0xFF)
 					renderer.color = color
@@ -125,6 +126,17 @@ class Main : ApplicationAdapter(), Updatable.ByTick {
 
 	override fun dispose() {
 		renderer.dispose()
+	}
+
+	private var time = System.nanoTime()
+	private var tick = 0L
+	override fun update(value: Long) {
+		world.update(value)
+		if(System.nanoTime()-time >= 1000000000) {
+			tickrate = value-tick
+			tick = value
+			time = System.nanoTime()
+		}
 	}
 
 }
