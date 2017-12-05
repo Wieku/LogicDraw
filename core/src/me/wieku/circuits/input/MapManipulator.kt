@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.InputProcessor
 import com.badlogic.gdx.graphics.OrthographicCamera
+import com.badlogic.gdx.math.Bresenham2
 import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.scenes.scene2d.Stage
 import me.wieku.circuits.api.math.Vector2i
@@ -79,15 +80,31 @@ class MapManipulator(val world:ClassicWorld, val camera: OrthographicCamera, val
 			if(dragging) {
 				if(res == last)
 					return
-				else last.set(res)
-			} else {
-				last.set(-1, -1)
-			}
+			} else last.set(res)
 			if(Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
-				world.placeElement(res, toPlace)
+				drawLine(last, res, true)
 			} else if(Gdx.input.isButtonPressed(Input.Buttons.RIGHT)) {
-				world.removeElement(res)
+				drawLine(last, res, false)
 			}
+			last.set(res)
+		}
+	}
+
+	var bresenham = Bresenham2()
+	private fun drawLine(from: Vector2i, to: Vector2i, place: Boolean) {
+		if(from == to) makeAction(from.x, from.y, place)
+
+		bresenham.line(from.x, from.y, to.x, to.y).forEach {
+			makeAction(it.x, it.y, place)
+		}
+
+	}
+
+	private fun makeAction(posx: Int, posy: Int, place: Boolean) {
+		if (place) {
+			world.placeElement(Vector2i(posx, posy), toPlace)
+		} else {
+			world.removeElement(Vector2i(posx, posy))
 		}
 	}
 
