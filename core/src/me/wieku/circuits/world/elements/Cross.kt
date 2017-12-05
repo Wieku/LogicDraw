@@ -43,14 +43,16 @@ class Cross(pos: Vector2i): BasicWire(pos) {
 			} else {
 				world.getStateManager()()
 			}
-
+			stateH.register()
+			stateV.register()
 			world.updateNeighboursOf(pos)
 		} else {
 			stateH = world.getStateManager()()
 			stateV = world.getStateManager()()
+			stateH.register()
+			stateV.register()
 		}
-		stateH.register()
-		stateV.register()
+
 	}
 
 	override fun onNeighbourChange(position: Vector2i, world: IWorld) {

@@ -47,8 +47,6 @@ class ClassicWorld(val width: Int, val height: Int):IWorld {
 	}
 
 	override fun placeElement(position: Vector2i, name: String) {
-		if(!position.isInBounds(0, 0, width-1, height-1)) return
-		if(map[position.x][position.y] != null) removeElement(position)
 		if(classes.containsKey(name)) {
 			placeElement(position, classes[name]!!)
 		} else {
@@ -58,6 +56,7 @@ class ClassicWorld(val width: Int, val height: Int):IWorld {
 
 	private fun placeElement(position: Vector2i, clazz: Class<out IElement>) {
 		if(!position.isInBounds(0, 0, width-1, height-1)) return
+		if(map[position.x][position.y] != null) removeElement(position)
 		var el:IElement = clazz.getConstructor(Vector2i::class.java).newInstance(position)
 		synchronized(map) {
 			map[position.x][position.y] = el

@@ -28,12 +28,13 @@ class Wire(pos: Vector2i): BasicWire(pos) {
 			} else {
 				world.getStateManager()()
 			}
-
+			state.register()
 			world.updateNeighboursOf(pos)
 		} else {
 			state = world.getStateManager()()
+			state.register()
 		}
-		state.register()
+
 	}
 
 	override fun onNeighbourChange(position: Vector2i, world: IWorld) {
