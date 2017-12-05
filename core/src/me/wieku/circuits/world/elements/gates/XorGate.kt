@@ -27,6 +27,10 @@ class XorGate(pos: Vector2i): BasicGate(pos) {
 		state = world.getStateManager()()
 	}
 
+	override fun onRemove(world: IWorld) {
+		state.unregister()
+	}
+
 	override fun getIdleColor(): Int = 0xC51162
 
 	override fun getActiveColor(): Int = 0xF50057

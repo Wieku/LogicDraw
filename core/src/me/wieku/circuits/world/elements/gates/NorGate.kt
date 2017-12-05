@@ -28,6 +28,10 @@ class NorGate(pos: Vector2i): BasicGate(pos) {
 		state = world.getStateManager()()
 	}
 
+	override fun onRemove(world: IWorld) {
+		state.unregister()
+	}
+
 	override fun getIdleColor(): Int = 0xFFD600
 
 	override fun getActiveColor(): Int = 0xFFEA00

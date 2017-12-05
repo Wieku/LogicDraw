@@ -6,7 +6,7 @@ class Vector2i(var x: Int, var y: Int) {
 
 	constructor(old: Vector2i) : this(old.x, old.y)
 
-	operator fun set(x: Int, y: Int): Vector2i {
+	fun set(x: Int, y: Int): Vector2i {
 		this.x = x
 		this.y = y
 		return this
@@ -104,7 +104,7 @@ class Vector2i(var x: Int, var y: Int) {
 			return false
 		// TODO: better checking
 		val vec = obj as Vector2i?
-		return (vec!!.x != this.x || vec.y != this.y )
+		return (vec!!.x == this.x && vec.y == this.y )
 	}
 
 

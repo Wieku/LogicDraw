@@ -19,6 +19,12 @@ class Cross(pos: Vector2i): BasicWire(pos) {
 		TODO("not implemented yet")
 	}
 
+	override fun onRemove(world: IWorld) {
+		stateH.unregister()
+		stateV.unregister()
+		world.updateNeighboursOf(pos)
+	}
+
 	override fun getIdleColor(): Int = 0x757575
 
 	override fun getActiveColor(): Int = 0x9E9E9E

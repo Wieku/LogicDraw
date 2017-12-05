@@ -53,6 +53,11 @@ class Wire(pos: Vector2i): BasicWire(pos) {
 		}
 	}
 
+	override fun onRemove(world: IWorld) {
+		state.unregister()
+		world.updateNeighboursOf(pos)
+	}
+
 	override fun getIdleColor(): Int = 0x7F0000
 
 	override fun getActiveColor(): Int = 0xD50000

@@ -27,6 +27,10 @@ class NandGate(pos: Vector2i): BasicGate(pos) {
 		state = world.getStateManager()()
 	}
 
+	override fun onRemove(world: IWorld) {
+		state.unregister()
+	}
+
 	override fun getIdleColor(): Int = 0x004D40
 
 	override fun getActiveColor(): Int = 0x00695C

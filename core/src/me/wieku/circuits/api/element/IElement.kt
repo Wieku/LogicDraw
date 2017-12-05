@@ -13,6 +13,7 @@ interface IElement {
 	fun getPosition(): Vector2i
 
 	fun onPlace(world: IWorld)
+	fun onRemove(world: IWorld)
 	fun onNeighbourChange(position: Vector2i, world: IWorld)
 
 	fun getIdleColor(): Int

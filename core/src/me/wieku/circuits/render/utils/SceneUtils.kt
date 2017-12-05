@@ -1,14 +1,30 @@
 package me.wieku.circuits.render.utils
 
-import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import com.badlogic.gdx.graphics.Texture.TextureFilter
-import com.badlogic.gdx.graphics.Pixmap
-import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton
-import com.badlogic.gdx.scenes.scene2d.ui.TextTooltip
+import me.wieku.circuits.world.ClassicWorld
+
+
+fun OrthographicCamera.fit(world: ClassicWorld, stage: Stage) {
+	var tim = System.currentTimeMillis()
+	if (stage.width * zoom > world.width) {
+		position.x = Math.max(-stage.width * zoom / 2 + world.width, Math.min(stage.width * zoom / 2, position.x))
+	} else {
+		position.x = Math.max(world.width / 2f, Math.min(world.width - stage.width * zoom / 2, position.x))
+	}
+
+	if (stage.height * zoom > world.height) {
+		position.y = Math.max(-stage.height * zoom / 2 + world.height, Math.min(stage.height * zoom / 2, position.y))
+	} else {
+		position.y = Math.max(world.height / 2f, Math.min(world.width - stage.height * zoom / 2, position.y))
+	}
+	println(System.currentTimeMillis()-tim)
+}
 
 
 fun Table(color: Color): Table {

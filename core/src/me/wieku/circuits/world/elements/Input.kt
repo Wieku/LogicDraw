@@ -49,6 +49,11 @@ class Input(pos: Vector2i):BasicInput(pos) {
 		}
 	}
 
+	override fun onRemove(world: IWorld) {
+		intSt.unregister()
+		world.updateNeighboursOf(pos)
+	}
+
 	override fun getIdleColor(): Int = 0x01579B
 
 	override fun getActiveColor(): Int = 0x0277BD

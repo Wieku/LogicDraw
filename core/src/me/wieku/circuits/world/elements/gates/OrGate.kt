@@ -27,6 +27,10 @@ class OrGate(pos: Vector2i): BasicGate(pos) {
 		state = world.getStateManager()()
 	}
 
+	override fun onRemove(world: IWorld) {
+		state.unregister()
+	}
+
 	override fun getIdleColor(): Int = 0xF57F17
 
 	override fun getActiveColor(): Int = 0xF9A825

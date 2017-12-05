@@ -27,6 +27,10 @@ class AndGate(pos: Vector2i): BasicGate(pos) {
 		state = world.getStateManager()()
 	}
 
+	override fun onRemove(world: IWorld) {
+		state.unregister()
+	}
+
 	override fun getIdleColor(): Int = 0x00BFA5
 
 	override fun getActiveColor(): Int = 0x1DE9B6

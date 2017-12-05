@@ -12,8 +12,7 @@ import me.wieku.circuits.world.elements.Wire
 import me.wieku.circuits.world.elements.gates.*
 import java.util.*
 
-class ClassicWorld(private val width: Int, private val height: Int):IWorld {
-
+class ClassicWorld(val width: Int, val height: Int):IWorld {
 	private val manager: StateManager = StateManager(width*height)
 	private val map: Array<Array<IElement?>> = Array(width) { Array<IElement?>(height) {null} }
 	private val tickables: HashMap<Vector2i, ITickable> = HashMap()
@@ -37,8 +36,8 @@ class ClassicWorld(private val width: Int, private val height: Int):IWorld {
 	}
 
 	override fun placeElement(position: Vector2i, name: String) {
-		if(!position.isInBounds(0, 0, 9, 9)) return
-		if(map[position.x][position.y] != null) return
+		if(!position.isInBounds(0, 0, width-1, height-1)) return
+		if(map[position.x][position.y] != null) removeElement(position)
 		if(classes.containsKey(name)) {
 			var el:BasicElement = classes[name]!!.getConstructor(Vector2i::class.java).newInstance(position)
 			map[position.x][position.y] = el
@@ -47,6 +46,14 @@ class ClassicWorld(private val width: Int, private val height: Int):IWorld {
 		} else {
 			println("[ERROR} Element doesn't exist!")
 		}
+	}
+
+	override fun removeElement(position: Vector2i) {
+		var element: IElement? = map[position.x][position.y] ?: return
+
+		tickables.remove(position)
+		map[position.x][position.y] = null
+		element!!.onRemove(this)
 	}
 
 	override fun getElement(position: Vector2i) = if(position.isInBounds(0, 0, width - 1, height - 1)) map[position.x][position.y] else null
