@@ -23,7 +23,7 @@ import java.util.*
 class Main : ApplicationAdapter(), Updatable.ByTick {
 
 	private lateinit var mainClock:AsyncClock
-	private var world = ClassicWorld(20, 20)
+	private var world = ClassicWorld(40, 40)
 	private var tickrate = 0L
 
 	private lateinit var manipulator: MapManipulator
@@ -84,6 +84,7 @@ class Main : ApplicationAdapter(), Updatable.ByTick {
 	}
 
 	private var color = Color()
+	private val bound = Color(0.2f, 0.2f, 0.2f, 0.6f)
 	private var delta1 = 0f
 	override fun render() {
 		Gdx.gl.glClearColor(0.1f, 0.1f, 0.1f, 1f)
@@ -114,11 +115,22 @@ class Main : ApplicationAdapter(), Updatable.ByTick {
 				}
 			}
 		}
+		if(manipulator.pasteMode || manipulator.rectangle != null) {
+			if(manipulator.rectangle != null) {
+				renderer.color = bound
+				renderer.rect(manipulator.rectangle!!.x.toFloat(), manipulator.rectangle!!.y.toFloat(), manipulator.rectangle!!.width.toFloat(), manipulator.rectangle!!.height.toFloat())
+			}
 
-		if(manipulator.position.isInBounds(0, 0, world.width-1, world.height-1)) {
-			renderer.color = brushes[manipulator.toPlace]
-			renderer.rect(manipulator.position.x.toFloat(), manipulator.position.y.toFloat(), 1f, 1f)
+			if(manipulator.pasteMode) {
+				manipulator.clipboard!!.drawClipboard(manipulator.position, renderer)
+			}
+		}else {
+			if(manipulator.position.isInBounds(0, 0, world.width-1, world.height-1)) {
+				renderer.color = brushes[manipulator.toPlace]
+				renderer.rect(manipulator.position.x.toFloat(), manipulator.position.y.toFloat(), 1f, 1f)
+			}
 		}
+
 
 		renderer.end()
 		Gdx.gl.glDisable(GL20.GL_BLEND)

@@ -1,9 +1,9 @@
 package me.wieku.circuits.world
 
-import me.wieku.circuits.api.element.BasicElement
 import me.wieku.circuits.api.element.IElement
 import me.wieku.circuits.api.element.ITickable
 import me.wieku.circuits.api.math.Direction
+import me.wieku.circuits.api.math.Rectangle
 import me.wieku.circuits.api.math.Vector2i
 import me.wieku.circuits.api.state.StateManager
 import me.wieku.circuits.api.world.IWorld
@@ -13,11 +13,12 @@ import me.wieku.circuits.world.elements.Wire
 import me.wieku.circuits.world.elements.gates.*
 import java.util.*
 
+//TODO: switch to tasks instead of locking objects
 class ClassicWorld(val width: Int, val height: Int):IWorld {
 	private val manager: StateManager = StateManager(width*height)
 	private val map: Array<Array<IElement?>> = Array(width) { Array<IElement?>(height) {null} }
 	private val tickables: HashMap<Vector2i, ITickable> = HashMap()
-	val classes: HashMap<String, Class<out BasicElement>> = HashMap()
+	val classes: HashMap<String, Class<out IElement>> = HashMap()
 
 	init {
 		classes.put("Wire", Wire::class.java)
@@ -33,20 +34,60 @@ class ClassicWorld(val width: Int, val height: Int):IWorld {
 
 
 	override fun update(tick: Long) {
-		tickables.entries.forEach { it.value.update(tick) }
-		manager.swap()
+		try {
+			synchronized(tickables) {
+				tickables.entries.forEach { it.value.update(tick) }
+				synchronized(manager) {
+					manager.swap()
+				}
+			}
+		} catch (i: Exception) {
+			i.printStackTrace()
+		}
 	}
 
 	override fun placeElement(position: Vector2i, name: String) {
 		if(!position.isInBounds(0, 0, width-1, height-1)) return
 		if(map[position.x][position.y] != null) removeElement(position)
 		if(classes.containsKey(name)) {
-			var el:BasicElement = classes[name]!!.getConstructor(Vector2i::class.java).newInstance(position)
-			map[position.x][position.y] = el
-			el.onPlace(this)
-			if(el is ITickable) tickables.put(position, el)
+			placeElement(position, classes[name]!!)
 		} else {
 			println("[ERROR} Element doesn't exist!")
+		}
+	}
+
+	private fun placeElement(position: Vector2i, clazz: Class<out IElement>) {
+		if(!position.isInBounds(0, 0, width-1, height-1)) return
+		var el:IElement = clazz.getConstructor(Vector2i::class.java).newInstance(position)
+		synchronized(map) {
+			map[position.x][position.y] = el
+			el.onPlace(this)
+			if(el is ITickable) {
+				synchronized(tickables) {
+					tickables.put(position, el)
+				}
+			}
+		}
+
+	}
+
+	private var tempVec = Vector2i()
+	fun clear(rectangle: Rectangle) {
+		for (x in rectangle.x until rectangle.x + rectangle.width) {
+			for (y in rectangle.y until rectangle.y + rectangle.height) {
+				removeElement(tempVec.set(x, y))
+			}
+		}
+	}
+
+	fun paste(position: Vector2i, clipboard: WorldClipboard) {
+		for(x in 0 until clipboard.selection.width) {
+			for (y in 0 until clipboard.selection.height) {
+				if(clipboard[x, y] != null)
+					placeElement(Vector2i(x, y).add(position), clipboard[x, y]!!.javaClass)
+				else
+					removeElement(Vector2i(x, y).add(position))
+			}
 		}
 	}
 
@@ -54,9 +95,13 @@ class ClassicWorld(val width: Int, val height: Int):IWorld {
 		if(!position.isInBounds(0, 0, width-1, height-1)) return
 		var element: IElement? = map[position.x][position.y] ?: return
 
-		tickables.remove(position)
-		map[position.x][position.y] = null
-		element!!.onRemove(this)
+		synchronized(map) {
+			synchronized(tickables) {
+				tickables.remove(position)
+			}
+			map[position.x][position.y] = null
+			element!!.onRemove(this)
+		}
 	}
 
 	override fun getElement(position: Vector2i) = if(position.isInBounds(0, 0, width - 1, height - 1)) map[position.x][position.y] else null
