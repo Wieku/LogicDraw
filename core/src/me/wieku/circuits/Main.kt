@@ -42,7 +42,7 @@ class Main : ApplicationAdapter(), Updatable.ByTick {
 		manipulator = MapManipulator(world, camera, stage)
 
 		camera.zoom = if(stage.width > stage.height) (world.height.toFloat()/stage.height) else (world.width.toFloat()/stage.width)
-
+		camera.position.set(world.width/2f, world.height/2f, 0f)
 		menuButton = StripeButton(Color.DARK_GRAY, Color.LIGHT_GRAY, 30)
 		stage.addActor(menuButton)
 

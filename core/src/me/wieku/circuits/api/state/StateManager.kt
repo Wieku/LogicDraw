@@ -34,8 +34,10 @@ class StateManager(private val managerSize: Int) {
 	private fun bytefill(array: ByteArray, length: Int, value: Byte) {
 		array[0] = value
 
-		for(i in 1 until length) {
+		var i = 1
+		while(i < length) {
 			System.arraycopy(array, 0, array, i, if((length - i) < i) length - i else i)
+			i*=2
 		}
 	}
 }
