@@ -12,11 +12,81 @@ class Cross(pos: Vector2i): BasicWire(pos) {
 	lateinit var stateV:State
 
 	override fun onPlace(world: IWorld) {
-		TODO("not implemented yet")
+		var list = world.getNeighboursOf(this)
+		if(list.isNotEmpty()) {
+			var ix = -1
+			var sizex = 0
+			var iy = -1
+			var sizey = 0
+
+			for(i in 0 until list.size) {
+				if(list[i] !is BasicWire) continue
+				val ax = Axis.getAxis(pos, list[i].getPosition())
+				val hol = list[i].getState(ax).holders
+				if(ax == Axis.HORIZONTAL && hol > sizex) {
+					ix = i
+					sizex = hol
+				} else if(ax == Axis.VERTICAL && hol > sizey) {
+					iy = i
+					sizey = hol
+				}
+
+			}
+			stateH = if(ix >= 0) {
+				list[ix].getState(Axis.getAxis(pos, list[ix].getPosition()))
+			} else {
+				world.getStateManager()()
+			}
+
+			stateV = if(iy >= 0) {
+				list[iy].getState(Axis.getAxis(pos, list[iy].getPosition()))
+			} else {
+				world.getStateManager()()
+			}
+
+			world.updateNeighboursOf(pos)
+		} else {
+			stateH = world.getStateManager()()
+			stateV = world.getStateManager()()
+		}
+		stateH.register()
+		stateV.register()
 	}
 
 	override fun onNeighbourChange(position: Vector2i, world: IWorld) {
-		TODO("not implemented yet")
+		var axis = Axis.getAxis(pos, position)
+		if(axis==Axis.HORIZONTAL) {
+			if (world.getElement(position) == null) {
+				stateH.unregister()
+				stateH = world.getStateManager()()
+				stateH.register()
+				world.updateNeighboursOf(pos)
+			} else if (world.getElement(position) is BasicWire){
+				var stateU = world.getElement(position)!!.getState(axis)
+				if(stateH != stateU) {
+					stateH.unregister()
+					stateH = stateU
+					stateH.register()
+					world.updateNeighboursOf(pos)
+				}
+			}
+		} else if(axis==Axis.VERTICAL) {
+			if (world.getElement(position) == null) {
+				stateV.unregister()
+				stateV = world.getStateManager()()
+				stateV.register()
+				world.updateNeighboursOf(pos)
+			} else if (world.getElement(position) is BasicWire){
+				var stateU = world.getElement(position)!!.getState(axis)
+				if(stateV != stateU) {
+					stateV.unregister()
+					stateV = stateU
+					stateV.register()
+					world.updateNeighboursOf(pos)
+				}
+			}
+		}
+
 	}
 
 	override fun onRemove(world: IWorld) {

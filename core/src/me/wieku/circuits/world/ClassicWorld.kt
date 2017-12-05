@@ -7,6 +7,7 @@ import me.wieku.circuits.api.math.Direction
 import me.wieku.circuits.api.math.Vector2i
 import me.wieku.circuits.api.state.StateManager
 import me.wieku.circuits.api.world.IWorld
+import me.wieku.circuits.world.elements.Cross
 import me.wieku.circuits.world.elements.Input
 import me.wieku.circuits.world.elements.Wire
 import me.wieku.circuits.world.elements.gates.*
@@ -20,6 +21,7 @@ class ClassicWorld(val width: Int, val height: Int):IWorld {
 
 	init {
 		classes.put("Wire", Wire::class.java)
+		classes.put("Cross", Cross::class.java)
 		classes.put("Input", Input::class.java)
 		classes.put("Or", OrGate::class.java)
 		classes.put("Nor", NorGate::class.java)
