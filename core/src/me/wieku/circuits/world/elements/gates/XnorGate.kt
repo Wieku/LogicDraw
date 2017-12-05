@@ -15,11 +15,8 @@ class XnorGate(pos: Vector2i): BasicGate(pos) {
 		for(i in 0 until inputs.size)
 			calc = calc.xor(inputs[i].isActive())
 
-		if(dirty || state.isActive() == calc) {
-			state.setActive(!calc)
-			setOut(!calc)
-			dirty = false
-		}
+		state.setActive(!calc)
+		setOut(!calc)
 	}
 
 	override fun onPlace(world: IWorld) {
