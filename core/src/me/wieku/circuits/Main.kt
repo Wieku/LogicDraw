@@ -18,6 +18,7 @@ import me.wieku.circuits.api.world.clock.Updatable
 import me.wieku.circuits.input.MapManipulator
 import me.wieku.circuits.render.utils.*
 import me.wieku.circuits.world.ClassicWorld
+import java.util.*
 
 class Main : ApplicationAdapter(), Updatable.ByTick {
 
@@ -35,6 +36,8 @@ class Main : ApplicationAdapter(), Updatable.ByTick {
 	private lateinit var elementTable: Table
 	private var tableShow: Boolean = true
 
+	private var brushes:HashMap<String, Color> = HashMap()
+
 	override fun create() {
 		renderer = ShapeRenderer()
 		camera = OrthographicCamera(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
@@ -51,7 +54,11 @@ class Main : ApplicationAdapter(), Updatable.ByTick {
 
 		var count = 0
 		world.classes.forEach{
-			var button = ColorButton(Color(it.value.getConstructor(Vector2i::class.java).newInstance(Vector2i()).getIdleColor().shl(8)+0xff))
+			var color = Color(it.value.getConstructor(Vector2i::class.java).newInstance(Vector2i()).getIdleColor().shl(8)+0xff)
+			var color1 = color.cpy()
+			color1.a = 0.5f
+			brushes.put(it.key, color1)
+			var button = ColorButton(color)
 			button.addListener(object : ClickListener() {
 				override fun clicked(event: InputEvent?, x: Float, y: Float) {
 					super.clicked(event, x, y)
@@ -91,6 +98,9 @@ class Main : ApplicationAdapter(), Updatable.ByTick {
 
 		camera.update()
 		renderer.projectionMatrix = camera.combined
+
+		Gdx.gl.glEnable(GL20.GL_BLEND)
+		Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
 		renderer.begin(ShapeRenderer.ShapeType.Filled)
 		renderer.color = Color.BLACK
 		renderer.rect(0f, 0f, world.width.toFloat(), world.height.toFloat())
@@ -104,7 +114,14 @@ class Main : ApplicationAdapter(), Updatable.ByTick {
 				}
 			}
 		}
+
+		if(manipulator.position.isInBounds(0, 0, world.width-1, world.height-1)) {
+			renderer.color = brushes[manipulator.toPlace]
+			renderer.rect(manipulator.position.x.toFloat(), manipulator.position.y.toFloat(), 1f, 1f)
+		}
+
 		renderer.end()
+		Gdx.gl.glDisable(GL20.GL_BLEND)
 		stage.act()
 		stage.draw()
 	}

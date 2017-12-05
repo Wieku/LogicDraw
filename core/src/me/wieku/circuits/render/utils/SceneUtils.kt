@@ -14,13 +14,13 @@ fun OrthographicCamera.fit(world: ClassicWorld, stage: Stage) {
 	if (stage.width * zoom > world.width) {
 		position.x = Math.max(-stage.width * zoom / 2 + world.width, Math.min(stage.width * zoom / 2, position.x))
 	} else {
-		position.x = Math.max(stage.width * zoom / 2, Math.min(world.width - stage.width * zoom / 2, position.x))
+		position.x = Math.max(stage.width * zoom / 4, Math.min(world.width - stage.width * zoom / 4, position.x))
 	}
 
 	if (stage.height * zoom > world.height) {
 		position.y = Math.max(-stage.height * zoom / 2 + world.height, Math.min(stage.height * zoom / 2, position.y))
 	} else {
-		position.y = Math.max(stage.height * zoom / 2, Math.min(world.width - stage.height * zoom / 2, position.y))
+		position.y = Math.max(stage.height * zoom / 4, Math.min(world.width - stage.height * zoom / 4, position.y))
 	}
 }
 

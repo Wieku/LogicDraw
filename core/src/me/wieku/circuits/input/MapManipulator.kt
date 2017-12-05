@@ -14,6 +14,7 @@ class MapManipulator(val world:ClassicWorld, val camera: OrthographicCamera, val
 
 	var toPlace = "Wire"
 	private var last = Vector2i(-1, -1)
+	var position = Vector2i()
 
 	override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
 		if(stage.touchUp(screenX, screenY, pointer, button)) return true
@@ -22,6 +23,8 @@ class MapManipulator(val world:ClassicWorld, val camera: OrthographicCamera, val
 
 	override fun mouseMoved(screenX: Int, screenY: Int): Boolean {
 		if(stage.mouseMoved(screenX, screenY)) return true
+		var vec = camera.unproject(Vector3(screenX.toFloat(), screenY.toFloat(), 0f))
+		position.set(vec.x.toInt(), vec.y.toInt())
 		return false
 	}
 
@@ -72,6 +75,7 @@ class MapManipulator(val world:ClassicWorld, val camera: OrthographicCamera, val
 		} else {
 			var upr = camera.unproject(Vector3(screenX.toFloat(), screenY.toFloat(), 0f))
 			var res = Vector2i(upr.x.toInt(), upr.y.toInt())
+			position.set(res)
 			if(dragging) {
 				if(res == last)
 					return
