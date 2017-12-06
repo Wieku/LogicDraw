@@ -1,5 +1,5 @@
 ## What is it?
-Circuits is the logic gates simulator, in which you can paint your circuit like in MS Paint
+LogicDraw is the logic gates simulator, in which you can paint your circuit like in MS Paint
 ## Elements
 |Element|Idle color|Active color|
 |-------|----------|------------|

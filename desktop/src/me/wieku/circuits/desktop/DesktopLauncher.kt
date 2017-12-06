@@ -8,5 +8,6 @@ fun main(args: Array<String>) {
 	val config = LwjglApplicationConfiguration()
 	config.width = 1024
 	config.height = 768
+	config.title = "LogicDraw"
 	LwjglApplication(Main(), config)
 }
