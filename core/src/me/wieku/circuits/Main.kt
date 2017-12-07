@@ -93,7 +93,9 @@ class Main : ApplicationAdapter(), Updatable.ByTick {
 		delta1+=Gdx.graphics.deltaTime
 		if(delta1>=1f) {
 			var fps = Gdx.graphics.framesPerSecond
-			Gdx.graphics.setTitle("LogicDraw (tickrate: $tickrate) (fps:$fps)")
+			var nodes = world.getStateManager().usedNodes
+			var tickables = world.updatables
+			Gdx.graphics.setTitle("LogicDraw (tickrate: $tickrate) (fps: $fps) ($nodes nodes) ($tickables tickables)")
 			delta1 = 0f
 		}
 

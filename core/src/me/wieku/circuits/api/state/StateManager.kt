@@ -9,6 +9,8 @@ class StateManager(private val managerSize: Int) {
 
 	private val indexPool: Queue<Int> = ArrayDeque<Int>()
 	private var lastIndex = 0
+	var usedNodes = 0
+	private set
 
 	fun free(index: Int) {
 		indexPool.add(index)
@@ -19,6 +21,7 @@ class StateManager(private val managerSize: Int) {
 	fun swap() {
 		System.arraycopy(output, 0, input, 0, lastIndex)
 		bytefill(used,  lastIndex, 0)
+		usedNodes = lastIndex-indexPool.size
 	}
 
 	operator fun invoke(): State = if(indexPool.isEmpty()) State(lastIndex++, this) else State(indexPool.poll(), this)

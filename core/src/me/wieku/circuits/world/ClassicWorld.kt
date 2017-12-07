@@ -18,6 +18,9 @@ class ClassicWorld(val width: Int, val height: Int):IWorld {
 	private val manager: StateManager = StateManager(width*height)
 	private val map: Array<Array<IElement?>> = Array(width) { Array<IElement?>(height) {null} }
 	private val tickables: HashMap<Vector2i, ITickable> = HashMap()
+	var updatables = 0
+	get() = tickables.size
+	private set
 	val classes: HashMap<String, Class<out IElement>> = HashMap()
 
 	init {
