@@ -110,7 +110,7 @@ class MapManipulator(val world:ClassicWorld, val camera: OrthographicCamera, val
 			}
 		} else if(pasteMode) {
 			if(!Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
-				world.paste(position, clipboard!!)
+				world.paste(position.copy().sub(clipboard!!.selection.width/2, clipboard!!.selection.height/2), clipboard!!)
 				pasteMode = false
 				afterOperation = true
 				return false
@@ -153,8 +153,7 @@ class MapManipulator(val world:ClassicWorld, val camera: OrthographicCamera, val
 			makeAction(from.x, from.y, place)
 		} else {
 			bresenham.line(from.x, from.y, to.x, to.y).forEach {
-				if(it.x != from.x || it.y != from.y)
-					makeAction(it.x, it.y, place)
+				makeAction(it.x, it.y, place)
 			}
 		}
 	}

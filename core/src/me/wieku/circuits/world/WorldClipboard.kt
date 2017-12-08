@@ -19,8 +19,10 @@ class WorldClipboard(val selection: Rectangle, world: ClassicWorld) {
 	}
 
 	private var color = Color()
-	fun drawClipboard(location: Vector2i, renderer: ShapeRenderer) {
+	private var location = Vector2i()
+	fun drawClipboard(loc: Vector2i, renderer: ShapeRenderer) {
 		renderer.setColor(0.1f, 0.1f, 0.1f, 0.5f)
+		location.set(loc).sub(selection.width/2, selection.height/2)
 		renderer.rect(location.x.toFloat(), location.y.toFloat(), selection.width.toFloat(), selection.height.toFloat())
 		for(x in 0 until selection.width) {
 			for(y in 0 until selection.height) {
