@@ -1,5 +1,9 @@
-## What is it?
-LogicDraw is the logic gates simulator, in which you can paint your circuit like in MS Paint
+![banner](https://static.wieku.me/logicdraw/banner.png)
+
+LogicDraw is an application to perform simulations of logic gates, in which you can paint your circuit like in raster graphics editor.
+
+Application is in early development, so be aware that critical bugs can occur.
+
 ## Elements
 |Element|Idle color|Active color|
 |-------|----------|------------|
