@@ -5,6 +5,8 @@ open class State(private val id: Int, private val manager: StateManager) {
 	var holders: Int = 0
 	private set
 
+	private var destroyed = false
+
 	fun setActive(value: Boolean) {
 		if(manager.used[id] > 0 && !value) return
 		manager[id] = value
@@ -15,7 +17,11 @@ open class State(private val id: Int, private val manager: StateManager) {
 
 	fun isActiveD() = manager.getDirty(id)
 
-	fun free() = manager.free(id)
+	fun free() {
+		if(!destroyed)
+			manager.free(id)
+		destroyed = true
+	}
 
 	fun register() {
 		++holders
@@ -23,9 +29,12 @@ open class State(private val id: Int, private val manager: StateManager) {
 
 	fun unregister() {
 		--holders
-		if(holders <= 0) free()
+		if(holders <= 0) {
+			free()
+		}
 	}
 
+	@Suppress("UNUSED")
 	fun finalize() {
 		free()
 	}

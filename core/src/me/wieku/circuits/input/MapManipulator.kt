@@ -147,14 +147,16 @@ class MapManipulator(val world:ClassicWorld, val camera: OrthographicCamera, val
 		}
 	}
 
-	var bresenham = Bresenham2()
+	private var bresenham = Bresenham2()
 	private fun drawLine(from: Vector2i, to: Vector2i, place: Boolean) {
-		if(from == to) makeAction(from.x, from.y, place)
-
-		bresenham.line(from.x, from.y, to.x, to.y).forEach {
-			makeAction(it.x, it.y, place)
+		if(from == to) {
+			makeAction(from.x, from.y, place)
+		} else {
+			bresenham.line(from.x, from.y, to.x, to.y).forEach {
+				if(it.x != from.x || it.y != from.y)
+					makeAction(it.x, it.y, place)
+			}
 		}
-
 	}
 
 	private fun makeAction(posx: Int, posy: Int, place: Boolean) {

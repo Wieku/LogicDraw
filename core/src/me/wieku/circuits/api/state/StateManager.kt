@@ -13,9 +13,10 @@ class StateManager(private val managerSize: Int) {
 	private set
 
 	fun free(index: Int) {
-		indexPool.add(index)
 		input[index] = 0
 		output[index] = 0
+
+		indexPool.add(index)
 	}
 
 	fun swap() {

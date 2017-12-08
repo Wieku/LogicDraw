@@ -18,9 +18,11 @@ class ClassicWorld(val width: Int, val height: Int):IWorld {
 	private val manager: StateManager = StateManager(width*height)
 	private val map: Array<Array<IElement?>> = Array(width) { Array<IElement?>(height) {null} }
 	private val tickables: HashMap<Vector2i, ITickable> = HashMap()
-	var updatables = 0
+
+	var entities = 0
 	get() = tickables.size
 	private set
+
 	val classes: HashMap<String, Class<out IElement>> = HashMap()
 
 	init {
@@ -53,13 +55,17 @@ class ClassicWorld(val width: Int, val height: Int):IWorld {
 		if(classes.containsKey(name)) {
 			placeElement(position, classes[name]!!)
 		} else {
-			println("[ERROR} Element doesn't exist!")
+			println("[ERROR] Element doesn't exist!")
 		}
 	}
 
 	private fun placeElement(position: Vector2i, clazz: Class<out IElement>) {
 		if(!position.isInBounds(0, 0, width-1, height-1)) return
-		if(map[position.x][position.y] != null) removeElement(position)
+		if(map[position.x][position.y] != null) {
+			if(map[position.x][position.y]!!.javaClass != clazz) {
+				removeElement(position)
+			} else return
+		}
 		var el:IElement = clazz.getConstructor(Vector2i::class.java).newInstance(position)
 		synchronized(map) {
 			map[position.x][position.y] = el
