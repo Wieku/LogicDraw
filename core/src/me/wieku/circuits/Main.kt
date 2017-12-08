@@ -6,9 +6,12 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
+import com.badlogic.gdx.math.MathUtils
+import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton
+import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.utils.viewport.ScreenViewport
@@ -38,17 +41,25 @@ class Main : ApplicationAdapter(), Updatable.ByTick {
 
 	private var brushes:HashMap<String, Color> = HashMap()
 
+	lateinit var tooltip: Label
+	lateinit var tooltipTable: Table
+
 	override fun create() {
+		FontManager.init()
 		renderer = ShapeRenderer()
 		camera = OrthographicCamera(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
 		stage = Stage(ScreenViewport())
 		manipulator = MapManipulator(world, camera, stage)
 
+		tooltipTable = Table(Color.BLACK)
+		tooltip = Label("", getLabelStyle(Color.WHITE, 10))
+		tooltipTable.add(tooltip).fill()
+
+
 		camera.zoom = if(stage.width > stage.height) (world.height.toFloat()/stage.height) else (world.width.toFloat()/stage.width)
 		camera.position.set(world.width/2f, world.height/2f, 0f)
 		menuButton = StripeButton(Color.DARK_GRAY, Color.LIGHT_GRAY, 30)
 		stage.addActor(menuButton)
-
 		elementTable = Table(Color(0x1f1f1faf))
 		elementTable.top().left()
 
@@ -60,9 +71,31 @@ class Main : ApplicationAdapter(), Updatable.ByTick {
 			brushes.put(it.key, color1)
 			var button = ColorButton(color)
 			button.addListener(object : ClickListener() {
+				var visib = false
 				override fun clicked(event: InputEvent?, x: Float, y: Float) {
 					super.clicked(event, x, y)
 					manipulator.toPlace = it.key
+				}
+
+				override fun enter(event: InputEvent?, x: Float, y: Float, pointer: Int, fromActor: Actor?) {
+					super.enter(event, x, y, pointer, fromActor)
+					visib = true
+					tooltipTable.isVisible = true
+					tooltip.setText(it.key)
+					tooltipTable.pack()
+					tooltipTable.setPosition(MathUtils.clamp(Gdx.input.x.toFloat()+10f, 0f, stage.width-tooltipTable.width), MathUtils.clamp(stage.height-Gdx.input.y.toFloat()+10f, 0f, stage.height-tooltipTable.height))
+				}
+
+				override fun mouseMoved(event: InputEvent?, x: Float, y: Float): Boolean {
+					if(visib)
+						tooltipTable.setPosition(MathUtils.clamp(Gdx.input.x.toFloat()+10f, 0f, stage.width-tooltipTable.width), MathUtils.clamp(stage.height-Gdx.input.y.toFloat()+10f, 0f, stage.height-tooltipTable.height))
+					return super.mouseMoved(event, x, y)
+				}
+
+				override fun exit(event: InputEvent?, x: Float, y: Float, pointer: Int, toActor: Actor?) {
+					super.exit(event, x, y, pointer, toActor)
+					visib = false
+					tooltipTable.isVisible = false
 				}
 			})
 
@@ -75,7 +108,11 @@ class Main : ApplicationAdapter(), Updatable.ByTick {
 			}
 
 		}
+
+		tooltipTable.isVisible = false
+
 		stage.addActor(elementTable)
+		stage.addActor(tooltipTable)
 
 		Gdx.input.inputProcessor = manipulator
 

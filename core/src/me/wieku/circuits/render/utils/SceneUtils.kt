@@ -7,7 +7,11 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import com.badlogic.gdx.graphics.Texture.TextureFilter
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton
+import com.badlogic.gdx.scenes.scene2d.ui.TextTooltip
 import me.wieku.circuits.world.ClassicWorld
+import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle
+
+
 
 
 fun OrthographicCamera.fit(world: ClassicWorld, stage: Stage) {
@@ -47,10 +51,21 @@ fun ColorButton(color:Color): ImageButton {
 	return ImageButton(stl)
 }
 
-/*fun TextTooltip(text: String): TextTooltip {
+fun TextTooltip(text: String): TextTooltip {
 	var stl = TextTooltip.TextTooltipStyle()
-	stl.background
-}*/
+	stl.label = getLabelStyle(Color.WHITE, 10)
+	stl.wrapWidth = 100f
+	stl.background = getTxRegion(Color.BLACK)
+	return TextTooltip(text, stl)
+}
+
+fun getLabelStyle(color: Color, size: Int): LabelStyle {
+	val stl = LabelStyle()
+	stl.font = FontManager.getFont(FontManager.ROBOTO, size)
+	stl.font.data.markupEnabled = true
+	stl.fontColor = color.cpy()
+	return stl
+}
 
 private fun getStripeImg(background: Color, color: Color, size: Int): TextureRegionDrawable {
 	var pixmap = Pixmap(size, size, Pixmap.Format.RGBA8888)
