@@ -53,7 +53,7 @@ class Main : ApplicationAdapter(), Updatable.ByTick {
 
 		tooltipTable = Table(Color.BLACK)
 		tooltip = Label("", getLabelStyle(Color.WHITE, 10))
-		tooltipTable.add(tooltip).fill()
+		tooltipTable.add(tooltip).pad(2f).fill()
 
 
 		camera.zoom = if(stage.width > stage.height) (world.height.toFloat()/stage.height) else (world.width.toFloat()/stage.width)
