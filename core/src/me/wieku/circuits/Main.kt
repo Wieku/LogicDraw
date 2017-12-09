@@ -13,6 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Table
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.utils.viewport.ScreenViewport
 import me.wieku.circuits.api.math.Vector2i
@@ -35,15 +36,17 @@ class Main : ApplicationAdapter(), Updatable.ByTick {
 	private lateinit var renderer: ShapeRenderer
 	private lateinit var camera: OrthographicCamera
 	private lateinit var stage: Stage
-	private lateinit var menuButton: ImageButton
+	private lateinit var menuButton: Table
 
 	private lateinit var elementTable: Table
-	private var tableShow: Boolean = true
+	private var tableShow: Boolean = false
 
 	private var brushes:HashMap<String, Color> = HashMap()
 
 	lateinit var tooltip: Label
 	lateinit var tooltipTable: Table
+
+	private val gray = Color(0x1f1f1faf)
 
 	override fun create() {
 		FontManager.init()
@@ -53,15 +56,29 @@ class Main : ApplicationAdapter(), Updatable.ByTick {
 		manipulator = MapManipulator(world, camera, stage)
 
 		tooltipTable = Table(Color.BLACK)
+
 		tooltip = Label("", getLabelStyle(Color.WHITE, 10))
-		tooltipTable.add(tooltip).pad(2f).fill()
+		tooltip.touchable = null
+		tooltipTable.add(tooltip).pad(5f).fill()
 
 
 		camera.zoom = if(stage.width > stage.height) (world.height.toFloat()/stage.height) else (world.width.toFloat()/stage.width)
 		camera.position.set(world.width/2f, world.height/2f, 0f)
-		menuButton = StripeButton(Color.DARK_GRAY, Color.LIGHT_GRAY, 30)
+		menuButton = Table(gray)
+		menuButton.isTransform = true
+		var buttn = TextButton("Menu", getTextButtonStyle(Color.WHITE, 15))
+		buttn.addListener(object: ClickListener(){
+			override fun clicked(event: InputEvent?, x: Float, y: Float) {
+				super.clicked(event, x, y)
+				tableShow = !tableShow
+			}
+		})
+		menuButton.add(buttn).pad(2f)
+
+		menuButton.rotation = 90f
+		menuButton.pack()
 		stage.addActor(menuButton)
-		elementTable = Table(Color(0x1f1f1faf))
+		elementTable = Table(gray)
 		elementTable.top().left().pad(5f)
 
 		var count = 0
@@ -84,12 +101,12 @@ class Main : ApplicationAdapter(), Updatable.ByTick {
 					tooltipTable.isVisible = true
 					tooltip.setText(it.key)
 					tooltipTable.pack()
-					tooltipTable.setPosition(MathUtils.clamp(Gdx.input.x.toFloat()+10f, 0f, stage.width-tooltipTable.width), MathUtils.clamp(stage.height-Gdx.input.y.toFloat()+10f, 0f, stage.height-tooltipTable.height))
+					tooltipTable.setPosition(MathUtils.clamp(Gdx.input.x.toFloat()+5f, 0f, stage.width-tooltipTable.width), MathUtils.clamp(stage.height-Gdx.input.y.toFloat()+5f, 0f, stage.height-tooltipTable.height))
 				}
 
 				override fun mouseMoved(event: InputEvent?, x: Float, y: Float): Boolean {
 					if(visib)
-						tooltipTable.setPosition(MathUtils.clamp(Gdx.input.x.toFloat()+10f, 0f, stage.width-tooltipTable.width), MathUtils.clamp(stage.height-Gdx.input.y.toFloat()+10f, 0f, stage.height-tooltipTable.height))
+						tooltipTable.setPosition(MathUtils.clamp(Gdx.input.x.toFloat()+5f, 0f, stage.width-tooltipTable.width), MathUtils.clamp(stage.height-Gdx.input.y.toFloat()+5f, 0f, stage.height-tooltipTable.height))
 					return super.mouseMoved(event, x, y)
 				}
 
@@ -110,9 +127,11 @@ class Main : ApplicationAdapter(), Updatable.ByTick {
 
 		}
 
+
 		tooltipTable.isVisible = false
 
 		stage.addActor(elementTable)
+
 		stage.addActor(tooltipTable)
 
 		Gdx.input.inputProcessor = manipulator
@@ -125,17 +144,18 @@ class Main : ApplicationAdapter(), Updatable.ByTick {
 	private val bound = Color(0.2f, 0.2f, 0.2f, 0.6f)
 	private var delta1 = 0f
 	override fun render() {
-		Gdx.gl.glClearColor(0.1f, 0.1f, 0.1f, 1f)
+		Gdx.gl.glClearColor(0.05f, 0.05f, 0.05f, 1f)
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
 
 		delta1+=Gdx.graphics.deltaTime
 		if(delta1>=1f) {
-			var fps = Gdx.graphics.framesPerSecond
-			var nodes = world.getStateManager().usedNodes
-			var tickables = world.entities
-			Gdx.graphics.setTitle("LogicDraw (tickrate: $tickrate) (fps: $fps) ($nodes nodes) ($tickables tickables) version: ${Version.version}")
+			Gdx.graphics.setTitle("LogicDraw ${Version.version} (tickrate: $tickrate) (fps: ${Gdx.graphics.framesPerSecond}) (${world.getStateManager().usedNodes} nodes) (${world.entities} entities)")
 			delta1 = 0f
 		}
+
+		elementTable.setBounds(if(tableShow) stage.width-200f else stage.width, 0f, 200f, stage.height)
+		menuButton.setPosition(elementTable.x, stage.height-menuButton.width-10)
+		menuButton.color = if(tableShow) Color.WHITE else Color.BLACK
 
 		camera.update()
 		renderer.projectionMatrix = camera.combined
@@ -179,18 +199,13 @@ class Main : ApplicationAdapter(), Updatable.ByTick {
 	}
 
 	override fun resize(width: Int, height: Int) {
-		var camPosBefore = camera.position.cpy()
+		val camPosBefore = camera.position.cpy()
 
 		stage.viewport.update(width, height, true)
-
-		menuButton.setPosition(stage.width-menuButton.width-5, stage.height-menuButton.height-5)
-		menuButton.setColor(1f, 1f, 1f, if(tableShow) 0.5f else 1f)
 
 		camera.setToOrtho(true, width.toFloat(), height.toFloat())
 		camera.position.set(camPosBefore)
 		camera.fit(world, stage)
-
-		elementTable.setBounds(if(tableShow) stage.width-200f else stage.width, 0f, 200f, stage.height)
 	}
 
 	override fun dispose() {

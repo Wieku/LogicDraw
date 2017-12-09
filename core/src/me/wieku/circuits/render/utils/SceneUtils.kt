@@ -10,8 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.ImageButton
 import com.badlogic.gdx.scenes.scene2d.ui.TextTooltip
 import me.wieku.circuits.world.ClassicWorld
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle
-
-
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton
 
 
 fun OrthographicCamera.fit(world: ClassicWorld, stage: Stage) {
@@ -64,6 +63,13 @@ fun getLabelStyle(color: Color, size: Int): LabelStyle {
 	stl.font = FontManager.getFont(FontManager.ROBOTO, size)
 	stl.font.data.markupEnabled = true
 	stl.fontColor = color.cpy()
+	return stl
+}
+
+fun getTextButtonStyle(color: Color, size: Int): TextButton.TextButtonStyle {
+	val stl = TextButton.TextButtonStyle()
+	stl.font = FontManager.getFont(FontManager.ROBOTO, size)
+	stl.fontColor = color
 	return stl
 }
 

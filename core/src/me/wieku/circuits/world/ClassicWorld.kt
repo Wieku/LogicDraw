@@ -23,7 +23,7 @@ class ClassicWorld(val width: Int, val height: Int):IWorld {
 	get() = tickables.size
 	private set
 
-	val classes: HashMap<String, Class<out IElement>> = HashMap()
+	val classes: LinkedHashMap<String, Class<out IElement>> = LinkedHashMap()
 
 	init {
 		classes.put("Wire", Wire::class.java)
