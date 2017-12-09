@@ -29,6 +29,7 @@ class ClassicWorld(val width: Int, val height: Int):IWorld {
 		classes.put("Wire", Wire::class.java)
 		classes.put("Cross", Cross::class.java)
 		classes.put("Input", Input::class.java)
+		classes.put("TFlipFlop", TFFGate::class.java)
 		classes.put("Or", OrGate::class.java)
 		classes.put("Nor", NorGate::class.java)
 		classes.put("And", AndGate::class.java)
