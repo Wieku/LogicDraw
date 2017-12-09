@@ -1,4 +1,4 @@
-package me.wieku.circuits.render.utils
+package me.wieku.circuits.render.scene
 
 import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.scenes.scene2d.ui.Table
@@ -11,6 +11,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextTooltip
 import me.wieku.circuits.world.ClassicWorld
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton
+import com.badlogic.gdx.scenes.scene2d.ui.Label
+import me.wieku.circuits.render.utils.FontManager
 
 
 fun OrthographicCamera.fit(world: ClassicWorld, stage: Stage) {
@@ -33,6 +35,8 @@ fun Table(color: Color): Table {
 	table.background = getTxRegion(color)
 	return table
 }
+
+fun Label(text: String, color: Color, size: Int) = Label(text, getLabelStyle(color, size))
 
 fun StripeButton(background: Color, color: Color, size: Int): ImageButton {
 	var stl = ImageButton.ImageButtonStyle()

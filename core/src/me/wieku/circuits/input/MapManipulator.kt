@@ -9,7 +9,7 @@ import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.scenes.scene2d.Stage
 import me.wieku.circuits.api.math.Rectangle
 import me.wieku.circuits.api.math.Vector2i
-import me.wieku.circuits.render.utils.fit
+import me.wieku.circuits.render.scene.fit
 import me.wieku.circuits.world.ClassicWorld
 import me.wieku.circuits.world.WorldClipboard
 

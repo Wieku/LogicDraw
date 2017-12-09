@@ -19,7 +19,9 @@ import me.wieku.circuits.api.math.Vector2i
 import me.wieku.circuits.api.world.clock.AsyncClock
 import me.wieku.circuits.api.world.clock.Updatable
 import me.wieku.circuits.input.MapManipulator
-import me.wieku.circuits.render.utils.*
+import me.wieku.circuits.render.scene.actors.TextTooltip
+import me.wieku.circuits.render.scene.fit
+import me.wieku.circuits.render.scene.getTextButtonStyle
 import me.wieku.circuits.utils.Version
 import me.wieku.circuits.world.ClassicWorld
 import java.util.*
@@ -41,8 +43,9 @@ class Editor(val world: ClassicWorld):Screen, Updatable.ByTick {
 
 	private var brushes: HashMap<String, Color> = HashMap()
 
-	var tooltip: Label
-	var tooltipTable: Table
+	//var tooltip: Label
+	//var tooltipTable: Table
+	var tooltyp: TextTooltip
 
 	private val gray = Color(0x1f1f1faf)
 
@@ -52,16 +55,11 @@ class Editor(val world: ClassicWorld):Screen, Updatable.ByTick {
 		stage = Stage(ScreenViewport())
 		manipulator = MapManipulator(world, camera, stage)
 
-		tooltipTable = Table(Color.BLACK)
-
-		tooltip = Label("", getLabelStyle(Color.WHITE, 10))
-		tooltip.touchable = null
-		tooltipTable.add(tooltip).pad(5f).fill()
-
+		tooltyp = TextTooltip(Color.BLACK, Color.WHITE, 10)
 
 		camera.zoom = if(stage.width > stage.height) (world.height.toFloat()/stage.height) else (world.width.toFloat()/stage.width)
 		camera.position.set(world.width/2f, world.height/2f, 0f)
-		menuButton = Table(gray)
+		menuButton = me.wieku.circuits.render.scene.Table(gray)
 		menuButton.isTransform = true
 		var buttn = TextButton("Menu", getTextButtonStyle(Color.WHITE, 15))
 		buttn.addListener(object: ClickListener(){
@@ -75,7 +73,7 @@ class Editor(val world: ClassicWorld):Screen, Updatable.ByTick {
 		menuButton.rotation = 90f
 		menuButton.pack()
 		stage.addActor(menuButton)
-		elementTable = Table(gray)
+		elementTable = me.wieku.circuits.render.scene.Table(gray)
 		elementTable.top().left().pad(5f)
 
 		var count = 0
@@ -84,37 +82,15 @@ class Editor(val world: ClassicWorld):Screen, Updatable.ByTick {
 			var color1 = color.cpy()
 			color1.a = 0.5f
 			brushes.put(it.key, color1)
-			var button = ColorButton(color)
+			var button = me.wieku.circuits.render.scene.ColorButton(color)
 			button.addListener(object : ClickListener() {
-				var visib = false
 				override fun clicked(event: InputEvent?, x: Float, y: Float) {
 					super.clicked(event, x, y)
 					manipulator.toPlace = it.key
 				}
-
-				override fun enter(event: InputEvent?, x: Float, y: Float, pointer: Int, fromActor: Actor?) {
-					super.enter(event, x, y, pointer, fromActor)
-					visib = true
-					tooltipTable.isVisible = true
-					tooltip.setText(it.key)
-					tooltipTable.pack()
-					tooltipTable.setPosition(MathUtils.clamp(Gdx.input.x.toFloat()+5f, 0f, stage.width-tooltipTable.width), MathUtils.clamp(stage.height- Gdx.input.y.toFloat()+5f, 0f, stage.height-tooltipTable.height))
-				}
-
-				override fun mouseMoved(event: InputEvent?, x: Float, y: Float): Boolean {
-					if(visib)
-						tooltipTable.setPosition(MathUtils.clamp(Gdx.input.x.toFloat()+5f, 0f, stage.width-tooltipTable.width), MathUtils.clamp(stage.height- Gdx.input.y.toFloat()+5f, 0f, stage.height-tooltipTable.height))
-					return super.mouseMoved(event, x, y)
-				}
-
-				override fun exit(event: InputEvent?, x: Float, y: Float, pointer: Int, toActor: Actor?) {
-					super.exit(event, x, y, pointer, toActor)
-					visib = false
-					tooltipTable.isVisible = false
-				}
 			})
+			button.addListener(tooltyp.getListener(it.key))
 
-			//button.addListener(TextTooltip(it.key))
 			elementTable.add(button).pad(3f).expandX().size(40f)
 			++count
 			if(count==4) {
@@ -124,12 +100,9 @@ class Editor(val world: ClassicWorld):Screen, Updatable.ByTick {
 
 		}
 
-
-		tooltipTable.isVisible = false
-
 		stage.addActor(elementTable)
 
-		stage.addActor(tooltipTable)
+		stage.addActor(tooltyp.tooltipTable)
 
 		Gdx.input.inputProcessor = manipulator
 
