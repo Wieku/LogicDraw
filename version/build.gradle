@@ -1,0 +1,23 @@
+buildscript {
+    repositories {
+        maven { url "https://plugins.gradle.org/m2/" }
+    }
+    dependencies {
+        classpath "gradle.plugin.de.fuerstenau:BuildConfigPlugin:1.1.7"
+    }
+}
+
+apply plugin: "java"
+apply plugin: "de.fuerstenau.buildconfig"
+
+sourceCompatibility = 1.7
+
+buildConfig {
+    appName = project.name
+    version = project.version
+
+    clsName = "LDBuildConf"
+    packageName = "me.wieku.circuits.utils"
+
+    charset = "UTF-8"
+}

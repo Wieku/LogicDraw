@@ -20,6 +20,7 @@ import me.wieku.circuits.api.world.clock.AsyncClock
 import me.wieku.circuits.api.world.clock.Updatable
 import me.wieku.circuits.input.MapManipulator
 import me.wieku.circuits.render.utils.*
+import me.wieku.circuits.utils.Version
 import me.wieku.circuits.world.ClassicWorld
 import java.util.*
 
@@ -61,7 +62,7 @@ class Main : ApplicationAdapter(), Updatable.ByTick {
 		menuButton = StripeButton(Color.DARK_GRAY, Color.LIGHT_GRAY, 30)
 		stage.addActor(menuButton)
 		elementTable = Table(Color(0x1f1f1faf))
-		elementTable.top().left()
+		elementTable.top().left().pad(5f)
 
 		var count = 0
 		world.classes.forEach{
@@ -100,7 +101,7 @@ class Main : ApplicationAdapter(), Updatable.ByTick {
 			})
 
 			//button.addListener(TextTooltip(it.key))
-			elementTable.add(button).pad(3f).size(40f)
+			elementTable.add(button).pad(3f).expandX().size(40f)
 			++count
 			if(count==4) {
 				elementTable.row()
@@ -132,7 +133,7 @@ class Main : ApplicationAdapter(), Updatable.ByTick {
 			var fps = Gdx.graphics.framesPerSecond
 			var nodes = world.getStateManager().usedNodes
 			var tickables = world.entities
-			Gdx.graphics.setTitle("LogicDraw (tickrate: $tickrate) (fps: $fps) ($nodes nodes) ($tickables tickables)")
+			Gdx.graphics.setTitle("LogicDraw (tickrate: $tickrate) (fps: $fps) ($nodes nodes) ($tickables tickables) version: ${Version.version}")
 			delta1 = 0f
 		}
 

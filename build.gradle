@@ -15,11 +15,30 @@ buildscript {
     }
 }
 
+def getGitRef() {
+    try {
+        def stdout = new ByteArrayOutputStream()
+        exec {
+            commandLine "git", "rev-parse", "--short", "HEAD"
+            standardOutput = stdout
+        }
+        return stdout.toString().trim()
+    } catch (Throwable e) {
+        return "unknown"
+    }
+}
+
 allprojects {
     apply plugin: "eclipse"
     apply plugin: "idea"
 
-    version = '1.0'
+    version = '0.1'
+
+    if (System.getenv("BUILD_NUMBER") != null)
+        version += ".${System.getenv("BUILD_NUMBER")}"
+    else
+        version += "-" + getGitRef()
+
     ext {
         appName = "Circuits"
         gdxVersion = '1.9.7'
@@ -39,7 +58,6 @@ allprojects {
 
 project(":desktop") {
     apply plugin: "kotlin"
-
 
     dependencies {
         compile project(":core")
@@ -93,8 +111,8 @@ project(":ios") {
 project(":core") {
     apply plugin: "kotlin"
 
-
     dependencies {
+        compile project(":version")
         compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
