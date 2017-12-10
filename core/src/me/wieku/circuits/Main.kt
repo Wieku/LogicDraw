@@ -17,7 +17,7 @@ class Main : Game() {
 		try {
 			world = SaveManagers.loadMap(File("test.ldmap"))
 		} catch (e: Exception) {
-			world = ClassicWorld(100, 100)
+			world = ClassicWorld(100, 100, "Test")
 		}
 
 		setScreen(Editor(world))

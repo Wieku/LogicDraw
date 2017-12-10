@@ -14,7 +14,9 @@ class SaveManagerVer01 : SaveManager {
 
 	override fun loadMap(file: DataInputStream): ClassicWorld {
 		inputStream = file
-		var world = ClassicWorld(file.readInt(), file.readInt())
+		var name = file.readUTF()
+		println("World name: $name")
+		var world = ClassicWorld(file.readInt(), file.readInt(), name)
 
 		println("World size: ${world.width}x${world.height}")
 
@@ -47,6 +49,7 @@ class SaveManagerVer01 : SaveManager {
 
 	override fun saveMap(world: ClassicWorld, file: DataOutputStream) {
 		outputStream = file
+		file.writeUTF(world.name)
 		file.writeInt(world.width)
 		file.writeInt(world.height)
 

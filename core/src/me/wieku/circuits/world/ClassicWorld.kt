@@ -14,7 +14,7 @@ import me.wieku.circuits.world.elements.gates.*
 import java.util.*
 
 //TODO: switch to tasks instead of locking objects
-class ClassicWorld(val width: Int, val height: Int):IWorld {
+class ClassicWorld(val width: Int, val height: Int, val name: String):IWorld {
 	private val manager: ClassicStateManager = ClassicStateManager(width * height)
 	private val map: Array<Array<IElement?>> = Array(width) { Array<IElement?>(height) {null} }
 	private val tickables: HashMap<Vector2i, ITickable> = HashMap()

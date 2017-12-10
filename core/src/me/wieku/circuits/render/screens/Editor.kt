@@ -137,7 +137,7 @@ class Editor(val world: ClassicWorld):Screen, Updatable.ByTick {
 
 		delta1+=delta
 		if(delta1>=1f) {
-			Gdx.graphics.setTitle("LogicDraw ${Version.version} (tickrate: $tickrate) (fps: ${Gdx.graphics.framesPerSecond}) (${world.getStateManager().usedNodes} nodes) (${world.entities} entities)")
+			Gdx.graphics.setTitle("LogicDraw ${Version.version} (world: ${world.name}) (tickrate: $tickrate) (fps: ${Gdx.graphics.framesPerSecond}) (${world.getStateManager().usedNodes} nodes) (${world.entities} entities)")
 			delta1 = 0f
 		}
 
