@@ -12,5 +12,5 @@ fun main(args: Array<String>) {
 	config.height = 768
 	config.title = "LogicDraw ${Version.version}"
 	config.addIcon("assets/logo/logo32.png", Files.FileType.Internal)
-	LwjglApplication(Main(), config)
+	LwjglApplication(Main, config)
 }

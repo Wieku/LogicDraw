@@ -1,5 +1,6 @@
 package me.wieku.circuits.save
 
+import com.sun.xml.internal.fastinfoset.util.StringArray
 import me.wieku.circuits.save.managers.SaveManagerVer01
 import me.wieku.circuits.world.ClassicWorld
 import sun.plugin.dom.exception.InvalidStateException
@@ -24,12 +25,28 @@ object SaveManagers {
 		throw IOException("Invaild file")
 	}
 
+	fun getHeader(file: File) : StringArray {
+		if(file.exists() && file.extension == "ldmap") {
+			var inputStream = DataInputStream(GZIPInputStream(FileInputStream(file)))
+			if(inputStream.readUTF() == "LogicDraw Map") {
+				inputStream.readInt()
+				var array = arrayOf(inputStream.readUTF(), inputStream.readUTF(), inputStream.readUTF()) as StringArray
+				inputStream.close()
+				return array
+			}
+		}
+		throw IOException("Invaild file")
+	}
+
 	fun saveMap(world: ClassicWorld, file: File) {
 		if(file.exists()) file.delete()
 		println("Saving ${file.name}...")
 		var outputStream = DataOutputStream(GZIPOutputStream(FileOutputStream(file)))
 		outputStream.writeUTF("LogicDraw Map")
 		outputStream.writeInt(latest)
+		outputStream.writeUTF(world.name)
+		outputStream.writeUTF(world.width.toString())
+		outputStream.writeUTF(world.height.toString())
 		getSaveManager(latest).saveMap(world, outputStream)
 		outputStream.close()
 		println("Saved!")

@@ -13,6 +13,10 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import me.wieku.circuits.render.utils.FontManager
+import javafx.scene.Cursor.cursor
+import com.badlogic.gdx.scenes.scene2d.ui.TextField.TextFieldStyle
+
+
 
 
 fun OrthographicCamera.fit(world: ClassicWorld, stage: Stage) {
@@ -81,6 +85,20 @@ fun getTextButtonStyle(background: Color, color: Color, size: Int): TextButton.T
 	var d = getTxRegion(background)
 	val stl = TextButton.TextButtonStyle(d, d, d, FontManager.getFont(FontManager.ROBOTO, size))
 	stl.fontColor = color
+	return stl
+}
+
+fun getTextFieldStyle(bg: Color, textColor: Color, size: Int): TextFieldStyle {
+	val stl = TextFieldStyle()
+	stl.background = getTxRegion(bg)
+	stl.background.leftWidth = 5f
+	stl.background.rightWidth = 5f
+	stl.background.topHeight = 5f
+	stl.background.bottomHeight = 5f
+	stl.font = FontManager.getFont(FontManager.ROBOTO, size)
+	stl.selection = getTxRegion(Color(0.8f, 0.8f, 0.8f, 0.5f))
+	stl.cursor = getTxRegion(Color.LIGHT_GRAY)
+	stl.fontColor = textColor.cpy()
 	return stl
 }
 

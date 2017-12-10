@@ -14,6 +14,9 @@ class SaveManagerVer01 : SaveManager {
 
 	override fun loadMap(file: DataInputStream): ClassicWorld {
 		inputStream = file
+		file.readUTF()
+		file.readUTF()
+		file.readUTF()
 		var name = file.readUTF()
 		println("World name: $name")
 		var world = ClassicWorld(file.readInt(), file.readInt(), name)
