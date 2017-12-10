@@ -7,6 +7,7 @@ import me.wieku.circuits.api.math.Rectangle
 import me.wieku.circuits.api.math.Vector2i
 import me.wieku.circuits.api.state.StateManager
 import me.wieku.circuits.api.world.IWorld
+import me.wieku.circuits.world.elements.Controller
 import me.wieku.circuits.world.elements.Cross
 import me.wieku.circuits.world.elements.Input
 import me.wieku.circuits.world.elements.Wire
@@ -29,6 +30,8 @@ class ClassicWorld(val width: Int, val height: Int, val name: String):IWorld {
 		classes.put("wire", Wire::class.java)
 		classes.put("cross", Cross::class.java)
 		classes.put("input", Input::class.java)
+		classes.put("controller", Controller::class.java)
+		classes.put("memory", MemoryGate::class.java)
 		classes.put("tflipflop", TFFGate::class.java)
 		classes.put("or", OrGate::class.java)
 		classes.put("nor", NorGate::class.java)

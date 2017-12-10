@@ -9,7 +9,7 @@ import java.util.*
 abstract class BasicGate(pos: Vector2i): BasicElement(pos),ITickable {
 
 	protected val inputs = ArrayList<BasicInput>()
-	private val outputs = ArrayList<State>()
+	protected val outputs = ArrayList<State>()
 
 	override fun onPlace(world: IWorld) {
 		updateIO(world)
@@ -23,7 +23,7 @@ abstract class BasicGate(pos: Vector2i): BasicElement(pos),ITickable {
 		for(i in 0 until outputs.size) outputs[i].setActive(value)
 	}
 
-	protected fun updateIO(world: IWorld) {
+	protected open fun updateIO(world: IWorld) {
 		inputs.clear()
 		outputs.clear()
 

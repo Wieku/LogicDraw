@@ -10,8 +10,10 @@ Application is in early development, so be aware that critical bugs can occur.
 |Wire|![](https://placehold.it/15/7F0000/000000?text=+)|![](https://placehold.it/15/D50000/000000?text=+)|
 |Cross|![](https://placehold.it/15/757575/000000?text=+)|![](https://placehold.it/15/9E9E9E/000000?text=+)|
 |Input|![](https://placehold.it/15/01579B/000000?text=+)|![](https://placehold.it/15/0277BD/000000?text=+)|
+|Controller|![](https://placehold.it/15/1B5E20/000000?text=+)|![](https://placehold.it/15/2E7D32/000000?text=+)|
 |TFlipFlop|![](https://placehold.it/15/311B92/000000?text=+)|![](https://placehold.it/15/4527A0/000000?text=+)|
-|Or gate|![](https://placehold.it/15/F57F17/000000?text=+)|![](https://placehold.it/15/F9A825/000000?text=+)|
+|Memory|![](https://placehold.it/15/37474F/000000?text=+)|![](https://placehold.it/15/455A64/000000?text=+)|
+|Or gate|![](https://placehold.it/15/F57F17/000000?text=+)|![](https://placehold.it/15/4E342E/000000?text=+)|
 |Nor gate|![](https://placehold.it/15/FFD600/000000?text=+)|![](https://placehold.it/15/FFEA00/000000?text=+)|
 |And gate|![](https://placehold.it/15/00BFA5/000000?text=+)|![](https://placehold.it/15/1DE9B6/000000?text=+)|
 |Nand gate|![](https://placehold.it/15/004D40/000000?text=+)|![](https://placehold.it/15/00695C/000000?text=+)|
