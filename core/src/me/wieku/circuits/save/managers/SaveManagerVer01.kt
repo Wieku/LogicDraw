@@ -13,16 +13,26 @@ class SaveManagerVer01 : SaveManager {
 	private lateinit var outputStream: DataOutputStream
 
 	override fun loadMap(file: DataInputStream): ClassicWorld {
+		inputStream = file
 		var world = ClassicWorld(file.readInt(), file.readInt())
+
+		println("World size: ${world.width}x${world.height}")
 
 		(world.getStateManager() as ClassicStateManager).load(this)
 
-		while (file.available() > 0) {
+		println("States: ${world.getStateManager().usedNodes}")
+
+		var counter = file.readInt()
+		println("Loading $counter elements started...")
+		while (counter>0) {
 			var element = world.forcePlace(file.readInt(), file.readInt(), file.readUTF())
 			if (element is Saveable) {
-				(element as Saveable).load(this)
+				(element as Saveable).load(world, this)
 			}
+			--counter
 		}
+
+		println("Loading elements finished, finalizing...")
 
 		for (x in 0 until world.width) {
 			for (y in 0 until world.height) {
@@ -32,20 +42,36 @@ class SaveManagerVer01 : SaveManager {
 				}
 			}
 		}
-
 		return world
 	}
 
 	override fun saveMap(world: ClassicWorld, file: DataOutputStream) {
+		outputStream = file
 		file.writeInt(world.width)
 		file.writeInt(world.height)
 
 		(world.getStateManager() as ClassicStateManager).save(this)
 
+		var counter = 0
+		for (x in 0 until world.width) {
+			for (y in 0 until world.height) {
+				if (world[x, y] != null) ++counter
+			}
+		}
+
+		file.writeInt(counter)
 		for (x in 0 until world.width) {
 			for (y in 0 until world.height) {
 				var element = world[x, y]
 				if (element != null && element is Saveable) {
+					file.writeInt(x)
+					file.writeInt(y)
+					for((k, v) in world.classes) {
+						if(v == element.javaClass) {
+							file.writeUTF(k)
+							break
+						}
+					}
 					(element as Saveable).save(this)
 				}
 			}

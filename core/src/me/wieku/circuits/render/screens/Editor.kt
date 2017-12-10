@@ -22,8 +22,10 @@ import me.wieku.circuits.input.MapManipulator
 import me.wieku.circuits.render.scene.actors.TextTooltip
 import me.wieku.circuits.render.scene.fit
 import me.wieku.circuits.render.scene.getTextButtonStyle
+import me.wieku.circuits.save.SaveManagers
 import me.wieku.circuits.utils.Version
 import me.wieku.circuits.world.ClassicWorld
+import java.io.File
 import java.util.*
 
 class Editor(val world: ClassicWorld):Screen, Updatable.ByTick {
@@ -37,14 +39,13 @@ class Editor(val world: ClassicWorld):Screen, Updatable.ByTick {
 	private var camera: OrthographicCamera
 	private var stage: Stage
 	private var menuButton: Table
+	private var saveButton: TextButton
 
 	private var elementTable: Table
 	private var tableShow: Boolean = false
 
 	private var brushes: HashMap<String, Color> = HashMap()
 
-	//var tooltip: Label
-	//var tooltipTable: Table
 	var tooltyp: TextTooltip
 
 	private val gray = Color(0x1f1f1faf)
@@ -99,6 +100,18 @@ class Editor(val world: ClassicWorld):Screen, Updatable.ByTick {
 			}
 
 		}
+		elementTable.row()
+
+		saveButton = TextButton("Save", getTextButtonStyle(Color.BLACK, Color.WHITE, 15))
+		saveButton.addListener(object: ClickListener(){
+			override fun clicked(event: InputEvent?, x: Float, y: Float) {
+				mainClock.stop()
+				SaveManagers.saveMap(world, File("test.ldmap"))
+				mainClock.start()
+			}
+		})
+
+		elementTable.add(saveButton).fillX().center().padTop(10f).colspan(4)
 
 		stage.addActor(elementTable)
 

@@ -23,7 +23,7 @@ abstract class BasicGate(pos: Vector2i): BasicElement(pos),ITickable {
 		for(i in 0 until outputs.size) outputs[i].setActive(value)
 	}
 
-	private fun updateIO(world: IWorld) {
+	protected fun updateIO(world: IWorld) {
 		inputs.clear()
 		outputs.clear()
 

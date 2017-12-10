@@ -77,6 +77,13 @@ fun getTextButtonStyle(color: Color, size: Int): TextButton.TextButtonStyle {
 	return stl
 }
 
+fun getTextButtonStyle(background: Color, color: Color, size: Int): TextButton.TextButtonStyle {
+	var d = getTxRegion(background)
+	val stl = TextButton.TextButtonStyle(d, d, d, FontManager.getFont(FontManager.ROBOTO, size))
+	stl.fontColor = color
+	return stl
+}
+
 private fun getStripeImg(background: Color, color: Color, size: Int): TextureRegionDrawable {
 	var pixmap = Pixmap(size, size, Pixmap.Format.RGBA8888)
 	pixmap.setColor(background)

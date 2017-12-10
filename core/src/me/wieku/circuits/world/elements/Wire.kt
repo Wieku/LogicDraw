@@ -5,8 +5,11 @@ import me.wieku.circuits.api.math.Axis
 import me.wieku.circuits.api.math.Vector2i
 import me.wieku.circuits.api.state.State
 import me.wieku.circuits.api.world.IWorld
+import me.wieku.circuits.save.SaveManager
+import me.wieku.circuits.save.Saveable
+import me.wieku.circuits.world.ClassicWorld
 
-class Wire(pos: Vector2i): BasicWire(pos) {
+class Wire(pos: Vector2i): BasicWire(pos), Saveable {
 
 	lateinit var state:State
 
@@ -68,4 +71,15 @@ class Wire(pos: Vector2i): BasicWire(pos) {
 	override fun setState(state: State, axis: Axis) {}
 
 	override fun getState(axis: Axis): State = state
+
+	override fun save(manager: SaveManager) {
+		manager.putInteger(state.id)
+	}
+
+	override fun load(world: ClassicWorld, manager: SaveManager) {
+		state = world.getStateManager().getState(manager.getInteger())!!
+		state.register()
+	}
+
+	override fun afterLoad(world: IWorld) {}
 }

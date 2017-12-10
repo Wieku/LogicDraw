@@ -6,7 +6,6 @@ import me.wieku.circuits.save.SaveManager
 
 class ClassicStateManager(managerSize: Int): StateManager(managerSize) {
 
-
 	fun load(manager: SaveManager) {
 		lastIndex = manager.getInteger()
 		var poolsize = manager.getInteger()
@@ -21,6 +20,7 @@ class ClassicStateManager(managerSize: Int): StateManager(managerSize) {
 				children[i] = State(i, this)
 			}
 		}
+		usedNodes = lastIndex - indexPool.size
 	}
 
 	fun save(manager: SaveManager) {

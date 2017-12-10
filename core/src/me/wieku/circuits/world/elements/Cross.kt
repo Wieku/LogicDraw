@@ -5,8 +5,11 @@ import me.wieku.circuits.api.math.Axis
 import me.wieku.circuits.api.math.Vector2i
 import me.wieku.circuits.api.state.State
 import me.wieku.circuits.api.world.IWorld
+import me.wieku.circuits.save.SaveManager
+import me.wieku.circuits.save.Saveable
+import me.wieku.circuits.world.ClassicWorld
 
-class Cross(pos: Vector2i): BasicWire(pos) {
+class Cross(pos: Vector2i): BasicWire(pos), Saveable {
 
 	lateinit var stateH:State
 	lateinit var stateV:State
@@ -106,4 +109,18 @@ class Cross(pos: Vector2i): BasicWire(pos) {
 	override fun setState(state: State, axis: Axis) {}
 
 	override fun getState(axis: Axis): State = if(axis == Axis.HORIZONTAL) stateH else stateV
+
+	override fun save(manager: SaveManager) {
+		manager.putInteger(stateH.id)
+		manager.putInteger(stateV.id)
+	}
+
+	override fun load(world: ClassicWorld, manager: SaveManager) {
+		stateH = world.getStateManager().getState(manager.getInteger())!!
+		stateH.register()
+		stateV = world.getStateManager().getState(manager.getInteger())!!
+		stateV.register()
+	}
+
+	override fun afterLoad(world: IWorld) {}
 }

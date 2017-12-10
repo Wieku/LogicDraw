@@ -11,7 +11,7 @@ open class StateManager(private val managerSize: Int) {
 	protected val indexPool: Queue<Int> = ArrayDeque<Int>()
 	protected var lastIndex = 0
 	var usedNodes = 0
-	private set
+	protected set
 
 	fun free(index: Int) {
 		input[index] = 0
@@ -39,6 +39,8 @@ open class StateManager(private val managerSize: Int) {
 	operator fun get(index: Int) = input[index] > 0
 
 	fun getDirty(index: Int) = output[index] > 0
+
+	fun getState(index: Int) = children[index]
 
 	operator fun set(index: Int, value: Boolean) {
 		output[index] = if(value) 1 else 0

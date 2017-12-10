@@ -6,19 +6,22 @@ import me.wieku.circuits.api.math.Axis
 import me.wieku.circuits.api.math.Vector2i
 import me.wieku.circuits.api.state.State
 import me.wieku.circuits.api.world.IWorld
+import me.wieku.circuits.save.SaveManager
+import me.wieku.circuits.save.Saveable
+import me.wieku.circuits.world.ClassicWorld
 import java.util.*
 
-class Input(pos: Vector2i):BasicInput(pos) {
+class Input(pos: Vector2i):BasicInput(pos), Saveable {
 
-	private lateinit var intSt: State
+	private lateinit var state: State
 	private val inputs = ArrayList<State>()
 
 	override fun isActive(): Boolean {
-		intSt.setActive(false)
+		state.setActive(false)
 		if(inputs.isNotEmpty()) {
 			for(i in 0 until inputs.size) {
 				if(inputs[i].isActive()) {
-					intSt.setActive(true)
+					state.setActive(true)
 					return true
 				}
 			}
@@ -27,14 +30,13 @@ class Input(pos: Vector2i):BasicInput(pos) {
 	}
 
 	override fun onPlace(world: IWorld) {
-		intSt = world.getStateManager()()
+		state = world.getStateManager()()
 		updateI(world)
 		world.updateNeighboursOf(pos)
 	}
 
 	override fun onNeighbourChange(position: Vector2i, world: IWorld) {
 		updateI(world)
-		//world.updateNeighboursOf(pos)
 	}
 
 	private fun updateI(world: IWorld) {
@@ -50,7 +52,7 @@ class Input(pos: Vector2i):BasicInput(pos) {
 	}
 
 	override fun onRemove(world: IWorld) {
-		intSt.unregister()
+		state.unregister()
 		world.updateNeighboursOf(pos)
 	}
 
@@ -62,5 +64,18 @@ class Input(pos: Vector2i):BasicInput(pos) {
 
 	override fun setState(state: State, axis: Axis) {}
 
-	override fun getState(axis: Axis): State = intSt
+	override fun getState(axis: Axis): State = state
+
+	override fun save(manager: SaveManager) {
+		manager.putInteger(state.id)
+	}
+
+	override fun load(world: ClassicWorld, manager: SaveManager) {
+		state = world.getStateManager().getState(manager.getInteger())!!
+		state.register()
+	}
+
+	override fun afterLoad(world: IWorld) {
+		updateI(world)
+	}
 }
