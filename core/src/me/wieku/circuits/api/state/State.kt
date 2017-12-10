@@ -1,6 +1,6 @@
 package me.wieku.circuits.api.state
 
-open class State(private val id: Int, private val manager: StateManager) {
+open class State(val id: Int, private val manager: StateManager) {
 
 	var holders: Int = 0
 	private set

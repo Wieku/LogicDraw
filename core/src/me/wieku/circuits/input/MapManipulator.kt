@@ -16,7 +16,7 @@ import me.wieku.circuits.world.WorldClipboard
 //TODO: Clean this mess
 class MapManipulator(val world:ClassicWorld, val camera: OrthographicCamera, val stage: Stage):InputProcessor {
 
-	var toPlace = "Wire"
+	var toPlace = "wire"
 	private var last = Vector2i(-1, -1)
 	var position = Vector2i()
 

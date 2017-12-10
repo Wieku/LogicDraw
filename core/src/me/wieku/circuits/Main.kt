@@ -13,4 +13,8 @@ class Main : Game() {
 		setScreen(Editor(ClassicWorld(1024, 1024)))
 	}
 
+	companion object {
+		val instance = this
+	}
+
 }

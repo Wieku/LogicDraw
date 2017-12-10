@@ -15,7 +15,7 @@ import java.util.*
 
 //TODO: switch to tasks instead of locking objects
 class ClassicWorld(val width: Int, val height: Int):IWorld {
-	private val manager: StateManager = StateManager(width*height)
+	private val manager: ClassicStateManager = ClassicStateManager(width * height)
 	private val map: Array<Array<IElement?>> = Array(width) { Array<IElement?>(height) {null} }
 	private val tickables: HashMap<Vector2i, ITickable> = HashMap()
 
@@ -26,16 +26,16 @@ class ClassicWorld(val width: Int, val height: Int):IWorld {
 	val classes: LinkedHashMap<String, Class<out IElement>> = LinkedHashMap()
 
 	init {
-		classes.put("Wire", Wire::class.java)
-		classes.put("Cross", Cross::class.java)
-		classes.put("Input", Input::class.java)
-		classes.put("TFlipFlop", TFFGate::class.java)
-		classes.put("Or", OrGate::class.java)
-		classes.put("Nor", NorGate::class.java)
-		classes.put("And", AndGate::class.java)
-		classes.put("Nand", NandGate::class.java)
-		classes.put("Xor", XorGate::class.java)
-		classes.put("Xnor", XnorGate::class.java)
+		classes.put("wire", Wire::class.java)
+		classes.put("cross", Cross::class.java)
+		classes.put("input", Input::class.java)
+		classes.put("tflipflop", TFFGate::class.java)
+		classes.put("or", OrGate::class.java)
+		classes.put("nor", NorGate::class.java)
+		classes.put("and", AndGate::class.java)
+		classes.put("nand", NandGate::class.java)
+		classes.put("xor", XorGate::class.java)
+		classes.put("xnor", XnorGate::class.java)
 	}
 
 
@@ -78,6 +78,20 @@ class ClassicWorld(val width: Int, val height: Int):IWorld {
 			}
 		}
 
+	}
+
+	fun forcePlace(x: Int, y: Int, name: String): IElement {
+		if(classes.containsKey(name)) {
+			var position = Vector2i(x, y)
+			var el:IElement = classes[name]!!.getConstructor(Vector2i::class.java).newInstance(position)
+			map[position.x][position.y] = el
+			if(el is ITickable) {
+				tickables.put(position, el)
+			}
+			return el
+		} else {
+			throw IllegalStateException("Element $name doesn't exist!")
+		}
 	}
 
 	private var tempVec = Vector2i()

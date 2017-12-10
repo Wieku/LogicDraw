@@ -2,20 +2,21 @@ package me.wieku.circuits.api.state
 
 import java.util.*
 
-class StateManager(private val managerSize: Int) {
+open class StateManager(private val managerSize: Int) {
 	var input = ByteArray(managerSize)
 	var output = ByteArray(managerSize)
 	var used = ByteArray(managerSize)
+	var children = Array<State?>(managerSize){null}
 
-	private val indexPool: Queue<Int> = ArrayDeque<Int>()
-	private var lastIndex = 0
+	protected val indexPool: Queue<Int> = ArrayDeque<Int>()
+	protected var lastIndex = 0
 	var usedNodes = 0
 	private set
 
 	fun free(index: Int) {
 		input[index] = 0
 		output[index] = 0
-
+		children[index] = null
 		indexPool.add(index)
 	}
 
@@ -25,7 +26,15 @@ class StateManager(private val managerSize: Int) {
 		usedNodes = lastIndex-indexPool.size
 	}
 
-	operator fun invoke(): State = if(indexPool.isEmpty()) State(lastIndex++, this) else State(indexPool.poll(), this)
+	operator fun invoke(): State {
+		var state = if(indexPool.isEmpty()) {
+			State(lastIndex++, this)
+		} else {
+			State(indexPool.poll(), this)
+		}
+		children[state.id] = state
+		return state
+	}
 
 	operator fun get(index: Int) = input[index] > 0
 
