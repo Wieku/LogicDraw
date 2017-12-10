@@ -15,6 +15,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label
 import me.wieku.circuits.render.utils.FontManager
 import javafx.scene.Cursor.cursor
 import com.badlogic.gdx.scenes.scene2d.ui.TextField.TextFieldStyle
+import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane.ScrollPaneStyle
+
+
 
 
 
@@ -102,6 +105,17 @@ fun getTextFieldStyle(bg: Color, textColor: Color, size: Int): TextFieldStyle {
 	return stl
 }
 
+fun getScrollPaneStyle(bg: Color, knob: Color): ScrollPaneStyle {
+	val style = ScrollPaneStyle()
+
+	style.hScroll = getTxHRegion(bg, 10)
+	style.vScroll = getTxWRegion(bg, 10)
+	style.hScrollKnob = getTxHRegion(knob, 10)
+	style.vScrollKnob = getTxWRegion(knob, 10)
+
+	return style
+}
+
 private fun getStripeImg(background: Color, color: Color, size: Int): TextureRegionDrawable {
 	var pixmap = Pixmap(size, size, Pixmap.Format.RGBA8888)
 	pixmap.setColor(background)
@@ -121,11 +135,11 @@ private fun getTxRegion(color: Color): TextureRegionDrawable {
 	return getTxRegion(color, 1, 1)
 }
 
-private fun getTxWRegion(color: Color, width: Int): TextureRegionDrawable {
+fun getTxWRegion(color: Color, width: Int): TextureRegionDrawable {
 	return getTxRegion(color, width, 1)
 }
 
-private fun getTxHRegion(color: Color, height: Int): TextureRegionDrawable {
+fun getTxHRegion(color: Color, height: Int): TextureRegionDrawable {
 	return getTxRegion(color, 1, height)
 }
 

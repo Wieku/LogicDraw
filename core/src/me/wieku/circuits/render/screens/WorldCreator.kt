@@ -15,12 +15,16 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.utils.Scaling
 import com.badlogic.gdx.utils.viewport.ExtendViewport
 import me.wieku.circuits.Main
-import me.wieku.circuits.render.scene.Label
-import me.wieku.circuits.render.scene.Table
-import me.wieku.circuits.render.scene.getTextButtonStyle
-import me.wieku.circuits.render.scene.getTextFieldStyle
 import me.wieku.circuits.world.ClassicWorld
 import java.io.File
+import com.sun.javafx.robot.impl.FXRobotHelper.getChildren
+import com.badlogic.gdx.scenes.scene2d.ui.Table
+import com.sun.xml.internal.fastinfoset.alphabet.BuiltInRestrictedAlphabets.table
+import com.sun.xml.internal.fastinfoset.util.StringArray
+import me.wieku.circuits.render.scene.*
+import me.wieku.circuits.render.scene.actors.MenuMap
+import me.wieku.circuits.save.SaveManagers
+
 
 class WorldCreator:Screen {
 
@@ -43,7 +47,7 @@ class WorldCreator:Screen {
 
 		var creatorTable = Table()
 
-		creatorTable.add(Label("Create new world:", Color.WHITE, 24)).left().fillX().colspan(4).row()
+		creatorTable.add(Label("Create new world:", Color.WHITE, 24)).left().fillX().expandX().colspan(4).row()
 
 		creatorTable.add(Label("World name:", Color.WHITE, 12)).left()
 		var nameField = TextField("Test", getTextFieldStyle(Color(0.07f, 0.07f, 0.07f, 1f), Color.WHITE, 12))
@@ -63,20 +67,9 @@ class WorldCreator:Screen {
 			}
 			accept
 		}
-		var listener = object: ChangeListener() {
-			override fun changed(event: ChangeEvent?, actor: Actor?) {
-				if(widthField.text.isEmpty())
-					event!!.cancel()
-				if(heightField.text.isEmpty())
-					event!!.cancel()
-
-			}
-		}
 
 		widthField.textFieldFilter = filter
-		widthField.addListener(listener)
 		heightField.textFieldFilter = filter
-		heightField.addListener(listener)
 
 		creatorTable.add(widthField).left()
 		creatorTable.add(Label("x", Color.WHITE, 12)).left()
@@ -86,13 +79,36 @@ class WorldCreator:Screen {
 		createButton.addListener(object: ClickListener(){
 			override fun clicked(event: InputEvent?, x: Float, y: Float) {
 				super.clicked(event, x, y)
-				Main.screen = Editor(ClassicWorld(widthField.text.toInt(), heightField.text.toInt(), nameField.text))
+				val width = if(widthField.text.isEmpty()) 1 else widthField.text.toInt()
+				val height = if(heightField.text.isEmpty()) 1 else heightField.text.toInt()
+				Main.screen = Editor(ClassicWorld(width, height, nameField.text))
 			}
 		})
-		creatorTable.add(createButton).colspan(5).fillX()
+		creatorTable.add(createButton).colspan(4).fillX()
 
-		mainTable.add(creatorTable).center().row()
+		mainTable.add(creatorTable).width(1024f*2/3).center().row()
+		mainTable.add(Label("Load world:", Color.WHITE, 24)).left().row()
 
+		var worldsTable = Table()
+
+		for(file in File("maps/").listFiles()) {
+			try {
+				var arr = Array<String>(4) { ""}
+				arr[0] = file.name
+				var arr2 = SaveManagers.getHeader(file)
+				for(i in 1..3) arr[i] = arr2[i-1]
+				worldsTable.add(MenuMap(arr)).width(1024f*2/3).fillX().row()
+			} catch (e: Exception){
+				e.printStackTrace()
+			}
+		}
+
+		var pane = ScrollPane(worldsTable, getScrollPaneStyle(Color.BLACK, Color.WHITE))
+		pane.setFadeScrollBars(false)
+		pane.setSmoothScrolling(false)
+		(pane.getChildren().get(0) as Table).top().left()
+		pane.setCancelTouchFocus(true)
+		mainTable.add(pane).fill()
 		stage.addActor(mainTable)
 		mainTable.setFillParent(true)
 	}
@@ -104,7 +120,6 @@ class WorldCreator:Screen {
 	override fun render(delta: Float) {
 		Gdx.gl.glClearColor(0.05f, 0.05f, 0.05f, 1f)
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
-		mainTable.debug()
 
 		cell.height(banner.imageHeight)
 		mainTable.invalidate()

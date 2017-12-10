@@ -15,6 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.utils.viewport.ScreenViewport
+import me.wieku.circuits.Main
 import me.wieku.circuits.api.math.Vector2i
 import me.wieku.circuits.api.world.clock.AsyncClock
 import me.wieku.circuits.api.world.clock.Updatable
@@ -106,12 +107,21 @@ class Editor(val world: ClassicWorld):Screen, Updatable.ByTick {
 		saveButton.addListener(object: ClickListener(){
 			override fun clicked(event: InputEvent?, x: Float, y: Float) {
 				mainClock.stop()
-				SaveManagers.saveMap(world, File("test.ldmap"))
+				SaveManagers.saveMap(world, File("maps/${world.name.toLowerCase().replace(" ", "_")}.ldmap"))
 				mainClock.start()
 			}
 		})
 
-		elementTable.add(saveButton).fillX().center().padTop(10f).colspan(4)
+		elementTable.add(saveButton).fillX().center().padTop(10f).colspan(4).row()
+
+		var exitButton = TextButton("Exit", getTextButtonStyle(Color.BLACK, Color.WHITE, 15))
+		exitButton.addListener(object: ClickListener(){
+			override fun clicked(event: InputEvent?, x: Float, y: Float) {
+				Main.screen = WorldCreator()
+			}
+		})
+
+		elementTable.add(exitButton).fillX().center().padTop(10f).colspan(4)
 
 		stage.addActor(elementTable)
 
@@ -178,7 +188,6 @@ class Editor(val world: ClassicWorld):Screen, Updatable.ByTick {
 				renderer.rect(manipulator.position.x.toFloat(), manipulator.position.y.toFloat(), 1f, 1f)
 			}
 		}
-
 
 		renderer.end()
 		Gdx.gl.glDisable(GL20.GL_BLEND)

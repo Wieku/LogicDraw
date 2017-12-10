@@ -125,3 +125,6 @@ Thumbs.db
 /ios-moe/xcode/native/
 
 /version/build/
+
+/android/assets/maps/*
+!/android/assets/maps/test.ldmap
