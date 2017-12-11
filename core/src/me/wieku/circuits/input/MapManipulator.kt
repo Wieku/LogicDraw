@@ -101,7 +101,6 @@ class MapManipulator(val world:ClassicWorld, val camera: OrthographicCamera, val
 	private fun calculate(beginPosition: Vector2i, endPosition: Vector2i) {
 		if(endPosition.x < beginPosition.x) {
 			beginPosition.add(1, 0)
-
 		} else {
 			endPosition.add(1, 0)
 		}
@@ -150,6 +149,18 @@ class MapManipulator(val world:ClassicWorld, val camera: OrthographicCamera, val
 			rectangle = null
 			afterOperation = true
 			return false
+		}
+		if(button == Input.Buttons.MIDDLE) {
+			var upr = camera.unproject(Vector3(screenX.toFloat(), screenY.toFloat(), 0f))
+			var element = world.getElement(Vector2i(upr.x.toInt(), upr.y.toInt()))
+			if(element != null) {
+				for((k, v) in world.classes) {
+					if(v == element.javaClass) {
+						toPlace = k
+						break
+					}
+				}
+			}
 		}
 		processTouch(screenX, screenY, pointer, false)
 		return false
