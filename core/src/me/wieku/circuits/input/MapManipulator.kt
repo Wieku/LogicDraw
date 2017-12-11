@@ -22,19 +22,28 @@ class MapManipulator(val world:ClassicWorld, val camera: OrthographicCamera, val
 
 	private var beginPos = Vector2i()
 	private var endPos = Vector2i()
+	private var beginTMP = Vector2i()
+	private var endTMP = Vector2i()
+
+
 	var rectangle:Rectangle? = null
 	var clipboard:WorldClipboard? = null
 
 	var pasteMode = false
-
 	private var afterOperation = false
 
 	override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
 		if(stage.touchUp(screenX, screenY, pointer, button)) return true
 		if(Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT) && rectangle != null) {
 			var upr = camera.unproject(Vector3(screenX.toFloat(), screenY.toFloat(), 0f))
-			endPos.set(upr.x.toInt()+1, upr.y.toInt()+1).clamp(0, 0, world.width, world.height)
-			rectangle!!.reshape(beginPos, endPos)
+			endPos.set(upr.x.toInt(), upr.y.toInt()).clamp(0, 0, world.width, world.height)
+
+			beginTMP.set(beginPos)
+			endTMP.set(endPos)
+
+			calculate(beginTMP, endTMP)
+
+			rectangle!!.reshape(beginTMP, endTMP)
 		}
 		afterOperation = false
 		return false
@@ -74,12 +83,34 @@ class MapManipulator(val world:ClassicWorld, val camera: OrthographicCamera, val
 		if(stage.touchDragged(screenX, screenY, pointer)) return true
 		if(!pasteMode && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
 			var upr = camera.unproject(Vector3(screenX.toFloat(), screenY.toFloat(), 0f))
-			endPos.set(upr.x.toInt()+1, upr.y.toInt()+1).clamp(0, 0, world.width, world.height)
-			rectangle!!.reshape(beginPos, endPos)
+
+			endPos.set(upr.x.toInt(), upr.y.toInt()).clamp(0, 0, world.width, world.height)
+
+			beginTMP.set(beginPos)
+			endTMP.set(endPos)
+
+			calculate(beginTMP, endTMP)
+
+			rectangle!!.reshape(beginTMP, endTMP)
 		} else {
 			processTouch(screenX, screenY, pointer, true)
 		}
 		return false
+	}
+
+	private fun calculate(beginPosition: Vector2i, endPosition: Vector2i) {
+		if(endPosition.x < beginPosition.x) {
+			beginPosition.add(1, 0)
+
+		} else {
+			endPosition.add(1, 0)
+		}
+
+		if(endPosition.y < beginPosition.y) {
+			beginPosition.add(0, 1)
+		} else {
+			endPosition.add(0, 1)
+		}
 	}
 
 	override fun keyDown(keycode: Int): Boolean {
@@ -128,10 +159,10 @@ class MapManipulator(val world:ClassicWorld, val camera: OrthographicCamera, val
 		if(Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT) && Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
 			camera.position.sub(Gdx.input.getDeltaX(pointer)*camera.zoom, Gdx.input.getDeltaY(pointer)*camera.zoom, 0f)
 			camera.fit(world, stage)
+			afterOperation = true
 		} else {
-
-			var upr = camera.unproject(Vector3(screenX.toFloat(), screenY.toFloat(), 0f))
-			var res = Vector2i(upr.x.toInt(), upr.y.toInt())
+			val upr = camera.unproject(Vector3(screenX.toFloat(), screenY.toFloat(), 0f))
+			val res = Vector2i(upr.x.toInt(), upr.y.toInt())
 			position.set(res)
 			if(afterOperation || pasteMode || (rectangle != null)) return
 			if(dragging) {
@@ -147,7 +178,7 @@ class MapManipulator(val world:ClassicWorld, val camera: OrthographicCamera, val
 		}
 	}
 
-	private var bresenham = Bresenham2()
+	private val bresenham = Bresenham2()
 	private fun drawLine(from: Vector2i, to: Vector2i, place: Boolean) {
 		if(from == to) {
 			makeAction(from.x, from.y, place)
