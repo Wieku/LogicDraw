@@ -1,15 +1,14 @@
 package me.wieku.circuits.render.screens
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.InputAdapter
 import com.badlogic.gdx.Screen
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.MathUtils
-import com.badlogic.gdx.scenes.scene2d.Actor
-import com.badlogic.gdx.scenes.scene2d.InputEvent
-import com.badlogic.gdx.scenes.scene2d.Stage
+import com.badlogic.gdx.scenes.scene2d.*
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton
@@ -129,6 +128,14 @@ class Editor(val world: ClassicWorld):Screen, Updatable.ByTick {
 
 		Gdx.input.inputProcessor = manipulator
 
+		elementTable.touchable = Touchable.enabled
+
+		elementTable.addListener(object: InputListener(){
+			override fun touchDown(event: InputEvent?, x: Float, y: Float, pointer: Int, button: Int): Boolean {
+				super.touchDown(event, x, y, pointer, button)
+				return true
+			}
+		})
 
 	}
 
