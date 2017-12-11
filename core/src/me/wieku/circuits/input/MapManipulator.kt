@@ -118,6 +118,11 @@ class MapManipulator(val world:ClassicWorld, val camera: OrthographicCamera, val
 			if(Gdx.input.isKeyPressed(Input.Keys.C)) {
 				if(rectangle != null)
 					clipboard = WorldClipboard(rectangle!!, world)
+			} else if(Gdx.input.isKeyPressed(Input.Keys.X)){
+				if(rectangle != null) {
+					clipboard = WorldClipboard(rectangle!!, world)
+					world.clear(rectangle!!)
+				}
 			} else if(Gdx.input.isKeyPressed(Input.Keys.V)){
 				if(clipboard != null) {
 					pasteMode = true
