@@ -204,7 +204,7 @@ class MapManipulator(val world:ClassicWorld, val camera: OrthographicCamera, val
 				}
 				return false
 			}
-		} else if(rectangle != null) {
+		} else if(!Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT) && rectangle != null) {
 			rectangle = null
 			afterOperation = true
 			return false
