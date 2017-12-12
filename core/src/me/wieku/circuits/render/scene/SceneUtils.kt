@@ -71,7 +71,10 @@ fun TextTooltip(text: String): TextTooltip {
 
 fun getLabelStyle(color: Color, size: Int): LabelStyle {
 	val stl = LabelStyle()
-	stl.font = FontManager.getFont(FontManager.ROBOTO, size)
+	stl.font = if(size < 12) {
+		 FontManager.getFont(FontManager.ROBOTO_16, size)
+	} else FontManager.getFont(FontManager.ROBOTO, size)
+
 	stl.font.data.markupEnabled = true
 	stl.fontColor = color.cpy()
 	return stl

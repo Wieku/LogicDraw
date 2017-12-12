@@ -18,7 +18,8 @@ import java.util.HashMap
 
 enum class FontManager(var fontName: String, var genSize: Int, var widthScale: Float, var heightScale: Float) {
 
-	ROBOTO("Roboto-Regular", 64, 35f, 39f);
+	ROBOTO("Roboto-Regular", 64, 35f, 39f),
+	ROBOTO_16("Roboto-Regular", 16, 8.75f, 9.75f);
 
 	internal data class FontData(var regions:Array<TextureRegion>, var fontData: BitmapFontData)
 

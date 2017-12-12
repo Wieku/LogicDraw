@@ -131,7 +131,11 @@ class MapManipulator(val world:ClassicWorld, val camera: OrthographicCamera, val
 					pasteMode = true
 				}
 			}
-		} else if(rectangle != null && Gdx.input.isKeyPressed(Input.Keys.FORWARD_DEL)) {
+		} else if(Gdx.input.isKeyPressed(Input.Keys.S)) {
+			if(rectangle != null){
+				world.fill(rectangle!!, toPlace)
+			}
+		}	else if(rectangle != null && Gdx.input.isKeyPressed(Input.Keys.FORWARD_DEL)) {
 			world.clear(rectangle!!)
 		}
 		return false

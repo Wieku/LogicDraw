@@ -16,6 +16,7 @@ import me.wieku.circuits.api.math.Vector2i
 import me.wieku.circuits.api.world.clock.AsyncClock
 import me.wieku.circuits.api.world.clock.Updatable
 import me.wieku.circuits.input.MapManipulator
+import me.wieku.circuits.render.scene.Label
 import me.wieku.circuits.render.scene.actors.TextTooltip
 import me.wieku.circuits.render.scene.fit
 import me.wieku.circuits.render.scene.getTextButtonStyle
@@ -162,7 +163,27 @@ class Editor(val world: ClassicWorld):Screen, Updatable.ByTick {
 			}
 		})
 
-		elementTable.add(stepButton).fillX().center().padTop(10f).colspan(4)
+		elementTable.add(stepButton).fillX().center().padTop(10f).colspan(4).row()
+
+
+		var controls = Label(
+				"Controls:\n" +
+						"LMB: Pencil\n" +
+						"RMB: Eraser\n" +
+						"Middle: Pick brush\n" +
+						"Scroll: Zoom\n" +
+						"Shift+LMB: Move canvas\n" +
+						"A+LMB: Draw line\n" +
+						"D+LMB: Axis aligned line\n" +
+						"Ctrl+LMB: Make selection\n" +
+						"On selected area:\n" +
+						"DEL: Clear selection\n" +
+						"S: Fill selection\n" +
+						"Ctrl+X: Cut\n" +
+						"Ctrl+C: Copy\n" +
+						"Ctrl+V: Paste", Color.WHITE, 9)
+
+		elementTable.add(controls).fillX().expandY().colspan(4).bottom()
 
 		stage.addActor(elementTable)
 

@@ -104,6 +104,14 @@ class ClassicWorld(val width: Int, val height: Int, val name: String):IWorld {
 		}
 	}
 
+	fun fill(rectangle: Rectangle, toPlace: String) {
+		for (x in rectangle.x until rectangle.x + rectangle.width) {
+			for (y in rectangle.y until rectangle.y + rectangle.height) {
+				placeElement(Vector2i(x, y), toPlace)
+			}
+		}
+	}
+
 	fun paste(position: Vector2i, clipboard: WorldClipboard) {
 		for(x in 0 until clipboard.selection.width) {
 			for (y in 0 until clipboard.selection.height) {
