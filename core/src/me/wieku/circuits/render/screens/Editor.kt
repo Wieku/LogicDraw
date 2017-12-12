@@ -24,6 +24,7 @@ import me.wieku.circuits.render.scene.fit
 import me.wieku.circuits.render.scene.getTextButtonStyle
 import me.wieku.circuits.save.SaveManagers
 import me.wieku.circuits.utils.Version
+import me.wieku.circuits.utils.asString
 import me.wieku.circuits.world.ClassicWorld
 import java.io.File
 import java.util.*
@@ -49,6 +50,8 @@ class Editor(val world: ClassicWorld):Screen, Updatable.ByTick {
 	var tooltyp: TextTooltip
 
 	private val gray = Color(0x1f1f1faf)
+
+	private var lastSave = "Not saved"
 
 	init {
 		renderer = ShapeRenderer()
@@ -106,7 +109,13 @@ class Editor(val world: ClassicWorld):Screen, Updatable.ByTick {
 		saveButton.addListener(object: ClickListener(){
 			override fun clicked(event: InputEvent?, x: Float, y: Float) {
 				mainClock.stop()
-				SaveManagers.saveMap(world, File("maps/${world.name.toLowerCase().replace(" ", "_")}.ldmap"))
+				try {
+					SaveManagers.saveMap(world, File("maps/${world.name.toLowerCase().replace(" ", "_")}.ldmap"))
+					lastSave = "Last saved: " + Date().asString()
+				} catch (err: Exception) {
+					lastSave = "Error saving file!!!"
+				}
+
 				mainClock.start()
 			}
 		})
@@ -154,7 +163,7 @@ class Editor(val world: ClassicWorld):Screen, Updatable.ByTick {
 
 		delta1+=delta
 		if(delta1>=1f) {
-			Gdx.graphics.setTitle("LogicDraw ${Version.version} (world: ${world.name}) (tickrate: $tickrate) (fps: ${Gdx.graphics.framesPerSecond}) (${world.getStateManager().usedNodes} nodes) (${world.entities} entities)")
+			Gdx.graphics.setTitle("LogicDraw ${Version.version} (world: ${world.name}) (tickrate: $tickrate) (fps: ${Gdx.graphics.framesPerSecond}) (${world.getStateManager().usedNodes} nodes) (${world.entities} entities) | $lastSave")
 			delta1 = 0f
 		}
 
