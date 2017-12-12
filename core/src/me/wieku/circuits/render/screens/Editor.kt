@@ -257,6 +257,7 @@ class Editor(val world: ClassicWorld):Screen, Updatable.ByTick {
 	}
 
 	override fun dispose() {
+		mainClock.stop()
 		renderer.dispose()
 	}
 
