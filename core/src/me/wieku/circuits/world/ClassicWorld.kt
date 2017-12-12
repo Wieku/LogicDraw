@@ -78,7 +78,6 @@ class ClassicWorld(val width: Int, val height: Int, val name: String):IWorld {
 				}
 			}
 		}
-
 	}
 
 	fun forcePlace(x: Int, y: Int, name: String): IElement {
@@ -151,8 +150,23 @@ class ClassicWorld(val width: Int, val height: Int, val name: String):IWorld {
 
 	override fun getNeighboursOf(element: IElement, consumer: (IElement) -> Unit) = getNeighboursOf(element).forEach(consumer)
 
+	private val stack = ArrayDeque<Vector2i>()
+	private var first = true
+	private var tempVector = Vector2i()
 	override fun updateNeighboursOf(pos: Vector2i) {
-		getNeighboursOf(pos).forEach { it.onNeighbourChange(pos, this) }
+		stack.push(pos)
+		if(first) {
+			first = false
+			while(stack.isNotEmpty()) {
+				val position = stack.pop()
+				for(i in 0 until Direction.VALID_DIRECTIONS.size) {
+					tempVector.set(position).add(Direction.VALID_DIRECTIONS[i].asVector)
+					val tmpE = getElement(tempVector)
+					if (tmpE != null) tmpE.onNeighbourChange(position, this)
+				}
+			}
+			first = true
+		}
 	}
 
 	override fun getStateManager(): StateManager = manager

@@ -199,7 +199,11 @@ class Editor(val world: ClassicWorld):Screen, Updatable.ByTick {
 				return true
 			}
 		})
-
+		var max = 0
+		world.getStateManager().children.forEach {
+			if(it != null) max = Math.max(max, it.holders)
+		}
+		println("MAX: $max")
 	}
 
 	override fun show() {
