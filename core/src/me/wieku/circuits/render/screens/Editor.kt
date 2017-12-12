@@ -46,7 +46,7 @@ class Editor(val world: ClassicWorld):Screen, Updatable.ByTick {
 
 	private var brushes: HashMap<String, Color> = HashMap()
 
-	var tooltyp: TextTooltip
+	var tooltip: TextTooltip
 
 	private val gray = Color(0x1f1f1faf)
 
@@ -58,7 +58,7 @@ class Editor(val world: ClassicWorld):Screen, Updatable.ByTick {
 		stage = Stage(ScreenViewport())
 		manipulator = MapManipulator(world, camera, stage)
 
-		tooltyp = TextTooltip(Color.BLACK, Color.WHITE, 10)
+		tooltip = TextTooltip(Color.BLACK, Color.WHITE, 10)
 
 		camera.zoom = if(stage.width > stage.height) (world.height.toFloat()/stage.height) else (world.width.toFloat()/stage.width)
 		camera.position.set(world.width/2f, world.height/2f, 0f)
@@ -92,7 +92,7 @@ class Editor(val world: ClassicWorld):Screen, Updatable.ByTick {
 					manipulator.toPlace = it.key
 				}
 			})
-			button.addListener(tooltyp.getListener(it.key))
+			button.addListener(tooltip.getListener(it.key))
 
 			elementTable.add(button).pad(3f).expandX().size(40f)
 			++count
@@ -187,7 +187,7 @@ class Editor(val world: ClassicWorld):Screen, Updatable.ByTick {
 
 		stage.addActor(elementTable)
 
-		stage.addActor(tooltyp.tooltipTable)
+		stage.addActor(tooltip.tooltipTable)
 
 		Gdx.input.inputProcessor = manipulator
 

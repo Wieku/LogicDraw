@@ -18,6 +18,7 @@ class TextTooltip(background: Color, textColor: Color, textSize: Int): InputList
 	init {
 		tooltipTable.add(tooltipLabel).pad(5f).fill()
 		tooltipTable.touchable = null
+		tooltipLabel.touchable = null
 		tooltipTable.isVisible = false
 	}
 
