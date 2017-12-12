@@ -7,10 +7,7 @@ import me.wieku.circuits.api.math.Rectangle
 import me.wieku.circuits.api.math.Vector2i
 import me.wieku.circuits.api.state.StateManager
 import me.wieku.circuits.api.world.IWorld
-import me.wieku.circuits.world.elements.Controller
-import me.wieku.circuits.world.elements.Cross
-import me.wieku.circuits.world.elements.Input
-import me.wieku.circuits.world.elements.Wire
+import me.wieku.circuits.world.elements.*
 import me.wieku.circuits.world.elements.gates.*
 import java.util.*
 
@@ -39,6 +36,7 @@ class ClassicWorld(val width: Int, val height: Int, val name: String):IWorld {
 		classes.put("nand", NandGate::class.java)
 		classes.put("xor", XorGate::class.java)
 		classes.put("xnor", XnorGate::class.java)
+		classes.put("description", Description::class.java)
 	}
 
 

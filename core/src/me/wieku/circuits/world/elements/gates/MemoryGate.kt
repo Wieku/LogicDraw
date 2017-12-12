@@ -53,7 +53,7 @@ class MemoryGate(pos: Vector2i): SaveableGate(pos) {
 					if(it is Controller) controllers += it else inputs += it
 				}
 				is BasicWire -> {
-					outputs += it.getState(Axis.getAxis(getPosition(), it.getPosition()))
+					outputs += it.getState(Axis.getAxis(getPosition(), it.getPosition()))!!
 				}
 			}
 		}

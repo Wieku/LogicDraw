@@ -19,6 +19,7 @@ Application is in early development, so be aware that critical bugs can occur.
 |Nand gate|![](https://placehold.it/15/004D40/000000?text=+)|![](https://placehold.it/15/00695C/000000?text=+)|
 |Xor gate|![](https://placehold.it/15/C51162/000000?text=+)|![](https://placehold.it/15/F50057/000000?text=+)|
 |Xnor gate|![](https://placehold.it/15/880E4F/000000?text=+)|![](https://placehold.it/15/AD1457/000000?text=+)|
+|Description|![](https://placehold.it/15/8D6E63/000000?text=+)|![](https://placehold.it/15/8D6E63/000000?text=+)|
 
 ## How to run it
 To run the project, just type: `./gradlew desktop:run` (`gradlew desktop:run` on Windows)

@@ -8,7 +8,7 @@ import me.wieku.circuits.api.math.Vector2i
 interface IElement {
 
 	fun setState(state: State, axis: Axis)
-	fun getState(axis: Axis): State
+	fun getState(axis: Axis): State?
 
 	fun getPosition(): Vector2i
 

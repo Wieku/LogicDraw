@@ -45,7 +45,9 @@ class Input(pos: Vector2i):BasicInput(pos), Saveable {
 		world.getNeighboursOf(this) {
 			when(it) {
 				is BasicWire -> {
-					inputs += it.getState(Axis.getAxis(getPosition(), it.getPosition()))
+					var intSt = it.getState(Axis.getAxis(getPosition(), it.getPosition()))
+					if(intSt != null)
+						inputs += intSt
 				}
 			}
 		}

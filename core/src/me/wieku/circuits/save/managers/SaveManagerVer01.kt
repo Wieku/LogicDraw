@@ -69,7 +69,7 @@ class SaveManagerVer01 : SaveManager {
 		for (x in 0 until world.width) {
 			for (y in 0 until world.height) {
 				var element = world[x, y]
-				if (element != null && element is Saveable) {
+				if (element != null) {
 					file.writeInt(x)
 					file.writeInt(y)
 					for((k, v) in world.classes) {
@@ -78,7 +78,9 @@ class SaveManagerVer01 : SaveManager {
 							break
 						}
 					}
-					(element as Saveable).save(this)
+
+					if(element is Saveable)
+						(element as Saveable).save(this)
 				}
 			}
 		}

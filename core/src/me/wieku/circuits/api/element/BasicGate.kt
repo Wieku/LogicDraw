@@ -31,7 +31,9 @@ abstract class BasicGate(pos: Vector2i): BasicElement(pos),ITickable {
 			when(it) {
 				is BasicInput -> inputs += it
 				is BasicWire -> {
-					outputs += it.getState(Axis.getAxis(getPosition(), it.getPosition()))
+					var state = it.getState(Axis.getAxis(getPosition(), it.getPosition()))
+					if(state != null)
+						outputs += state
 				}
 			}
 		}

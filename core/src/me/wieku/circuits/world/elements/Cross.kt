@@ -25,7 +25,7 @@ class Cross(pos: Vector2i): BasicWire(pos), Saveable {
 			for(i in 0 until list.size) {
 				if(list[i] !is BasicWire) continue
 				val ax = Axis.getAxis(pos, list[i].getPosition())
-				val hol = list[i].getState(ax).holders
+				val hol = list[i].getState(ax)!!.holders
 				if(ax == Axis.HORIZONTAL && hol > sizex) {
 					ix = i
 					sizex = hol
@@ -36,13 +36,13 @@ class Cross(pos: Vector2i): BasicWire(pos), Saveable {
 
 			}
 			stateH = if(ix >= 0) {
-				list[ix].getState(Axis.getAxis(pos, list[ix].getPosition()))
+				list[ix].getState(Axis.getAxis(pos, list[ix].getPosition()))!!
 			} else {
 				world.getStateManager()()
 			}
 
 			stateV = if(iy >= 0) {
-				list[iy].getState(Axis.getAxis(pos, list[iy].getPosition()))
+				list[iy].getState(Axis.getAxis(pos, list[iy].getPosition()))!!
 			} else {
 				world.getStateManager()()
 			}
@@ -70,7 +70,7 @@ class Cross(pos: Vector2i): BasicWire(pos), Saveable {
 				var stateU = world.getElement(position)!!.getState(axis)
 				if(stateH != stateU) {
 					stateH.unregister()
-					stateH = stateU
+					stateH = stateU!!
 					stateH.register()
 					world.updateNeighboursOf(pos)
 				}
@@ -85,7 +85,7 @@ class Cross(pos: Vector2i): BasicWire(pos), Saveable {
 				var stateU = world.getElement(position)!!.getState(axis)
 				if(stateV != stateU) {
 					stateV.unregister()
-					stateV = stateU
+					stateV = stateU!!
 					stateV.register()
 					world.updateNeighboursOf(pos)
 				}
