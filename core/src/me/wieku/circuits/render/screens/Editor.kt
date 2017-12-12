@@ -129,7 +129,42 @@ class Editor(val world: ClassicWorld):Screen, Updatable.ByTick {
 			}
 		})
 
-		elementTable.add(exitButton).fillX().center().padTop(10f).colspan(4)
+		elementTable.add(exitButton).fillX().center().padTop(10f).colspan(4).row()
+
+		var clockButton = TextButton("Stop clock", getTextButtonStyle(Color.BLACK, Color.WHITE, 15))
+
+		var stepButton = TextButton("Make step", getTextButtonStyle(Color.BLACK, Color.WHITE, 15))
+
+		stepButton.isDisabled = true
+
+		clockButton.addListener(object: ClickListener(){
+			override fun clicked(event: InputEvent?, x: Float, y: Float) {
+				if(clockButton.text.trim() == "Stop clock") {
+					println("ffeergrdgrd")
+					mainClock.stop()
+					clockButton.setText("Start clock")
+					stepButton.isDisabled = false
+				} else if(clockButton.text.trim() == "Start clock") {
+					mainClock.start()
+					clockButton.setText("Stop clock")
+					stepButton.isDisabled = true
+				}
+
+			}
+		})
+
+
+
+		elementTable.add(clockButton).fillX().center().padTop(40f).colspan(4).row()
+
+		stepButton.addListener(object: ClickListener(){
+			override fun clicked(event: InputEvent?, x: Float, y: Float) {
+				if(!stepButton.isDisabled)
+					mainClock.step()
+			}
+		})
+
+		elementTable.add(stepButton).fillX().center().padTop(10f).colspan(4)
 
 		stage.addActor(elementTable)
 

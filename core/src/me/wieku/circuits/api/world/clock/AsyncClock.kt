@@ -54,6 +54,14 @@ class AsyncClock (private val updatable: Updatable<*>, tickRate: Int)  {
 
 	fun getTPS() = currentTPS
 
+	@Suppress("UNCHECKED_CAST")
+	fun step() {
+		executor.schedule({
+			(updatable as Updatable<Number>).update(if (delta) sleepTime else currentTick)
+			++currentTick
+		}, 0, TimeUnit.NANOSECONDS)
+	}
+
 	companion object {
 		val executor: ScheduledExecutorService = Executors.newScheduledThreadPool(5)
 	}
