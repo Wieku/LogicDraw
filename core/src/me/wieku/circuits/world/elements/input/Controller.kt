@@ -1,4 +1,4 @@
-package me.wieku.circuits.world.elements
+package me.wieku.circuits.world.elements.input
 
 import me.wieku.circuits.api.element.BasicInput
 import me.wieku.circuits.api.element.BasicWire
@@ -11,7 +11,7 @@ import me.wieku.circuits.save.Saveable
 import me.wieku.circuits.world.ClassicWorld
 import java.util.*
 
-class Input(pos: Vector2i):BasicInput(pos), Saveable {
+class Controller(pos: Vector2i): BasicInput(pos), Saveable {
 
 	private lateinit var state: State
 	private val inputs = ArrayList<State>()
@@ -47,7 +47,7 @@ class Input(pos: Vector2i):BasicInput(pos), Saveable {
 				is BasicWire -> {
 					var intSt = it.getState(Axis.getAxis(getPosition(), it.getPosition()))
 					if(intSt != null)
-						inputs += intSt
+					inputs += intSt
 				}
 			}
 		}
@@ -58,9 +58,9 @@ class Input(pos: Vector2i):BasicInput(pos), Saveable {
 		world.updateNeighboursOf(pos)
 	}
 
-	override fun getIdleColor(): Int = 0x01579B
+	override fun getIdleColor(): Int = 0x1B5E20
 
-	override fun getActiveColor(): Int = 0x0277BD
+	override fun getActiveColor(): Int = 0x2E7D32
 
 	override fun getColor(): Int = if(isActive()) getActiveColor() else getIdleColor()
 

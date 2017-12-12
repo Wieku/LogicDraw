@@ -9,6 +9,14 @@ import me.wieku.circuits.api.state.StateManager
 import me.wieku.circuits.api.world.IWorld
 import me.wieku.circuits.world.elements.*
 import me.wieku.circuits.world.elements.gates.*
+import me.wieku.circuits.world.elements.input.Controller
+import me.wieku.circuits.world.elements.input.Input
+import me.wieku.circuits.world.elements.wire.Cross
+import me.wieku.circuits.world.elements.wire.DarkWire
+import me.wieku.circuits.world.elements.wire.Wire
+import me.wieku.circuits.world.elements.wire.display.GreenPixel
+import me.wieku.circuits.world.elements.wire.display.RedPixel
+import me.wieku.circuits.world.elements.wire.display.WhitePixel
 import java.util.*
 
 //TODO: switch to tasks instead of locking objects
@@ -36,6 +44,10 @@ class ClassicWorld(val width: Int, val height: Int, val name: String):IWorld {
 		classes.put("nand", NandGate::class.java)
 		classes.put("xor", XorGate::class.java)
 		classes.put("xnor", XnorGate::class.java)
+		classes.put("pixel_white", WhitePixel::class.java)
+		classes.put("pixel_green", GreenPixel::class.java)
+		classes.put("pixel_red", RedPixel::class.java)
+		classes.put("dark_wire", DarkWire::class.java)
 		classes.put("description", Description::class.java)
 	}
 

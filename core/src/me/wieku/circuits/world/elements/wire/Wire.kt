@@ -1,4 +1,4 @@
-package me.wieku.circuits.world.elements
+package me.wieku.circuits.world.elements.wire
 
 import me.wieku.circuits.api.element.BasicWire
 import me.wieku.circuits.api.math.Axis

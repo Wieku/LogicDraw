@@ -7,7 +7,7 @@ import me.wieku.circuits.api.math.Vector2i
 import me.wieku.circuits.api.world.IWorld
 import me.wieku.circuits.save.SaveManager
 import me.wieku.circuits.world.ClassicWorld
-import me.wieku.circuits.world.elements.Controller
+import me.wieku.circuits.world.elements.input.Controller
 import java.util.*
 
 class MemoryGate(pos: Vector2i): SaveableGate(pos) {
