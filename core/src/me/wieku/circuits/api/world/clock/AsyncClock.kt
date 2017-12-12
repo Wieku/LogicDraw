@@ -64,6 +64,13 @@ class AsyncClock (private val updatable: Updatable<*>, tickRate: Int)  {
 
 	companion object {
 		val executor: ScheduledExecutorService = Executors.newScheduledThreadPool(5)
+
+		fun dispose() {
+			executor.shutdown()
+			var terminated = executor.awaitTermination(2, TimeUnit.SECONDS)
+			if(!terminated)
+				executor.shutdownNow()
+		}
 	}
 
 	init {

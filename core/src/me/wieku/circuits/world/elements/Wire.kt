@@ -9,7 +9,7 @@ import me.wieku.circuits.save.SaveManager
 import me.wieku.circuits.save.Saveable
 import me.wieku.circuits.world.ClassicWorld
 
-class Wire(pos: Vector2i): BasicWire(pos), Saveable {
+open class Wire(pos: Vector2i): BasicWire(pos), Saveable {
 
 	lateinit var state:State
 
