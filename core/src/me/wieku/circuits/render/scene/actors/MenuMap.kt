@@ -42,7 +42,8 @@ class MenuMap(arr: Array<String>):Table() {
 		button.addListener(object: ClickListener() {
 			override fun clicked(event: InputEvent?, x: Float, y: Float) {
 				super.clicked(event, x, y)
-				Main.screen = Editor(SaveManagers.loadMap(File("maps/${arr[0]}")))
+				var file = File("maps/${arr[0]}")
+				Main.screen = Editor(SaveManagers.loadMap(file), file)
 			}
 		})
 

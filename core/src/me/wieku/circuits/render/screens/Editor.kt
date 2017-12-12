@@ -37,7 +37,7 @@ class Editor(val world: ClassicWorld):Screen, Updatable.ByTick {
 
 	private var renderer: ShapeRenderer
 	private var camera: OrthographicCamera
-	private var stage: Stage
+	var stage: Stage
 	private var menuButton: Table
 	private var saveButton: TextButton
 
@@ -52,11 +52,17 @@ class Editor(val world: ClassicWorld):Screen, Updatable.ByTick {
 
 	private var lastSave = "Not saved"
 
+	private var file: File = File("maps/${world.name.toLowerCase().replace(" ", "_")}.ldmap")
+
+	constructor(world: ClassicWorld, file: File):this(world) {
+		this.file = file
+	}
+
 	init {
 		renderer = ShapeRenderer()
 		camera = OrthographicCamera(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
 		stage = Stage(ScreenViewport())
-		manipulator = MapManipulator(world, camera, stage)
+		manipulator = MapManipulator(world, camera, this)
 
 		tooltip = TextTooltip(Color.BLACK, Color.WHITE, 10)
 
@@ -107,15 +113,7 @@ class Editor(val world: ClassicWorld):Screen, Updatable.ByTick {
 		saveButton = TextButton("Save", getTextButtonStyle(Color.BLACK, Color.WHITE, 15))
 		saveButton.addListener(object: ClickListener(){
 			override fun clicked(event: InputEvent?, x: Float, y: Float) {
-				mainClock.stop()
-				try {
-					SaveManagers.saveMap(world, File("maps/${world.name.toLowerCase().replace(" ", "_")}.ldmap"))
-					lastSave = "Last saved: " + Date().asString()
-				} catch (err: Exception) {
-					lastSave = "Error saving file!!!"
-				}
-
-				mainClock.start()
+				saveFile()
 			}
 		})
 
@@ -178,10 +176,11 @@ class Editor(val world: ClassicWorld):Screen, Updatable.ByTick {
 						"Ctrl+LMB: Make selection\n" +
 						"On selected area:\n" +
 						"DEL: Clear selection\n" +
-						"S: Fill selection\n" +
+						"F: Fill selection\n" +
 						"Ctrl+X: Cut\n" +
 						"Ctrl+C: Copy\n" +
-						"Ctrl+V: Paste", Color.WHITE, 9)
+						"Ctrl+V: Paste\n" +
+						"Ctrl+S: Save world", Color.WHITE, 9)
 
 		elementTable.add(controls).fillX().expandY().colspan(4).bottom()
 
@@ -203,8 +202,21 @@ class Editor(val world: ClassicWorld):Screen, Updatable.ByTick {
 		world.getStateManager().children.forEach {
 			if(it != null) max = Math.max(max, it.holders)
 		}
-		println("MAX: $max")
+		println("Biggest node size: $max")
 	}
+
+	fun saveFile() {
+		mainClock.stop()
+		try {
+			SaveManagers.saveMap(world, file)
+			lastSave = "Last saved: " + Date().asString()
+		} catch (err: Exception) {
+			lastSave = "Error saving file!!!"
+		}
+
+		mainClock.start()
+	}
+
 
 	override fun show() {
 		mainClock = AsyncClock(this, 1000)
