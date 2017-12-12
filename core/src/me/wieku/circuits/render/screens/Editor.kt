@@ -1,15 +1,12 @@
 package me.wieku.circuits.render.screens
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.InputAdapter
 import com.badlogic.gdx.Screen
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
-import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.scenes.scene2d.*
-import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
@@ -23,6 +20,7 @@ import me.wieku.circuits.render.scene.actors.TextTooltip
 import me.wieku.circuits.render.scene.fit
 import me.wieku.circuits.render.scene.getTextButtonStyle
 import me.wieku.circuits.save.SaveManagers
+import me.wieku.circuits.utils.Bresenham
 import me.wieku.circuits.utils.Version
 import me.wieku.circuits.utils.asString
 import me.wieku.circuits.world.ClassicWorld
@@ -233,7 +231,13 @@ class Editor(val world: ClassicWorld):Screen, Updatable.ByTick {
 			if(manipulator.pasteMode) {
 				manipulator.clipboard!!.drawClipboard(manipulator.position, renderer)
 			}
-		}else {
+		} else {
+			if(manipulator.lineMode) {
+				renderer.color = brushes[manipulator.toPlace]
+				Bresenham.iterateFast(manipulator.beginPos, manipulator.endPos) {
+					renderer.rect(it.x.toFloat(), it.y.toFloat(), 1f, 1f)
+				}
+			}
 			if(manipulator.position.isInBounds(0, 0, world.width-1, world.height-1)) {
 				renderer.color = brushes[manipulator.toPlace]
 				renderer.rect(manipulator.position.x.toFloat(), manipulator.position.y.toFloat(), 1f, 1f)

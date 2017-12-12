@@ -1,5 +1,7 @@
 package me.wieku.circuits.api.math
 
+import com.badlogic.gdx.math.MathUtils
+
 class Vector2i(var x: Int, var y: Int) {
 
 	constructor() : this(0, 0)
@@ -79,6 +81,12 @@ class Vector2i(var x: Int, var y: Int) {
 
 	fun len(): Int {
 		return Math.sqrt((x * x + y * y).toDouble()).toInt()
+	}
+
+	fun angle(): Float {
+		var angle = Math.atan2(y.toDouble(), x.toDouble()).toFloat() * MathUtils.radiansToDegrees
+		if (angle < 0) angle += 360f
+		return angle
 	}
 
 	fun clamp(boundX0: Int, boundY0:Int, boundX1: Int, boundY1: Int): Vector2i = set(clamp(x, boundX0, boundX1), clamp(y, boundY0, boundY1))

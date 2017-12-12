@@ -20,8 +20,8 @@ class MapManipulator(val world:ClassicWorld, val camera: OrthographicCamera, val
 	private var last = Vector2i(-1, -1)
 	var position = Vector2i()
 
-	private var beginPos = Vector2i()
-	private var endPos = Vector2i()
+	val beginPos = Vector2i()
+	val endPos = Vector2i()
 	private var beginTMP = Vector2i()
 	private var endTMP = Vector2i()
 
@@ -30,28 +30,8 @@ class MapManipulator(val world:ClassicWorld, val camera: OrthographicCamera, val
 	var clipboard:WorldClipboard? = null
 
 	var pasteMode = false
+	var lineMode = false
 	private var afterOperation = false
-
-	override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-		if(stage.touchUp(screenX, screenY, pointer, button)) return true
-		if(Gdx.input.isKeyPressed(Input.Keys.ALT_LEFT) && afterOperation) {
-			var upr = camera.unproject(Vector3(screenX.toFloat(), screenY.toFloat(), 0f))
-			endPos.set(upr.x.toInt(), upr.y.toInt()).clamp(0, 0, world.width, world.height)
-			drawLine(beginPos, endPos, true)
-		} else if(Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT) && rectangle != null) {
-			var upr = camera.unproject(Vector3(screenX.toFloat(), screenY.toFloat(), 0f))
-			endPos.set(upr.x.toInt(), upr.y.toInt()).clamp(0, 0, world.width, world.height)
-
-			beginTMP.set(beginPos)
-			endTMP.set(endPos)
-
-			calculate(beginTMP, endTMP)
-
-			rectangle!!.reshape(beginTMP, endTMP)
-		}
-		afterOperation = false
-		return false
-	}
 
 	override fun mouseMoved(screenX: Int, screenY: Int): Boolean {
 		if(stage.mouseMoved(screenX, screenY)) return true
@@ -78,16 +58,36 @@ class MapManipulator(val world:ClassicWorld, val camera: OrthographicCamera, val
 
 	override fun keyUp(keycode: Int): Boolean {
 		if(stage.keyUp(keycode)) return true
+		if(keycode == Input.Keys.A || keycode == Input.Keys.D) {
+			lineMode = false
+		}
 		return false
 	}
 
 	override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
 		if(stage.touchDragged(screenX, screenY, pointer)) return true
-		if(Gdx.input.isKeyPressed(Input.Keys.ALT_LEFT)) return true
+
+		if(Gdx.input.isKeyPressed(Input.Keys.A) && afterOperation) {
+			var upr = camera.unproject(Vector3(screenX.toFloat(), screenY.toFloat(), 0f))
+			endPos.set(upr.x.toInt(), upr.y.toInt()).clamp(0, 0, world.width-1, world.height-1)
+			return true
+		} else if(Gdx.input.isKeyPressed(Input.Keys.D) && afterOperation) {
+			var upr = camera.unproject(Vector3(screenX.toFloat(), screenY.toFloat(), 0f))
+			endPos.set(upr.x.toInt(), upr.y.toInt()).clamp(0, 0, world.width-1, world.height-1)
+			var angle = endPos.copy().sub(beginPos).angle()
+
+			if(angle >= 315 || angle <=45 || (angle in 135.0..225.0)) {
+				endPos.set(endPos.x, beginPos.y)
+			} else {
+				endPos.set(beginPos.x, endPos.y)
+			}
+			return true
+		}
+
 		if(!pasteMode && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
 			var upr = camera.unproject(Vector3(screenX.toFloat(), screenY.toFloat(), 0f))
 
-			endPos.set(upr.x.toInt(), upr.y.toInt()).clamp(0, 0, world.width, world.height)
+			endPos.set(upr.x.toInt(), upr.y.toInt()).clamp(0, 0, world.width-1, world.height-1)
 
 			beginTMP.set(beginPos)
 			endTMP.set(endPos)
@@ -137,17 +137,54 @@ class MapManipulator(val world:ClassicWorld, val camera: OrthographicCamera, val
 		return false
 	}
 
+	override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+		if(stage.touchUp(screenX, screenY, pointer, button)) return true
+		if(Gdx.input.isKeyPressed(Input.Keys.A) && afterOperation) {
+			var upr = camera.unproject(Vector3(screenX.toFloat(), screenY.toFloat(), 0f))
+			endPos.set(upr.x.toInt(), upr.y.toInt()).clamp(0, 0, world.width-1, world.height-1)
+			lineMode = false
+			drawLine(beginPos, endPos, true)
+		} else if(Gdx.input.isKeyPressed(Input.Keys.D) && afterOperation) {
+			var upr = camera.unproject(Vector3(screenX.toFloat(), screenY.toFloat(), 0f))
+			endPos.set(upr.x.toInt(), upr.y.toInt()).clamp(0, 0, world.width-1, world.height-1)
+			var angle = endPos.copy().sub(beginPos).angle()
+
+			if(angle >= 315 || angle <=45 || (angle in 135.0..225.0)) {
+				endPos.set(endPos.x, beginPos.y)
+			} else {
+				endPos.set(beginPos.x, endPos.y)
+			}
+			lineMode = false
+			drawLine(beginPos, endPos, true)
+		} else if(Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT) && rectangle != null) {
+			var upr = camera.unproject(Vector3(screenX.toFloat(), screenY.toFloat(), 0f))
+			endPos.set(upr.x.toInt(), upr.y.toInt()).clamp(0, 0, world.width-1, world.height-1)
+
+			beginTMP.set(beginPos)
+			endTMP.set(endPos)
+
+			calculate(beginTMP, endTMP)
+
+			rectangle!!.reshape(beginTMP, endTMP)
+		}
+		afterOperation = false
+		return false
+	}
+
 	override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
 		if(stage.touchDown(screenX, screenY, pointer, button)) return true
 
-		if(Gdx.input.isKeyPressed(Input.Keys.ALT_LEFT)) {
+		if(Gdx.input.isKeyPressed(Input.Keys.A) || Gdx.input.isKeyPressed(Input.Keys.D)) {
 			var upr = camera.unproject(Vector3(screenX.toFloat(), screenY.toFloat(), 0f))
-			beginPos.set(upr.x.toInt(), upr.y.toInt()).clamp(0, 0, world.width, world.height)
+			beginPos.set(upr.x.toInt(), upr.y.toInt()).clamp(0, 0, world.width-1, world.height-1)
+			endPos.set(upr.x.toInt(), upr.y.toInt()).clamp(0, 0, world.width-1, world.height-1)
 			afterOperation = true
+			lineMode = true
+			return false
 		} else if(Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
 			if(button == Input.Buttons.LEFT) {
 				var upr = camera.unproject(Vector3(screenX.toFloat(), screenY.toFloat(), 0f))
-				beginPos.set(upr.x.toInt(), upr.y.toInt()).clamp(0, 0, world.width, world.height)
+				beginPos.set(upr.x.toInt(), upr.y.toInt()).clamp(0, 0, world.width-1, world.height-1)
 				endPos.set(beginPos)
 				rectangle = Rectangle(beginPos, endPos)
 			}
