@@ -46,6 +46,7 @@ class MemoryGate(pos: Vector2i): SaveableGate(pos) {
 	override protected fun updateIO(world: IWorld) {
 		inputs.clear()
 		outputs.clear()
+		controllers.clear()
 
 		world.getNeighboursOf(this) {
 			when(it) {

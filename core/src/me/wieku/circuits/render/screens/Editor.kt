@@ -2,9 +2,7 @@ package me.wieku.circuits.render.screens
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Screen
-import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.GL20
-import com.badlogic.gdx.graphics.OrthographicCamera
+import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.scenes.scene2d.*
 import com.badlogic.gdx.scenes.scene2d.ui.Table
@@ -110,7 +108,7 @@ class Editor(val world: ClassicWorld):Screen, Updatable.ByTick {
 		}
 		elementTable.row()
 
-		saveButton = TextButton("Save", getTextButtonStyle(Color.BLACK, Color.WHITE, 15))
+		saveButton = TextButton("Save", getTextButtonStyle(Color.BLACK, Color.WHITE, 13))
 		saveButton.addListener(object: ClickListener(){
 			override fun clicked(event: InputEvent?, x: Float, y: Float) {
 				saveFile()
@@ -119,7 +117,31 @@ class Editor(val world: ClassicWorld):Screen, Updatable.ByTick {
 
 		elementTable.add(saveButton).fillX().center().padTop(10f).colspan(4).row()
 
-		var exitButton = TextButton("Exit", getTextButtonStyle(Color.BLACK, Color.WHITE, 15))
+		//NOTE: THIS WILL BE ADDED WITH UI DESIGN UPDATE
+		/*var imageButton = TextButton("Export as image", getTextButtonStyle(Color.BLACK, Color.WHITE, 13))
+		imageButton.addListener(object: ClickListener(){
+			override fun clicked(event: InputEvent?, x: Float, y: Float) {
+				mainClock.stop()
+				var pixmap = Pixmap(world.width*8, world.height*8, Pixmap.Format.RGBA8888)
+				pixmap.setColor(Color.BLACK)
+				pixmap.fillRectangle(0, 0, pixmap.width-1, pixmap.height-1)
+				for(x in 0 until world.width) {
+					for (y in 0 until world.height) {
+						val el = world[x, y]
+						if (el != null) {
+							pixmap.setColor(el.getColor().shl(8)+255)
+							pixmap.fillRectangle(x*8, y*8, 8, 8)
+						}
+					}
+				}
+				PixmapIO.writePNG(Gdx.files.local(file.name.split(".")[0]+".png"), pixmap)
+				mainClock.start()
+			}
+		})
+
+		elementTable.add(imageButton).fillX().center().padTop(10f).colspan(4).row()*/
+
+		var exitButton = TextButton("Exit", getTextButtonStyle(Color.BLACK, Color.WHITE, 13))
 		exitButton.addListener(object: ClickListener(){
 			override fun clicked(event: InputEvent?, x: Float, y: Float) {
 				Main.screen = WorldCreator()
@@ -128,9 +150,9 @@ class Editor(val world: ClassicWorld):Screen, Updatable.ByTick {
 
 		elementTable.add(exitButton).fillX().center().padTop(10f).colspan(4).row()
 
-		var clockButton = TextButton("Stop clock", getTextButtonStyle(Color.BLACK, Color.WHITE, 15))
+		var clockButton = TextButton("Stop clock", getTextButtonStyle(Color.BLACK, Color.WHITE, 13))
 
-		var stepButton = TextButton("Make step", getTextButtonStyle(Color.BLACK, Color.WHITE, 15))
+		var stepButton = TextButton("Make step", getTextButtonStyle(Color.BLACK, Color.WHITE, 13))
 
 		stepButton.isDisabled = true
 

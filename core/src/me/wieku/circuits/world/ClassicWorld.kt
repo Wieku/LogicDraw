@@ -49,6 +49,9 @@ class ClassicWorld(val width: Int, val height: Int, val name: String):IWorld {
 		classes.put("pixel_red", RedPixel::class.java)
 		classes.put("dark_wire", DarkWire::class.java)
 		classes.put("description", Description::class.java)
+
+		//NOTE: THIS WILL BE ADDED WITH UI DESIGN UPDATE
+		//classes.put("delay", DelayGate::class.java)
 	}
 
 
