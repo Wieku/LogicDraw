@@ -1,26 +1,23 @@
 package me.wieku.circuits.render.scene
 
+import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import com.badlogic.gdx.graphics.Texture.TextureFilter
+import com.badlogic.gdx.scenes.scene2d.Actor
+import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton
-import com.badlogic.gdx.scenes.scene2d.ui.TextTooltip
 import me.wieku.circuits.world.ClassicWorld
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import me.wieku.circuits.render.utils.FontManager
-import javafx.scene.Cursor.cursor
 import com.badlogic.gdx.scenes.scene2d.ui.TextField.TextFieldStyle
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane.ScrollPaneStyle
-
-
-
-
-
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 
 fun OrthographicCamera.fit(world: ClassicWorld, stage: Stage) {
 	if (stage.width * zoom > world.width) {
@@ -36,6 +33,19 @@ fun OrthographicCamera.fit(world: ClassicWorld, stage: Stage) {
 	}
 }
 
+inline fun Actor.onClick(crossinline consumer: (InputEvent?, Float, Float)-> Unit) = addListener(object: ClickListener() {
+	override fun clicked(event: InputEvent?, x: Float, y: Float) {
+		super.clicked(event, x, y)
+		consumer(event, x, y)
+	}
+})
+
+inline fun Actor.onClickS(crossinline consumer: () -> Unit) = addListener(object: ClickListener() {
+	override fun clicked(event: InputEvent?, x: Float, y: Float) {
+		super.clicked(event, x, y)
+		consumer()
+	}
+})
 
 fun Table(color: Color): Table {
 	var table = Table()
@@ -45,14 +55,6 @@ fun Table(color: Color): Table {
 
 fun Label(text: String, color: Color, size: Int) = Label(text, getLabelStyle(color, size))
 
-fun StripeButton(background: Color, color: Color, size: Int): ImageButton {
-	var stl = ImageButton.ImageButtonStyle()
-	stl.up = getStripeImg(background, color, size)
-	stl.over = getStripeImg(background.lerp(Color.WHITE, 0.05f), color, size)
-	stl.down = getStripeImg(background.lerp(Color.LIGHT_GRAY, 0.05f), color, size)
-	return ImageButton(stl)
-}
-
 fun ColorButton(color:Color): ImageButton {
 	var stl = ImageButton.ImageButtonStyle()
 	stl.up = getTxRegion(color)
@@ -61,13 +63,7 @@ fun ColorButton(color:Color): ImageButton {
 	return ImageButton(stl)
 }
 
-fun TextTooltip(text: String): TextTooltip {
-	var stl = TextTooltip.TextTooltipStyle()
-	stl.label = getLabelStyle(Color.WHITE, 10)
-	stl.wrapWidth = 100f
-	stl.background = getTxRegion(Color.BLACK)
-	return TextTooltip(text, stl)
-}
+fun Drawable(file: FileHandle) : TextureRegionDrawable = getTxRegion(Texture(file))
 
 fun getLabelStyle(color: Color, size: Int): LabelStyle {
 	val stl = LabelStyle()
@@ -119,22 +115,7 @@ fun getScrollPaneStyle(bg: Color, knob: Color): ScrollPaneStyle {
 	return style
 }
 
-private fun getStripeImg(background: Color, color: Color, size: Int): TextureRegionDrawable {
-	var pixmap = Pixmap(size, size, Pixmap.Format.RGBA8888)
-	pixmap.setColor(background)
-	pixmap.fillRectangle(0, 0, size, size)
-	pixmap.setColor(color)
-	var xa = size*0.1f
-	var hei = (size-2*xa)/5f
-	pixmap.fillRectangle(xa, xa, size-2*xa, hei)
-	pixmap.fillRectangle(xa, xa+2*hei, size-2*xa, hei)
-	pixmap.fillRectangle(xa, xa+4*hei, size-2*xa, hei)
-	return getTxRegion(pixmap)
-}
-
-private fun Pixmap.fillRectangle(x: Float, y: Float, width: Float, height: Float) = fillRectangle(x.toInt(), y.toInt(), width.toInt(), height.toInt())
-
-private fun getTxRegion(color: Color): TextureRegionDrawable {
+fun getTxRegion(color: Color): TextureRegionDrawable {
 	return getTxRegion(color, 1, 1)
 }
 
@@ -144,15 +125,6 @@ fun getTxWRegion(color: Color, width: Int): TextureRegionDrawable {
 
 fun getTxHRegion(color: Color, height: Int): TextureRegionDrawable {
 	return getTxRegion(color, 1, height)
-}
-
-private fun getTxHRegionUB(color: Color, uB: Color, height: Int): TextureRegionDrawable {
-	val pixMap = Pixmap(1, height, Pixmap.Format.RGBA8888)
-	pixMap.setColor(color)
-	pixMap.fillRectangle(0, 0, 1, height)
-	pixMap.setColor(uB)
-	pixMap.fillRectangle(0, 0, 1, height / 8)
-	return getTxRegion(pixMap)
 }
 
 private fun getTxRegion(color: Color, width: Int, height: Int): TextureRegionDrawable {

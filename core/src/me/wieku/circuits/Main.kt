@@ -1,6 +1,7 @@
 package me.wieku.circuits
 
 import com.badlogic.gdx.Game
+import com.kotcrab.vis.ui.VisUI
 import me.wieku.circuits.api.world.clock.AsyncClock
 import me.wieku.circuits.render.screens.WorldCreator
 
@@ -17,7 +18,14 @@ object Main : Game() {
 			}
 		})
 
+		VisUI.load()
+
 		setScreen(WorldCreator())
 	}
 
+
+	override fun dispose() {
+		super.dispose()
+		VisUI.dispose()
+	}
 }

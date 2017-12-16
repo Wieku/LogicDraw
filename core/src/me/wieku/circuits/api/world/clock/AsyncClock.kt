@@ -7,9 +7,10 @@ import java.util.concurrent.TimeUnit
 
 class AsyncClock (private val updatable: Updatable<*>, tickRate: Int)  {
 	private var sleepTime: Long = 1000000000L/tickRate
-	private var tickRate: Int = tickRate
+	var tickRate: Int = tickRate
 	set (value) {
-		if(tickRate<0) IllegalStateException("Tick Rate has to be positive")
+		if(value<0) IllegalStateException("Tick Rate has to be positive")
+		field = value
 		sleepTime = 1000000000L/value
 	}
 

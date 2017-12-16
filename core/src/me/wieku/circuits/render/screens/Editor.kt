@@ -4,20 +4,36 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Screen
 import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
+import com.badlogic.gdx.math.Vector2
+import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.scenes.scene2d.*
+import com.badlogic.gdx.scenes.scene2d.ui.Image
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
+import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.viewport.ScreenViewport
+import com.kotcrab.vis.ui.VisUI
+import com.kotcrab.vis.ui.util.ToastManager
+import com.kotcrab.vis.ui.util.form.SimpleFormValidator
+import com.kotcrab.vis.ui.widget.Tooltip
+import com.kotcrab.vis.ui.widget.VisTable
+import com.kotcrab.vis.ui.widget.VisWindow
+import com.kotcrab.vis.ui.widget.spinner.IntSpinnerModel
+import com.kotcrab.vis.ui.widget.spinner.SpinnerModel
+import com.kotcrab.vis.ui.widget.toast.MessageToast
+import com.kotcrab.vis.ui.widget.toast.Toast
+import ktx.vis.addTextTooltip
+import ktx.vis.table
+import ktx.vis.window
 import me.wieku.circuits.Main
 import me.wieku.circuits.api.math.Vector2i
 import me.wieku.circuits.api.world.clock.AsyncClock
 import me.wieku.circuits.api.world.clock.Updatable
 import me.wieku.circuits.input.MapManipulator
-import me.wieku.circuits.render.scene.Label
+import me.wieku.circuits.render.scene.*
 import me.wieku.circuits.render.scene.actors.TextTooltip
-import me.wieku.circuits.render.scene.fit
-import me.wieku.circuits.render.scene.getTextButtonStyle
 import me.wieku.circuits.save.SaveManagers
 import me.wieku.circuits.utils.Bresenham
 import me.wieku.circuits.utils.Version
@@ -33,9 +49,10 @@ class Editor(val world: ClassicWorld):Screen, Updatable.ByTick {
 
 	private var manipulator: MapManipulator
 
-	private var renderer: ShapeRenderer
+	private var renderer = ShapeRenderer()
 	private var camera: OrthographicCamera
-	var stage: Stage
+	var stage = Stage(ScreenViewport())
+	var toastManager: ToastManager
 	private var menuButton: Table
 	private var saveButton: TextButton
 
@@ -51,39 +68,52 @@ class Editor(val world: ClassicWorld):Screen, Updatable.ByTick {
 	private var lastSave = "Not saved"
 
 	private var file: File = File("maps/${world.name.toLowerCase().replace(" ", "_")}.ldmap")
+	private lateinit var simulationBar: VisTable
 
 	constructor(world: ClassicWorld, file: File):this(world) {
 		this.file = file
 	}
 
 	init {
-		renderer = ShapeRenderer()
-		camera = OrthographicCamera(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
-		stage = Stage(ScreenViewport())
+		camera = object: OrthographicCamera(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat()) {
+			override fun unproject(screenCoords: Vector3?): Vector3 {
+				return super.unproject(screenCoords, 0f, 0f, Gdx.graphics.width.toFloat(), Gdx.graphics.height-simulationBar.height)
+			}
+		}
+
+		val toastTable = Table()
+		toastManager = ToastManager(toastTable)
+		toastManager.alignment = Align.bottomLeft
+
 		manipulator = MapManipulator(world, camera, this)
 
-		tooltip = TextTooltip(Color.BLACK, Color.WHITE, 10)
+		tooltip = TextTooltip(Color.WHITE)
 
 		camera.zoom = if(stage.width > stage.height) (world.height.toFloat()/stage.height) else (world.width.toFloat()/stage.width)
 		camera.position.set(world.width/2f, world.height/2f, 0f)
-		menuButton = me.wieku.circuits.render.scene.Table(gray)
-		menuButton.isTransform = true
-		var buttn = TextButton("Menu", getTextButtonStyle(Color.WHITE, 15))
-		buttn.addListener(object: ClickListener(){
-			override fun clicked(event: InputEvent?, x: Float, y: Float) {
-				super.clicked(event, x, y)
-				tableShow = !tableShow
-			}
-		})
-		menuButton.add(buttn).pad(2f)
 
-		menuButton.rotation = 90f
-		menuButton.pack()
+		menuButton = table {
+			background = getTxRegion(gray)
+			isTransform = true
+			rotation = 90f
+			pad(2f)
+			textButton("Menu").addListener(object : ClickListener() {
+				override fun clicked(event: InputEvent?, x: Float, y: Float) {
+					super.clicked(event, x, y)
+					tableShow = !tableShow
+				}
+			})
+			pack()
+		}
+
 		stage.addActor(menuButton)
-		elementTable = me.wieku.circuits.render.scene.Table(gray)
+
+		elementTable = VisTable()
+		elementTable.background = VisUI.getSkin().get("default", Tooltip.TooltipStyle::class.java).background
 		elementTable.top().left().pad(5f)
 
 		var count = 0
+
 		world.classes.forEach{
 			var color = Color(it.value.getConstructor(Vector2i::class.java).newInstance(Vector2i()).getIdleColor().shl(8)+0xff)
 			var color1 = color.cpy()
@@ -150,42 +180,6 @@ class Editor(val world: ClassicWorld):Screen, Updatable.ByTick {
 
 		elementTable.add(exitButton).fillX().center().padTop(10f).colspan(4).row()
 
-		var clockButton = TextButton("Stop clock", getTextButtonStyle(Color.BLACK, Color.WHITE, 13))
-
-		var stepButton = TextButton("Make step", getTextButtonStyle(Color.BLACK, Color.WHITE, 13))
-
-		stepButton.isDisabled = true
-
-		clockButton.addListener(object: ClickListener(){
-			override fun clicked(event: InputEvent?, x: Float, y: Float) {
-				if(clockButton.text.trim() == "Stop clock") {
-					println("ffeergrdgrd")
-					mainClock.stop()
-					clockButton.setText("Start clock")
-					stepButton.isDisabled = false
-				} else if(clockButton.text.trim() == "Start clock") {
-					mainClock.start()
-					clockButton.setText("Stop clock")
-					stepButton.isDisabled = true
-				}
-
-			}
-		})
-
-
-
-		elementTable.add(clockButton).fillX().center().padTop(40f).colspan(4).row()
-
-		stepButton.addListener(object: ClickListener(){
-			override fun clicked(event: InputEvent?, x: Float, y: Float) {
-				if(!stepButton.isDisabled)
-					mainClock.step()
-			}
-		})
-
-		elementTable.add(stepButton).fillX().center().padTop(10f).colspan(4).row()
-
-
 		var controls = Label(
 				"Controls:\n" +
 						"LMB: Pencil\n" +
@@ -208,8 +202,6 @@ class Editor(val world: ClassicWorld):Screen, Updatable.ByTick {
 
 		stage.addActor(elementTable)
 
-		stage.addActor(tooltip.tooltipTable)
-
 		Gdx.input.inputProcessor = manipulator
 
 		elementTable.touchable = Touchable.enabled
@@ -225,6 +217,87 @@ class Editor(val world: ClassicWorld):Screen, Updatable.ByTick {
 			if(it != null) max = Math.max(max, it.holders)
 		}
 		println("Biggest node size: $max")
+
+		simulationBar = table(true) {
+			background = VisUI.getSkin().get("default", Tooltip.TooltipStyle::class.java).background
+			left()
+			val startButton = imageButton(Drawable(Gdx.files.internal("assets/icons/play.png")))
+				startButton.style.imageDisabled = Drawable(Gdx.files.internal("assets/icons/play_gray.png"))
+				startButton.addTextTooltip("Start the clock")
+				startButton.isDisabled = true
+
+			val stopButton = imageButton(Drawable(Gdx.files.internal("assets/icons/stop.png")))
+				stopButton.style.imageDisabled = Drawable(Gdx.files.internal("assets/icons/stop_gray.png"))
+				stopButton.addTextTooltip("Stop the clock")
+				stopButton.isDisabled = false
+
+			val stepButton = imageButton(Drawable(Gdx.files.internal("assets/icons/forward.png")))
+				stepButton.style.imageDisabled = Drawable(Gdx.files.internal("assets/icons/forward_gray.png"))
+				stepButton.addTextTooltip("Generate single tick")
+				stepButton.isDisabled = true
+
+			val configButton = imageButton(Drawable(Gdx.files.internal("assets/icons/gear.png")))
+			configButton.addTextTooltip("Simulation settings")
+
+			startButton.onClickS {
+				mainClock.start()
+				startButton.isDisabled = true
+				stepButton.isDisabled = true
+				stopButton.isDisabled = false
+			}
+
+			stopButton.onClickS {
+				mainClock.stop()
+				startButton.isDisabled = false
+				stepButton.isDisabled = false
+				stopButton.isDisabled = true
+			}
+
+			stepButton.onClickS {
+				mainClock.step()
+			}
+
+			var window: VisWindow? = null
+			configButton.onClickS {
+				if(window == null || !stage.actors.contains(window)) {
+					window = window("Simulation settings") {
+						addCloseButton()
+						val model = IntSpinnerModel(mainClock.tickRate, 1, 1000000, 10)
+						val spinner = spinner("Tickrate:", model).cell(growX = true, pad = 2f)
+						row()
+
+						val okButton = textButton("OK").cell(growX = true)
+						okButton.onClickS {
+							mainClock.stop()
+							mainClock.tickRate = model.value
+							mainClock.start()
+							fadeOut()
+						}
+
+						val listener = object: ChangeListener(){
+							override fun changed(event: ChangeEvent?, actor: Actor?) {
+								okButton.isDisabled = !spinner.textField.isInputValid
+							}
+						}
+
+						spinner.textField.addListener(listener)
+						spinner.addListener(listener)
+
+						pack()
+
+						val vector = configButton.localToStageCoordinates(Vector2(0f, 0f))
+						setPosition(vector.x, vector.y-height)
+					}
+					stage.addActor(window!!.fadeIn())
+				}
+			}
+		}
+
+		stage.addActor(simulationBar)
+
+		toastTable.setFillParent(true)
+		toastTable.addActor(tooltip.tooltipTable)
+		stage.addActor(toastTable)
 	}
 
 	fun saveFile() {
@@ -232,6 +305,8 @@ class Editor(val world: ClassicWorld):Screen, Updatable.ByTick {
 		try {
 			SaveManagers.saveMap(world, file)
 			lastSave = "Last saved: " + Date().asString()
+			var message = MessageToast("File saved succesfully!")
+			toastManager.show(message, 5f)
 		} catch (err: Exception) {
 			lastSave = "Error saving file!!!"
 		}
@@ -259,8 +334,8 @@ class Editor(val world: ClassicWorld):Screen, Updatable.ByTick {
 			delta1 = 0f
 		}
 
-		elementTable.setBounds(if(tableShow) stage.width-200f else stage.width, 0f, 200f, stage.height)
-		menuButton.setPosition(elementTable.x, stage.height-menuButton.width-10)
+		elementTable.setBounds(if(tableShow) stage.width-200f else stage.width, 0f, 200f, stage.height-simulationBar.height)
+		menuButton.setPosition(elementTable.x, stage.height-simulationBar.height-menuButton.width-10)
 		menuButton.color = if(tableShow) Color.WHITE else Color.BLACK
 
 		camera.update()
@@ -268,6 +343,7 @@ class Editor(val world: ClassicWorld):Screen, Updatable.ByTick {
 
 		Gdx.gl.glEnable(GL20.GL_BLEND)
 		Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
+		Gdx.gl.glViewport(0, 0, Gdx.graphics.width, (Gdx.graphics.height-simulationBar.height).toInt())
 		renderer.begin(ShapeRenderer.ShapeType.Filled)
 		renderer.color = Color.BLACK
 		renderer.rect(0f, 0f, world.width.toFloat(), world.height.toFloat())
@@ -304,6 +380,7 @@ class Editor(val world: ClassicWorld):Screen, Updatable.ByTick {
 		}
 
 		renderer.end()
+		Gdx.gl.glViewport(0, 0, Gdx.graphics.width, Gdx.graphics.height)
 		Gdx.gl.glDisable(GL20.GL_BLEND)
 		stage.act()
 		stage.draw()
@@ -314,9 +391,13 @@ class Editor(val world: ClassicWorld):Screen, Updatable.ByTick {
 
 		stage.viewport.update(width, height, true)
 
-		camera.setToOrtho(true, width.toFloat(), height.toFloat())
+		simulationBar.width = width.toFloat()
+		simulationBar.setPosition(0f, stage.height-simulationBar.height)
+
+		camera.setToOrtho(true, width.toFloat(), height - simulationBar.height)
 		camera.position.set(camPosBefore)
 		camera.fit(world, stage)
+		toastManager.resize()
 	}
 
 	override fun dispose() {

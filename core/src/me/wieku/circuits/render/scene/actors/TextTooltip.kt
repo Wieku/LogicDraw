@@ -6,17 +6,19 @@ import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.InputListener
-import com.badlogic.gdx.scenes.scene2d.ui.Label
-import com.badlogic.gdx.scenes.scene2d.ui.Table
-import me.wieku.circuits.render.scene.Label
+import com.kotcrab.vis.ui.VisUI
+import com.kotcrab.vis.ui.widget.Tooltip
+import com.kotcrab.vis.ui.widget.VisLabel
+import com.kotcrab.vis.ui.widget.VisTable
 
-class TextTooltip(background: Color, textColor: Color, textSize: Int): InputListener() {
-	var tooltipTable: Table = me.wieku.circuits.render.scene.Table(background)
+class TextTooltip(textColor: Color): InputListener() {
+	var tooltipTable: VisTable = VisTable(true)
 	private set
-	var tooltipLabel: Label = Label("", textColor, textSize)
+	var tooltipLabel: VisLabel = VisLabel("", textColor)
 
 	init {
-		tooltipTable.add(tooltipLabel).pad(5f).fill()
+		tooltipTable.background = VisUI.getSkin().get("default", Tooltip.TooltipStyle::class.java).background
+		tooltipTable.add(tooltipLabel).pad(2f)
 		tooltipTable.touchable = null
 		tooltipLabel.touchable = null
 		tooltipTable.isVisible = false
