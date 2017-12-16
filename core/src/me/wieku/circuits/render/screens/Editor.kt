@@ -1,6 +1,7 @@
 package me.wieku.circuits.render.screens
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Input
 import com.badlogic.gdx.Screen
 import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
@@ -13,10 +14,13 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.utils.Align
+import com.badlogic.gdx.utils.Scaling
 import com.badlogic.gdx.utils.viewport.ScreenViewport
 import com.kotcrab.vis.ui.VisUI
 import com.kotcrab.vis.ui.util.ToastManager
+import com.kotcrab.vis.ui.util.dialog.Dialogs
 import com.kotcrab.vis.ui.util.form.SimpleFormValidator
+import com.kotcrab.vis.ui.widget.MenuBar
 import com.kotcrab.vis.ui.widget.Tooltip
 import com.kotcrab.vis.ui.widget.VisTable
 import com.kotcrab.vis.ui.widget.VisWindow
@@ -24,9 +28,7 @@ import com.kotcrab.vis.ui.widget.spinner.IntSpinnerModel
 import com.kotcrab.vis.ui.widget.spinner.SpinnerModel
 import com.kotcrab.vis.ui.widget.toast.MessageToast
 import com.kotcrab.vis.ui.widget.toast.Toast
-import ktx.vis.addTextTooltip
-import ktx.vis.table
-import ktx.vis.window
+import ktx.vis.*
 import me.wieku.circuits.Main
 import me.wieku.circuits.api.math.Vector2i
 import me.wieku.circuits.api.world.clock.AsyncClock
@@ -42,9 +44,9 @@ import me.wieku.circuits.world.ClassicWorld
 import java.io.File
 import java.util.*
 
-class Editor(val world: ClassicWorld):Screen, Updatable.ByTick {
+class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 
-	private lateinit var mainClock:AsyncClock
+	private lateinit var mainClock: AsyncClock
 	private var tickrate = 0L
 
 	private var manipulator: MapManipulator
@@ -54,7 +56,6 @@ class Editor(val world: ClassicWorld):Screen, Updatable.ByTick {
 	var stage = Stage(ScreenViewport())
 	var toastManager: ToastManager
 	private var menuButton: Table
-	private var saveButton: TextButton
 
 	private var elementTable: Table
 	private var tableShow: Boolean = false
@@ -68,16 +69,18 @@ class Editor(val world: ClassicWorld):Screen, Updatable.ByTick {
 	private var lastSave = "Not saved"
 
 	private var file: File = File("maps/${world.name.toLowerCase().replace(" ", "_")}.ldmap")
+
+	private lateinit var menuBar: MenuBar
 	private lateinit var simulationBar: VisTable
 
-	constructor(world: ClassicWorld, file: File):this(world) {
+	constructor(world: ClassicWorld, file: File) : this(world) {
 		this.file = file
 	}
 
 	init {
-		camera = object: OrthographicCamera(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat()) {
+		camera = object : OrthographicCamera(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat()) {
 			override fun unproject(screenCoords: Vector3?): Vector3 {
-				return super.unproject(screenCoords, 0f, 0f, Gdx.graphics.width.toFloat(), Gdx.graphics.height-simulationBar.height)
+				return super.unproject(screenCoords, 0f, 0f, Gdx.graphics.width.toFloat(), Gdx.graphics.height - simulationBar.height)
 			}
 		}
 
@@ -89,8 +92,8 @@ class Editor(val world: ClassicWorld):Screen, Updatable.ByTick {
 
 		tooltip = TextTooltip(Color.WHITE)
 
-		camera.zoom = if(stage.width > stage.height) (world.height.toFloat()/stage.height) else (world.width.toFloat()/stage.width)
-		camera.position.set(world.width/2f, world.height/2f, 0f)
+		camera.zoom = if (stage.width > stage.height) (world.height.toFloat() / stage.height) else (world.width.toFloat() / stage.width)
+		camera.position.set(world.width / 2f, world.height / 2f, 0f)
 
 		menuButton = table {
 			background = getTxRegion(gray)
@@ -114,8 +117,8 @@ class Editor(val world: ClassicWorld):Screen, Updatable.ByTick {
 
 		var count = 0
 
-		world.classes.forEach{
-			var color = Color(it.value.getConstructor(Vector2i::class.java).newInstance(Vector2i()).getIdleColor().shl(8)+0xff)
+		world.classes.forEach {
+			var color = Color(it.value.getConstructor(Vector2i::class.java).newInstance(Vector2i()).getIdleColor().shl(8) + 0xff)
 			var color1 = color.cpy()
 			color1.a = 0.5f
 			brushes.put(it.key, color1)
@@ -130,22 +133,13 @@ class Editor(val world: ClassicWorld):Screen, Updatable.ByTick {
 
 			elementTable.add(button).pad(3f).expandX().size(40f)
 			++count
-			if(count==4) {
+			if (count == 4) {
 				elementTable.row()
 				count = 0
 			}
 
 		}
 		elementTable.row()
-
-		saveButton = TextButton("Save", getTextButtonStyle(Color.BLACK, Color.WHITE, 13))
-		saveButton.addListener(object: ClickListener(){
-			override fun clicked(event: InputEvent?, x: Float, y: Float) {
-				saveFile()
-			}
-		})
-
-		elementTable.add(saveButton).fillX().center().padTop(10f).colspan(4).row()
 
 		//NOTE: THIS WILL BE ADDED WITH UI DESIGN UPDATE
 		/*var imageButton = TextButton("Export as image", getTextButtonStyle(Color.BLACK, Color.WHITE, 13))
@@ -170,15 +164,6 @@ class Editor(val world: ClassicWorld):Screen, Updatable.ByTick {
 		})
 
 		elementTable.add(imageButton).fillX().center().padTop(10f).colspan(4).row()*/
-
-		var exitButton = TextButton("Exit", getTextButtonStyle(Color.BLACK, Color.WHITE, 13))
-		exitButton.addListener(object: ClickListener(){
-			override fun clicked(event: InputEvent?, x: Float, y: Float) {
-				Main.screen = WorldCreator()
-			}
-		})
-
-		elementTable.add(exitButton).fillX().center().padTop(10f).colspan(4).row()
 
 		var controls = Label(
 				"Controls:\n" +
@@ -206,7 +191,7 @@ class Editor(val world: ClassicWorld):Screen, Updatable.ByTick {
 
 		elementTable.touchable = Touchable.enabled
 
-		elementTable.addListener(object: InputListener(){
+		elementTable.addListener(object : InputListener() {
 			override fun touchDown(event: InputEvent?, x: Float, y: Float, pointer: Int, button: Int): Boolean {
 				super.touchDown(event, x, y, pointer, button)
 				return true
@@ -214,27 +199,80 @@ class Editor(val world: ClassicWorld):Screen, Updatable.ByTick {
 		})
 		var max = 0
 		world.getStateManager().children.forEach {
-			if(it != null) max = Math.max(max, it.holders)
+			if (it != null) max = Math.max(max, it.holders)
 		}
 		println("Biggest node size: $max")
 
+		menuBar = menuBar {
+			menu("File") {
+				menuItem("Save file", Drawable(Gdx.files.internal("assets/icons/save.png"))).setShortcut(Input.Keys.CONTROL_LEFT, Input.Keys.S).addListener(object : ChangeListener() {
+					override fun changed(event: ChangeEvent?, actor: Actor?) {
+						saveFile()
+					}
+				})
+
+				menuItem("Close project").addListener(object : ChangeListener() {
+					override fun changed(event: ChangeEvent?, actor: Actor?) {
+						Main.screen = WorldCreator()
+					}
+				})
+			}
+
+			menu("Help") {
+
+				var window: VisWindow? = null
+				menuItem("About").addListener(object : ChangeListener() {
+					override fun changed(event: ChangeEvent?, actor: Actor?) {
+						if (window == null || !this@Editor.stage.actors.contains(window)) {
+							window = window("About") {
+								addCloseButton()
+								center()
+								image(Drawable(Gdx.files.internal("assets/logo/banner_inv_320.png")), Scaling.fillX)
+
+								row()
+								label("Version: ${Version.version}")
+
+								row()
+								linkLabel("GitHub", "https://github.com/Wieku/LogicDraw")
+
+								row()
+								label("Powered by open-source")
+
+								row()
+
+								val okButton = textButton("OK").cell(growX = true)
+								okButton.onClickS {
+									fadeOut()
+								}
+								pack()
+								centerWindow()
+							}
+							this@Editor.stage.addActor(window!!.fadeIn())
+						}
+					}
+				})
+			}
+		}
+
+		stage.addActor(menuBar.table)
+
 		simulationBar = table(true) {
-			background = VisUI.getSkin().get("default", Tooltip.TooltipStyle::class.java).background
+			//background = VisUI.getSkin().get("default", Tooltip.TooltipStyle::class.java).background
 			left()
 			val startButton = imageButton(Drawable(Gdx.files.internal("assets/icons/play.png")))
-				startButton.style.imageDisabled = Drawable(Gdx.files.internal("assets/icons/play_gray.png"))
-				startButton.addTextTooltip("Start the clock")
-				startButton.isDisabled = true
+			startButton.style.imageDisabled = Drawable(Gdx.files.internal("assets/icons/play_gray.png"))
+			startButton.addTextTooltip("Start the clock")
+			startButton.isDisabled = true
 
 			val stopButton = imageButton(Drawable(Gdx.files.internal("assets/icons/stop.png")))
-				stopButton.style.imageDisabled = Drawable(Gdx.files.internal("assets/icons/stop_gray.png"))
-				stopButton.addTextTooltip("Stop the clock")
-				stopButton.isDisabled = false
+			stopButton.style.imageDisabled = Drawable(Gdx.files.internal("assets/icons/stop_gray.png"))
+			stopButton.addTextTooltip("Stop the clock")
+			stopButton.isDisabled = false
 
 			val stepButton = imageButton(Drawable(Gdx.files.internal("assets/icons/forward.png")))
-				stepButton.style.imageDisabled = Drawable(Gdx.files.internal("assets/icons/forward_gray.png"))
-				stepButton.addTextTooltip("Generate single tick")
-				stepButton.isDisabled = true
+			stepButton.style.imageDisabled = Drawable(Gdx.files.internal("assets/icons/forward_gray.png"))
+			stepButton.addTextTooltip("Generate single tick")
+			stepButton.isDisabled = true
 
 			val configButton = imageButton(Drawable(Gdx.files.internal("assets/icons/gear.png")))
 			configButton.addTextTooltip("Simulation settings")
@@ -259,7 +297,7 @@ class Editor(val world: ClassicWorld):Screen, Updatable.ByTick {
 
 			var window: VisWindow? = null
 			configButton.onClickS {
-				if(window == null || !stage.actors.contains(window)) {
+				if (window == null || !stage.actors.contains(window)) {
 					window = window("Simulation settings") {
 						addCloseButton()
 						val model = IntSpinnerModel(mainClock.tickRate, 1, 1000000, 10)
@@ -274,7 +312,7 @@ class Editor(val world: ClassicWorld):Screen, Updatable.ByTick {
 							fadeOut()
 						}
 
-						val listener = object: ChangeListener(){
+						val listener = object : ChangeListener() {
 							override fun changed(event: ChangeEvent?, actor: Actor?) {
 								okButton.isDisabled = !spinner.textField.isInputValid
 							}
@@ -286,14 +324,15 @@ class Editor(val world: ClassicWorld):Screen, Updatable.ByTick {
 						pack()
 
 						val vector = configButton.localToStageCoordinates(Vector2(0f, 0f))
-						setPosition(vector.x, vector.y-height)
+						setPosition(vector.x, vector.y - height)
 					}
 					stage.addActor(window!!.fadeIn())
 				}
 			}
+			pack()
 		}
 
-		stage.addActor(simulationBar)
+		menuBar.table.add(simulationBar).right().expandX()
 
 		toastTable.setFillParent(true)
 		toastTable.addActor(tooltip.tooltipTable)
@@ -305,8 +344,7 @@ class Editor(val world: ClassicWorld):Screen, Updatable.ByTick {
 		try {
 			SaveManagers.saveMap(world, file)
 			lastSave = "Last saved: " + Date().asString()
-			var message = MessageToast("File saved succesfully!")
-			toastManager.show(message, 5f)
+			toastManager.show(MessageToast("File saved succesfully!"), 5f)
 		} catch (err: Exception) {
 			lastSave = "Error saving file!!!"
 		}
@@ -328,52 +366,52 @@ class Editor(val world: ClassicWorld):Screen, Updatable.ByTick {
 		Gdx.gl.glClearColor(0.05f, 0.05f, 0.05f, 1f)
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
 
-		delta1+=delta
-		if(delta1>=1f) {
+		delta1 += delta
+		if (delta1 >= 1f) {
 			Gdx.graphics.setTitle("LogicDraw ${Version.version} (world: ${world.name}) (tickrate: $tickrate) (fps: ${Gdx.graphics.framesPerSecond}) (${world.getStateManager().usedNodes} nodes) (${world.entities} entities) | $lastSave")
 			delta1 = 0f
 		}
 
-		elementTable.setBounds(if(tableShow) stage.width-200f else stage.width, 0f, 200f, stage.height-simulationBar.height)
-		menuButton.setPosition(elementTable.x, stage.height-simulationBar.height-menuButton.width-10)
-		menuButton.color = if(tableShow) Color.WHITE else Color.BLACK
+		elementTable.setBounds(if (tableShow) stage.width - 200f else stage.width, 0f, 200f, stage.height /*- simulationBar.height*/ - menuBar.table.height)
+		menuButton.setPosition(elementTable.x, stage.height /*- simulationBar.height*/ - menuBar.table.height - menuButton.width - 10)
+		menuButton.color = if (tableShow) Color.WHITE else Color.BLACK
 
 		camera.update()
 		renderer.projectionMatrix = camera.combined
 
 		Gdx.gl.glEnable(GL20.GL_BLEND)
 		Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
-		Gdx.gl.glViewport(0, 0, Gdx.graphics.width, (Gdx.graphics.height-simulationBar.height).toInt())
+		Gdx.gl.glViewport(0, 0, Gdx.graphics.width, (Gdx.graphics.height - simulationBar.height).toInt())
 		renderer.begin(ShapeRenderer.ShapeType.Filled)
 		renderer.color = Color.BLACK
 		renderer.rect(0f, 0f, world.width.toFloat(), world.height.toFloat())
-		for(x in 0 until world.width) {
-			for(y in 0 until world.height) {
+		for (x in 0 until world.width) {
+			for (y in 0 until world.height) {
 				val el = world[x, y]
-				if(el != null) {
+				if (el != null) {
 					color.set((el.getColor().shl(8)) + 0xFF)
 					renderer.color = color
 					renderer.rect(x.toFloat(), y.toFloat(), 1f, 1f)
 				}
 			}
 		}
-		if(manipulator.pasteMode || manipulator.rectangle != null) {
-			if(manipulator.rectangle != null) {
+		if (manipulator.pasteMode || manipulator.rectangle != null) {
+			if (manipulator.rectangle != null) {
 				renderer.color = bound
 				renderer.rect(manipulator.rectangle!!.x.toFloat(), manipulator.rectangle!!.y.toFloat(), manipulator.rectangle!!.width.toFloat(), manipulator.rectangle!!.height.toFloat())
 			}
 
-			if(manipulator.pasteMode) {
+			if (manipulator.pasteMode) {
 				manipulator.clipboard!!.drawClipboard(manipulator.position, renderer)
 			}
 		} else {
-			if(manipulator.lineMode) {
+			if (manipulator.lineMode) {
 				renderer.color = brushes[manipulator.toPlace]
 				Bresenham.iterateFast(manipulator.beginPos, manipulator.endPos) {
 					renderer.rect(it.x.toFloat(), it.y.toFloat(), 1f, 1f)
 				}
 			}
-			if(manipulator.position.isInBounds(0, 0, world.width-1, world.height-1)) {
+			if (manipulator.position.isInBounds(0, 0, world.width - 1, world.height - 1)) {
 				renderer.color = brushes[manipulator.toPlace]
 				renderer.rect(manipulator.position.x.toFloat(), manipulator.position.y.toFloat(), 1f, 1f)
 			}
@@ -382,7 +420,7 @@ class Editor(val world: ClassicWorld):Screen, Updatable.ByTick {
 		renderer.end()
 		Gdx.gl.glViewport(0, 0, Gdx.graphics.width, Gdx.graphics.height)
 		Gdx.gl.glDisable(GL20.GL_BLEND)
-		stage.act()
+		stage.act(delta)
 		stage.draw()
 	}
 
@@ -391,10 +429,14 @@ class Editor(val world: ClassicWorld):Screen, Updatable.ByTick {
 
 		stage.viewport.update(width, height, true)
 
-		simulationBar.width = width.toFloat()
-		simulationBar.setPosition(0f, stage.height-simulationBar.height)
+		menuBar.table.pack()
+		menuBar.table.width = width.toFloat()
+		menuBar.table.setPosition(0f, stage.height - menuBar.table.height)
 
-		camera.setToOrtho(true, width.toFloat(), height - simulationBar.height)
+		//simulationBar.width = width.toFloat()
+		//simulationBar.setPosition(0f, stage.height - simulationBar.height - menuBar.table.height)
+
+		camera.setToOrtho(true, width.toFloat(), height /*- simulationBar.height*/ - menuBar.table.height)
 		camera.position.set(camPosBefore)
 		camera.fit(world, stage)
 		toastManager.resize()
@@ -409,8 +451,8 @@ class Editor(val world: ClassicWorld):Screen, Updatable.ByTick {
 	private var tick = 0L
 	override fun update(value: Long) {
 		world.update(value)
-		if(System.nanoTime()-time >= 1000000000) {
-			tickrate = value-tick
+		if (System.nanoTime() - time >= 1000000000) {
+			tickrate = value - tick
 			tick = value
 			time = System.nanoTime()
 		}

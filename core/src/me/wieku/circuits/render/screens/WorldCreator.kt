@@ -24,6 +24,7 @@ import com.sun.xml.internal.fastinfoset.util.StringArray
 import me.wieku.circuits.render.scene.*
 import me.wieku.circuits.render.scene.actors.MenuMap
 import me.wieku.circuits.save.SaveManagers
+import me.wieku.circuits.utils.Version
 
 
 class WorldCreator:Screen {
@@ -115,6 +116,7 @@ class WorldCreator:Screen {
 
 	override fun show() {
 		Gdx.input.inputProcessor = stage
+		Gdx.graphics.setTitle("LogicDraw ${Version.version}")
 	}
 
 	override fun render(delta: Float) {
