@@ -41,6 +41,7 @@ import me.wieku.circuits.utils.Bresenham
 import me.wieku.circuits.utils.Version
 import me.wieku.circuits.utils.asString
 import me.wieku.circuits.world.ClassicWorld
+import me.wieku.circuits.world.ElementRegistry
 import java.io.File
 import java.util.*
 
@@ -117,7 +118,7 @@ class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 
 		var count = 0
 
-		world.classes.forEach {
+		ElementRegistry.classes.forEach {
 			var color = Color(it.value.getConstructor(Vector2i::class.java).newInstance(Vector2i()).getIdleColor().shl(8) + 0xff)
 			var color1 = color.cpy()
 			color1.a = 0.5f

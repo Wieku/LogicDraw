@@ -29,32 +29,6 @@ class ClassicWorld(val width: Int, val height: Int, val name: String):IWorld {
 	get() = tickables.size
 	private set
 
-	val classes: LinkedHashMap<String, Class<out IElement>> = LinkedHashMap()
-
-	init {
-		classes.put("wire", Wire::class.java)
-		classes.put("cross", Cross::class.java)
-		classes.put("input", Input::class.java)
-		classes.put("controller", Controller::class.java)
-		classes.put("memory", MemoryGate::class.java)
-		classes.put("tflipflop", TFFGate::class.java)
-		classes.put("or", OrGate::class.java)
-		classes.put("nor", NorGate::class.java)
-		classes.put("and", AndGate::class.java)
-		classes.put("nand", NandGate::class.java)
-		classes.put("xor", XorGate::class.java)
-		classes.put("xnor", XnorGate::class.java)
-		classes.put("pixel_white", WhitePixel::class.java)
-		classes.put("pixel_green", GreenPixel::class.java)
-		classes.put("pixel_red", RedPixel::class.java)
-		classes.put("dark_wire", DarkWire::class.java)
-		classes.put("description", Description::class.java)
-
-		//NOTE: THIS WILL BE ADDED WITH UI DESIGN UPDATE
-		//classes.put("delay", DelayGate::class.java)
-	}
-
-
 	override fun update(tick: Long) {
 		try {
 			synchronized(tickables) {
@@ -69,8 +43,8 @@ class ClassicWorld(val width: Int, val height: Int, val name: String):IWorld {
 	}
 
 	override fun placeElement(position: Vector2i, name: String) {
-		if(classes.containsKey(name)) {
-			placeElement(position, classes[name]!!)
+		if(ElementRegistry.classes.containsKey(name)) {
+			placeElement(position, ElementRegistry.classes[name]!!)
 		} else {
 			println("[ERROR] Element doesn't exist!")
 		}
@@ -96,9 +70,9 @@ class ClassicWorld(val width: Int, val height: Int, val name: String):IWorld {
 	}
 
 	fun forcePlace(x: Int, y: Int, name: String): IElement {
-		if(classes.containsKey(name)) {
+		if(ElementRegistry.classes.containsKey(name)) {
 			var position = Vector2i(x, y)
-			var el:IElement = classes[name]!!.getConstructor(Vector2i::class.java).newInstance(position)
+			var el:IElement = ElementRegistry.classes[name]!!.getConstructor(Vector2i::class.java).newInstance(position)
 			map[position.x][position.y] = el
 			if(el is ITickable) {
 				tickables.put(position, el)

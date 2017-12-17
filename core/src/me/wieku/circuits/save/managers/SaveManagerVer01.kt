@@ -4,6 +4,7 @@ import me.wieku.circuits.world.ClassicWorld
 import me.wieku.circuits.world.ClassicStateManager
 import me.wieku.circuits.save.SaveManager
 import me.wieku.circuits.save.Saveable
+import me.wieku.circuits.world.ElementRegistry
 import java.io.DataInputStream
 import java.io.DataOutputStream
 
@@ -72,12 +73,7 @@ class SaveManagerVer01 : SaveManager {
 				if (element != null) {
 					file.writeInt(x)
 					file.writeInt(y)
-					for((k, v) in world.classes) {
-						if(v == element.javaClass) {
-							file.writeUTF(k)
-							break
-						}
-					}
+					file.writeUTF(ElementRegistry.names[element.javaClass]!!)
 
 					if(element is Saveable)
 						(element as Saveable).save(this)

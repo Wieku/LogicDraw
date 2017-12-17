@@ -12,6 +12,7 @@ import me.wieku.circuits.api.math.Vector2i
 import me.wieku.circuits.render.scene.fit
 import me.wieku.circuits.render.screens.Editor
 import me.wieku.circuits.world.ClassicWorld
+import me.wieku.circuits.world.ElementRegistry
 import me.wieku.circuits.world.WorldClipboard
 
 //TODO: Clean this mess
@@ -211,12 +212,7 @@ class MapManipulator(val world:ClassicWorld, val camera: OrthographicCamera, val
 			var upr = camera.unproject(Vector3(screenX.toFloat(), screenY.toFloat(), 0f))
 			var element = world.getElement(Vector2i(upr.x.toInt(), upr.y.toInt()))
 			if(element != null) {
-				for((k, v) in world.classes) {
-					if(v == element.javaClass) {
-						toPlace = k
-						break
-					}
-				}
+				toPlace = ElementRegistry.names[element.javaClass]!!
 			}
 		}
 		processTouch(screenX, screenY, pointer, false)
