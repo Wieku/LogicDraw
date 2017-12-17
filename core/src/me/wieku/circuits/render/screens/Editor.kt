@@ -17,6 +17,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport
 import com.kotcrab.vis.ui.VisUI
 import com.kotcrab.vis.ui.util.ToastManager
 import com.kotcrab.vis.ui.util.dialog.Dialogs
+import com.kotcrab.vis.ui.util.dialog.InputDialogListener
 import com.kotcrab.vis.ui.util.dialog.OptionDialogAdapter
 import com.kotcrab.vis.ui.util.form.SimpleFormValidator
 import com.kotcrab.vis.ui.widget.*
@@ -246,6 +247,16 @@ class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 
 				addSeparator()
 
+				menuItem("Import blueprint...").onChange {
+					Dialogs.showInputDialog(this@Editor.stage, "Import", "Gist id", true, object: InputDialogListener {
+						override fun canceled() {}
+
+						override fun finished(input: String?) {
+							downloadBlueprint(input!!)
+						}
+					})
+				}
+
 				var window: VisWindow? = null
 				MenuManager.addDependent("clipboard", menuItem("Save blueprint").onChange {
 					if (window == null || !this@Editor.stage.actors.contains(window)) {
@@ -462,7 +473,7 @@ class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 	fun uploadBlueprint(file: File, public: Boolean) {
 		try {
 			val client = GitHubClient()
-			var gist = Gist().setPublic(public)
+			var gist = Gist().setPublic(public).setDescription("")
 			val gistFile = GistFile().setContent(Base64.getEncoder().encodeToString(file.readBytes()))
 			gist.files = Collections.singletonMap(file.name+".b64", gistFile)
 			gist = GistService(client).createGist(gist)
@@ -473,6 +484,26 @@ class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 		} catch (e: Exception) {
 			e.printStackTrace()
 			toastManager.show(MessageToast("Blueprint upload failed!"), 5f)
+		}
+	}
+
+	fun downloadBlueprint(gist: String) {
+		try {
+			val client = GitHubClient()
+			val service = GistService()
+			var gist = service.getGist(gist)
+			for(file in gist.files) {
+				if(file.key.endsWith(".ldbp.b64")) {
+					var binFile = File("blueprints/"+file.key.replace(".b64", ""))
+					if(!binFile.exists()) {
+						binFile.writeBytes(Base64.getDecoder().decode(file.value.content))
+						toastManager.show(MessageToast("Blueprint ${binFile.name} imported!"), 5f)
+					}
+				}
+			}
+		} catch (e: Exception) {
+			e.printStackTrace()
+			toastManager.show(MessageToast("Blueprint import failed!"), 5f)
 		}
 	}
 
