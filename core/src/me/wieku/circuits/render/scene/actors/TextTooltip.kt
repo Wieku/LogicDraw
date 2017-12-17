@@ -27,22 +27,33 @@ class TextTooltip(textColor: Color): InputListener() {
 	fun getListener(text: String) = object: InputListener() {
 		override fun enter(event: InputEvent?, x: Float, y: Float, pointer: Int, fromActor: Actor?) {
 			super.enter(event, x, y, pointer, fromActor)
-			tooltipTable.isVisible = true
-			tooltipLabel.setText(text)
-			tooltipTable.pack()
-			tooltipTable.setPosition(MathUtils.clamp(Gdx.input.x.toFloat()+5f, 0f, tooltipTable.stage.width-tooltipTable.width), MathUtils.clamp(tooltipTable.stage.height- Gdx.input.y.toFloat()+5f, 0f, tooltipTable.stage.height-tooltipTable.height))
+			showTooltip(text)
 		}
 
 		override fun mouseMoved(event: InputEvent?, x: Float, y: Float): Boolean {
-			if(tooltipTable.isVisible)
-				tooltipTable.setPosition(MathUtils.clamp(Gdx.input.x.toFloat()+5f, 0f, tooltipTable.stage.width-tooltipTable.width), MathUtils.clamp(tooltipTable.stage.height- Gdx.input.y.toFloat()+5f, 0f, tooltipTable.stage.height-tooltipTable.height))
+			update()
 			return super.mouseMoved(event, x, y)
 		}
 
 		override fun exit(event: InputEvent?, x: Float, y: Float, pointer: Int, toActor: Actor?) {
 			super.exit(event, x, y, pointer, toActor)
-			tooltipTable.isVisible = false
+			hide()
 		}
 	}
 
+	fun showTooltip(text: String) {
+		tooltipTable.isVisible = true
+		tooltipLabel.setText(text)
+		tooltipTable.pack()
+		tooltipTable.setPosition(MathUtils.clamp(Gdx.input.x.toFloat()+5f, 0f, tooltipTable.stage.width-tooltipTable.width), MathUtils.clamp(tooltipTable.stage.height- Gdx.input.y.toFloat()+5f, 0f, tooltipTable.stage.height-tooltipTable.height))
+	}
+
+	fun update() {
+		if(tooltipTable.isVisible)
+			tooltipTable.setPosition(MathUtils.clamp(Gdx.input.x.toFloat()+5f, 0f, tooltipTable.stage.width-tooltipTable.width), MathUtils.clamp(tooltipTable.stage.height- Gdx.input.y.toFloat()+5f, 0f, tooltipTable.stage.height-tooltipTable.height))
+	}
+
+	fun hide() {
+		tooltipTable.isVisible = false
+	}
 }

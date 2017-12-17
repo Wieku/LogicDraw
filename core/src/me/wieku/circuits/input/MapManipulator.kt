@@ -35,12 +35,35 @@ class MapManipulator(val world:ClassicWorld, val camera: OrthographicCamera, val
 	var lineMode = false
 	private var afterOperation = false
 
+	private var lastTooltip = ""
+
 	override fun mouseMoved(screenX: Int, screenY: Int): Boolean {
 		if(editor.stage.mouseMoved(screenX, screenY)) return true
 		var vec = camera.unproject(Vector3(screenX.toFloat(), screenY.toFloat(), 0f))
 		position.set(vec.x.toInt(), vec.y.toInt())
 
+		if(Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
+			tooltip(position)
+		}
+
 		return false
+	}
+
+
+	private fun tooltip(position: Vector2i) {
+		var element = world.getElement(position)
+		if(element != null) {
+			var name = ElementRegistry.names[element.javaClass]!!
+			if(lastTooltip != name) {
+				editor.tooltip.showTooltip(name)
+				lastTooltip = name
+			} else {
+				editor.tooltip.update()
+			}
+		} else if(lastTooltip != "") {
+			editor.tooltip.hide()
+			lastTooltip = ""
+		}
 	}
 
 	override fun keyTyped(character: Char): Boolean {
@@ -64,6 +87,14 @@ class MapManipulator(val world:ClassicWorld, val camera: OrthographicCamera, val
 		if(keycode == Input.Keys.A || keycode == Input.Keys.D) {
 			lineMode = false
 		}
+
+		if(keycode == Input.Keys.CONTROL_LEFT) {
+			if(lastTooltip != "") {
+				editor.tooltip.hide()
+				lastTooltip = ""
+			}
+		}
+
 		return false
 	}
 
@@ -88,8 +119,8 @@ class MapManipulator(val world:ClassicWorld, val camera: OrthographicCamera, val
 		}
 
 		if(!pasteMode && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
+			var upr = camera.unproject(Vector3(screenX.toFloat(), screenY.toFloat(), 0f))
 			if(Gdx.input.isButtonPressed(Input.Buttons.LEFT) && rectangle != null) {
-				var upr = camera.unproject(Vector3(screenX.toFloat(), screenY.toFloat(), 0f))
 
 				endPos.set(upr.x.toInt(), upr.y.toInt()).clamp(0, 0, world.width-1, world.height-1)
 
@@ -100,6 +131,8 @@ class MapManipulator(val world:ClassicWorld, val camera: OrthographicCamera, val
 
 				rectangle!!.reshape(beginTMP, endTMP)
 			}
+
+			tooltip(Vector2i(upr.x.toInt(), upr.y.toInt()))
 		} else {
 			processTouch(screenX, screenY, pointer, true)
 		}

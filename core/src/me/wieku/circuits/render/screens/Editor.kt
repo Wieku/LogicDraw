@@ -203,6 +203,11 @@ class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 				super.touchDown(event, x, y, pointer, button)
 				return true
 			}
+
+			override fun mouseMoved(event: InputEvent?, x: Float, y: Float): Boolean {
+				super.mouseMoved(event, x, y)
+				return true
+			}
 		})
 		var max = 0
 		world.getStateManager().children.forEach {
