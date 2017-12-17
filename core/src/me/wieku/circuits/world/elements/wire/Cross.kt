@@ -9,7 +9,7 @@ import me.wieku.circuits.save.SaveManager
 import me.wieku.circuits.save.Saveable
 import me.wieku.circuits.world.ClassicWorld
 
-class Cross(pos: Vector2i): BasicWire(pos), Saveable {
+open class Cross(pos: Vector2i): BasicWire(pos), Saveable {
 
 	lateinit var stateH:State
 	lateinit var stateV:State

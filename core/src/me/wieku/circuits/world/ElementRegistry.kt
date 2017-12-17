@@ -7,6 +7,7 @@ import me.wieku.circuits.world.elements.gates.*
 import me.wieku.circuits.world.elements.input.Controller
 import me.wieku.circuits.world.elements.input.Input
 import me.wieku.circuits.world.elements.wire.Cross
+import me.wieku.circuits.world.elements.wire.DarkCross
 import me.wieku.circuits.world.elements.wire.DarkWire
 import me.wieku.circuits.world.elements.wire.Wire
 import me.wieku.circuits.world.elements.wire.display.GreenPixel
@@ -58,6 +59,7 @@ object ElementRegistry {
 		register("pixel_green", GreenPixel::class.java)
 		register("pixel_red", RedPixel::class.java)
 		register("dark_wire", DarkWire::class.java)
+		register("dark_cross", DarkCross::class.java)
 		register("description", Description::class.java)
 		register("delay", DelayGate::class.java)
 		register("pwm", PWMGate::class.java)
