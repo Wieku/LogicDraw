@@ -8,9 +8,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.scenes.scene2d.*
-import com.badlogic.gdx.scenes.scene2d.ui.Image
 import com.badlogic.gdx.scenes.scene2d.ui.Table
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.utils.Align
@@ -24,12 +22,9 @@ import com.kotcrab.vis.ui.util.form.SimpleFormValidator
 import com.kotcrab.vis.ui.widget.*
 import com.kotcrab.vis.ui.widget.spinner.IntSpinnerModel
 import com.kotcrab.vis.ui.widget.spinner.Spinner
-import com.kotcrab.vis.ui.widget.spinner.SpinnerModel
 import com.kotcrab.vis.ui.widget.toast.MessageToast
-import com.kotcrab.vis.ui.widget.toast.Toast
 import ktx.vis.*
 import me.wieku.circuits.Main
-import me.wieku.circuits.api.element.BasicElement
 import me.wieku.circuits.api.element.IElement
 import me.wieku.circuits.api.element.edit.Editable
 import me.wieku.circuits.api.math.Rectangle
@@ -46,6 +41,10 @@ import me.wieku.circuits.utils.asString
 import me.wieku.circuits.world.ClassicWorld
 import me.wieku.circuits.world.ElementRegistry
 import me.wieku.circuits.world.WorldClipboard
+import org.eclipse.egit.github.core.Gist
+import org.eclipse.egit.github.core.GistFile
+import org.eclipse.egit.github.core.client.GitHubClient
+import org.eclipse.egit.github.core.service.GistService
 import java.io.File
 import java.lang.reflect.Field
 import java.util.*
@@ -287,7 +286,7 @@ class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 				})
 
 				var menu = popupMenu {  }
-				var load: MenuItem = menuItem("Load blueprint") {
+				var load: MenuItem = menuItem("Blueprints") {
 					subMenu {}
 				}
 				load.addListener(object: InputListener() {
@@ -442,8 +441,38 @@ class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 			val dir = File("blueprints/")
 			dir.mkdirs()
 			dir.listFiles().filter { it.extension == "ldbp" }.forEach {
-				menuItem(it.nameWithoutExtension).onChange { loadBlueprint(it) }
+				menuItem(it.nameWithoutExtension).subMenu {
+
+					menuItem("Load").onChange { loadBlueprint(it) }
+
+					menuItem("Upload to gist").subMenu {
+						menuItem("Public").onChange {
+							uploadBlueprint(it, true)
+						}
+
+						menuItem("Private").onChange {
+							uploadBlueprint(it, false)
+						}
+					}
+				}
 			}
+		}
+	}
+
+	fun uploadBlueprint(file: File, public: Boolean) {
+		try {
+			val client = GitHubClient()
+			var gist = Gist().setPublic(public)
+			val gistFile = GistFile().setContent(Base64.getEncoder().encodeToString(file.readBytes()))
+			gist.files = Collections.singletonMap(file.name+".b64", gistFile)
+			gist = GistService(client).createGist(gist)
+			val toast = MessageToast("Blueprint uploaded!")
+			Gdx.app.clipboard.contents = gist.htmlUrl.toString()
+			toast.addLinkLabel(gist.htmlUrl.toString(), null)
+			toastManager.show(toast, 5f)
+		} catch (e: Exception) {
+			e.printStackTrace()
+			toastManager.show(MessageToast("Blueprint upload failed!"), 5f)
 		}
 	}
 
