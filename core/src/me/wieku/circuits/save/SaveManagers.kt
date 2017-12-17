@@ -24,6 +24,20 @@ object SaveManagers {
 		throw IOException("Invaild file")
 	}
 
+	fun loadBlueprint(file: File) : ClassicWorld {
+		if(file.exists() && file.extension == "ldbp") {
+			var inputStream = DataInputStream(GZIPInputStream(FileInputStream(file)))
+			if(inputStream.readUTF() == "LogicDraw Blueprint") {
+				println("Loading ${file.name} started...")
+				var world = getSaveManager(inputStream.readInt()).loadMap(inputStream)
+				inputStream.close()
+				println(("Loading ${file.name} finished!"))
+				return world
+			}
+		}
+		throw IOException("Invaild file")
+	}
+
 	fun getHeader(file: File) : Array<String> {
 		if(file.exists() && file.extension == "ldmap") {
 			var inputStream = DataInputStream(GZIPInputStream(FileInputStream(file)))
@@ -42,6 +56,20 @@ object SaveManagers {
 		println("Saving ${file.name}...")
 		var outputStream = DataOutputStream(GZIPOutputStream(FileOutputStream(file)))
 		outputStream.writeUTF("LogicDraw Map")
+		outputStream.writeInt(latest)
+		outputStream.writeUTF(world.name)
+		outputStream.writeUTF(world.width.toString())
+		outputStream.writeUTF(world.height.toString())
+		getSaveManager(latest).saveMap(world, outputStream)
+		outputStream.close()
+		println("Saved!")
+	}
+
+	fun saveBlueprint(world: ClassicWorld, file: File) {
+		if(file.exists()) file.delete()
+		println("Saving ${file.name}...")
+		var outputStream = DataOutputStream(GZIPOutputStream(FileOutputStream(file)))
+		outputStream.writeUTF("LogicDraw Blueprint")
 		outputStream.writeInt(latest)
 		outputStream.writeUTF(world.name)
 		outputStream.writeUTF(world.width.toString())

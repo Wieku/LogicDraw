@@ -10,6 +10,10 @@ class Rectangle() {
 		reshape(from, to)
 	}
 
+	constructor(x0: Int, y0: Int, x1: Int, y1: Int):this() {
+		reshape(x0, y0, x1, y1)
+	}
+
 	fun reshape(from:Vector2i, to: Vector2i): Rectangle = reshape(from.x, from.y, to.x, to.y)
 
 	fun reshape(x0: Int, y0: Int, x1: Int, y1: Int): Rectangle {

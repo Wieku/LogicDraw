@@ -6,21 +6,16 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.math.MathUtils
-import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.*
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.utils.Scaling
 import com.badlogic.gdx.utils.viewport.ExtendViewport
 import me.wieku.circuits.Main
 import me.wieku.circuits.world.ClassicWorld
 import java.io.File
-import com.sun.javafx.robot.impl.FXRobotHelper.getChildren
 import com.badlogic.gdx.scenes.scene2d.ui.Table
-import com.sun.xml.internal.fastinfoset.alphabet.BuiltInRestrictedAlphabets.table
-import com.sun.xml.internal.fastinfoset.util.StringArray
 import me.wieku.circuits.render.scene.*
 import me.wieku.circuits.render.scene.actors.MenuMap
 import me.wieku.circuits.save.SaveManagers
@@ -39,6 +34,7 @@ class WorldCreator:Screen {
 
 	init {
 		File("maps/").mkdir()
+		File("blueprints/").mkdir()
 		bannerTexture.setFilter(Texture.TextureFilter.MipMapLinearLinear, Texture.TextureFilter.Linear)
 		banner.setScaling(Scaling.fillX)
 

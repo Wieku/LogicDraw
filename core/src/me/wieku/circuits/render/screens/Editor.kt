@@ -19,11 +19,9 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport
 import com.kotcrab.vis.ui.VisUI
 import com.kotcrab.vis.ui.util.ToastManager
 import com.kotcrab.vis.ui.util.dialog.Dialogs
+import com.kotcrab.vis.ui.util.dialog.OptionDialogAdapter
 import com.kotcrab.vis.ui.util.form.SimpleFormValidator
-import com.kotcrab.vis.ui.widget.MenuBar
-import com.kotcrab.vis.ui.widget.Tooltip
-import com.kotcrab.vis.ui.widget.VisTable
-import com.kotcrab.vis.ui.widget.VisWindow
+import com.kotcrab.vis.ui.widget.*
 import com.kotcrab.vis.ui.widget.spinner.IntSpinnerModel
 import com.kotcrab.vis.ui.widget.spinner.Spinner
 import com.kotcrab.vis.ui.widget.spinner.SpinnerModel
@@ -34,6 +32,7 @@ import me.wieku.circuits.Main
 import me.wieku.circuits.api.element.BasicElement
 import me.wieku.circuits.api.element.IElement
 import me.wieku.circuits.api.element.edit.Editable
+import me.wieku.circuits.api.math.Rectangle
 import me.wieku.circuits.api.math.Vector2i
 import me.wieku.circuits.api.world.clock.AsyncClock
 import me.wieku.circuits.api.world.clock.Updatable
@@ -46,6 +45,7 @@ import me.wieku.circuits.utils.Version
 import me.wieku.circuits.utils.asString
 import me.wieku.circuits.world.ClassicWorld
 import me.wieku.circuits.world.ElementRegistry
+import me.wieku.circuits.world.WorldClipboard
 import java.io.File
 import java.lang.reflect.Field
 import java.util.*
@@ -245,6 +245,69 @@ class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 					}
 				})
 
+				addSeparator()
+
+				var window: VisWindow? = null
+				MenuManager.addDependent("clipboard", menuItem("Save blueprint").onChange {
+					if (window == null || !this@Editor.stage.actors.contains(window)) {
+						window = window("Save blueprint") {
+							addCloseButton()
+							center()
+
+							var textField = validatableTextField {name = "Blueprint name"}
+
+							val okButton = textButton("OK").cell(growX = true)
+							okButton.onClickS {
+								var file = File("blueprints/"+textField.text+".ldbp")
+								if(file.exists()) {
+									Dialogs.showOptionDialog(this@Editor.stage, "Blueprint exists", "Blueprint with that name exists.\n Do you want to overwrite?", Dialogs.OptionDialogType.YES_CANCEL, object: OptionDialogAdapter() {
+										@Override
+										override fun yes () {
+											saveBlueprint(file)
+											fadeOut()
+										}
+
+										@Override
+										override fun cancel () {}
+									})
+								} else {
+									saveBlueprint(file)
+									fadeOut()
+								}
+							}
+
+							var validator = SimpleFormValidator(okButton)
+							validator.notEmpty(textField, "")
+
+							pack()
+							centerWindow()
+						}
+						this@Editor.stage.addActor(window!!.fadeIn())
+					}
+				})
+
+				var menu = popupMenu {  }
+				var load: MenuItem = menuItem("Load blueprint") {
+					subMenu {}
+				}
+				load.addListener(object: InputListener() {
+					override fun enter(event: InputEvent?, x: Float, y: Float, pointer: Int, fromActor: Actor?) {
+						super.enter(event, x, y, pointer, fromActor)
+						if(load.subMenu == menu) {
+							load.subMenu = createBPMenu()
+							for(listener in load.listeners) {
+								if(listener is InputListener) run {
+									listener.enter(event, x, y, pointer, fromActor)
+								}
+							}
+						}
+					}
+
+					override fun exit(event: InputEvent?, x: Float, y: Float, pointer: Int, toActor: Actor?) {
+						load.subMenu = menu
+					}
+				})
+
 			}
 
 			menu("Help") {
@@ -370,6 +433,43 @@ class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 		toastTable.setFillParent(true)
 		toastTable.addActor(tooltip.tooltipTable)
 		stage.addActor(toastTable)
+	}
+
+	private fun createBPMenu() : PopupMenu {
+		return popupMenu {
+
+			//menuItem("Import blueprint (IPFS").isDisabled = true
+			val dir = File("blueprints/")
+			dir.mkdirs()
+			dir.listFiles().filter { it.extension == "ldbp" }.forEach {
+				menuItem(it.nameWithoutExtension).onChange { loadBlueprint(it) }
+			}
+		}
+	}
+
+	fun loadBlueprint(file: File) {
+
+		try {
+			val world = SaveManagers.loadBlueprint(file)
+			manipulator.clipboard = WorldClipboard.create(Rectangle(0, 0, world.width, world.height), world)
+			toastManager.show(MessageToast("Blueprint loaded!"), 5f)
+		} catch (e: Exception) {
+			toastManager.show(MessageToast("Error loading blueprint!"), 5f)
+		}
+
+	}
+
+	fun saveBlueprint(file: File) {
+		if(manipulator.clipboard != null) {
+			try {
+				val blueprint = ClassicWorld(manipulator.clipboard!!.width, manipulator.clipboard!!.height, file.nameWithoutExtension)
+				blueprint.paste(Vector2i(0, 0), manipulator.clipboard!!)
+				SaveManagers.saveBlueprint(blueprint, file)
+				toastManager.show(MessageToast("Blueprint saved!"), 5f)
+			} catch (e: Exception) {
+				toastManager.show(MessageToast("Error saving blueprint!"), 5f)
+			}
+		}
 	}
 
 	fun saveFile() {

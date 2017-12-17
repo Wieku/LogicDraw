@@ -7,16 +7,6 @@ import me.wieku.circuits.api.math.Rectangle
 import me.wieku.circuits.api.math.Vector2i
 import me.wieku.circuits.api.state.StateManager
 import me.wieku.circuits.api.world.IWorld
-import me.wieku.circuits.world.elements.*
-import me.wieku.circuits.world.elements.gates.*
-import me.wieku.circuits.world.elements.input.Controller
-import me.wieku.circuits.world.elements.input.Input
-import me.wieku.circuits.world.elements.wire.Cross
-import me.wieku.circuits.world.elements.wire.DarkWire
-import me.wieku.circuits.world.elements.wire.Wire
-import me.wieku.circuits.world.elements.wire.display.GreenPixel
-import me.wieku.circuits.world.elements.wire.display.RedPixel
-import me.wieku.circuits.world.elements.wire.display.WhitePixel
 import java.util.*
 
 //TODO: switch to tasks instead of locking objects
