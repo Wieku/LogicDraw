@@ -12,6 +12,7 @@ Application is in early development, so be aware that critical bugs can occur.
 |Wire|![](https://placehold.it/15/7F0000/000000?text=+)|![](https://placehold.it/15/D50000/000000?text=+)|
 |Dark wire|![](https://placehold.it/15/130000/000000?text=+)|![](https://placehold.it/15/200000/000000?text=+)|
 |Cross|![](https://placehold.it/15/757575/000000?text=+)|![](https://placehold.it/15/9E9E9E/000000?text=+)|
+|Dark cross|![](https://placehold.it/15/131313/000000?text=+)|![](https://placehold.it/15/171717/000000?text=+)|
 |Input|![](https://placehold.it/15/01579B/000000?text=+)|![](https://placehold.it/15/0277BD/000000?text=+)|
 |Controller|![](https://placehold.it/15/1B5E20/000000?text=+)|![](https://placehold.it/15/2E7D32/000000?text=+)|
 |TFlipFlop|![](https://placehold.it/15/311B92/000000?text=+)|![](https://placehold.it/15/4527A0/000000?text=+)|
@@ -26,6 +27,8 @@ Application is in early development, so be aware that critical bugs can occur.
 |Red pixel|![](https://placehold.it/15/1B1010/000000?text=+)|![](https://placehold.it/15/FE2626/000000?text=+)|
 |Green pixel|![](https://placehold.it/15/121512/000000?text=+)|![](https://placehold.it/15/19FE19/000000?text=+)|
 |Description|![](https://placehold.it/15/8D6E63/000000?text=+)|![](https://placehold.it/15/8D6E63/000000?text=+)|
+|Delay gate|![](https://placehold.it/15/827717/000000?text=+)|![](https://placehold.it/15/9E9D24/000000?text=+)|
+|PWM generator|![](https://placehold.it/15/AA00FF/000000?text=+)|![](https://placehold.it/15/D500F9/000000?text=+)|
 
 ## How to run it
 To run the project, just type: `./gradlew desktop:run` (`gradlew desktop:run` on Windows)
