@@ -298,7 +298,7 @@ class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 
 				var menu = popupMenu {  }
 				var load: MenuItem = menuItem("Blueprints") {
-					subMenu {}
+					subMenu = menu
 				}
 				load.addListener(object: InputListener() {
 					override fun enter(event: InputEvent?, x: Float, y: Float, pointer: Int, fromActor: Actor?) {
