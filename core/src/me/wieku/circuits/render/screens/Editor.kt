@@ -373,7 +373,10 @@ class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 	}
 
 	fun saveFile() {
-		mainClock.stop()
+		val isRunning = mainClock.isRunning()
+		if(isRunning)
+			mainClock.stop()
+
 		try {
 			SaveManagers.saveMap(world, file)
 			lastSave = "Last saved: " + Date().asString()
@@ -382,7 +385,8 @@ class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 			lastSave = "Error saving file!!!"
 		}
 
-		mainClock.start()
+		if(isRunning)
+			mainClock.start()
 	}
 
 
