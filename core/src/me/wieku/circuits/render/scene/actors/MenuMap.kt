@@ -1,6 +1,7 @@
 package me.wieku.circuits.render.scene.actors
 
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.ui.Image
 import com.badlogic.gdx.scenes.scene2d.ui.Label
@@ -59,4 +60,8 @@ class MenuMap(arr: Array<String>):Table() {
 
 	}
 
+	override fun draw(batch: Batch?, parentAlpha: Float) {
+		width = 1024f * 2 / 3
+		super.draw(batch, parentAlpha)
+	}
 }

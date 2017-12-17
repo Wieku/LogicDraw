@@ -38,6 +38,7 @@ class MapManipulator(val world:ClassicWorld, val camera: OrthographicCamera, val
 		if(editor.stage.mouseMoved(screenX, screenY)) return true
 		var vec = camera.unproject(Vector3(screenX.toFloat(), screenY.toFloat(), 0f))
 		position.set(vec.x.toInt(), vec.y.toInt())
+
 		return false
 	}
 
@@ -120,17 +121,11 @@ class MapManipulator(val world:ClassicWorld, val camera: OrthographicCamera, val
 		if(editor.stage.keyDown(keycode)) return true
 		if(Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
 			if(Gdx.input.isKeyPressed(Input.Keys.C)) {
-				if(rectangle != null)
-					clipboard = WorldClipboard(rectangle!!, world)
+				makeCopy()
 			} else if(Gdx.input.isKeyPressed(Input.Keys.X)){
-				if(rectangle != null) {
-					clipboard = WorldClipboard(rectangle!!, world)
-					world.clear(rectangle!!)
-				}
+				makeCut()
 			} else if(Gdx.input.isKeyPressed(Input.Keys.V)){
-				if(clipboard != null) {
-					pasteMode = true
-				}
+				makePaste()
 			} else if(Gdx.input.isKeyPressed(Input.Keys.S)){
 				editor.saveFile()
 			}
@@ -198,7 +193,7 @@ class MapManipulator(val world:ClassicWorld, val camera: OrthographicCamera, val
 		} else if(pasteMode) {
 			if(!Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
 				if(button == Input.Buttons.LEFT) {
-					world.paste(position.copy().sub(clipboard!!.selection.width/2, clipboard!!.selection.height/2), clipboard!!)
+					world.paste(position.copy().sub(clipboard!!.width/2, clipboard!!.height/2), clipboard!!)
 					pasteMode = false
 					afterOperation = true
 				} else {
@@ -267,6 +262,25 @@ class MapManipulator(val world:ClassicWorld, val camera: OrthographicCamera, val
 			world.placeElement(Vector2i(posx, posy), toPlace)
 		} else {
 			world.removeElement(Vector2i(posx, posy))
+		}
+	}
+
+	fun makeCut() {
+		if(rectangle != null) {
+			clipboard = WorldClipboard.create(rectangle!!, world)
+			world.clear(rectangle!!)
+		}
+	}
+
+	fun makeCopy() {
+		if(rectangle != null) {
+			clipboard = WorldClipboard.create(rectangle!!, world)
+		}
+	}
+
+	fun makePaste() {
+		if(clipboard != null) {
+			pasteMode = true
 		}
 	}
 

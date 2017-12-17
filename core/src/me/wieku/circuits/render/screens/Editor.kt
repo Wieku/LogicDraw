@@ -70,7 +70,7 @@ class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 
 	private var file: File = File("maps/${world.name.toLowerCase().replace(" ", "_")}.ldmap")
 
-	private lateinit var menuBar: MenuBar
+	private var menuBar: MenuBar
 	private lateinit var simulationBar: VisTable
 
 	constructor(world: ClassicWorld, file: File) : this(world) {
@@ -216,6 +216,23 @@ class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 						Main.screen = WorldCreator()
 					}
 				})
+			}
+
+			menu("Edit") {
+
+				MenuManager.addDependent("selection", menuItem("Cut").onChange { manipulator.makeCut() })
+				MenuManager.addDependent("selection", menuItem("Copy").onChange { manipulator.makeCopy() })
+				MenuManager.addDependent("clipboard", menuItem("Paste").onChange { manipulator.makePaste() })
+
+				MenuManager.addDependent("clipboard", menuItem("Transform") {
+					subMenu {
+						menuItem("Rotate right").onChange { manipulator.clipboard = manipulator.clipboard!!.rotateRight() }
+						menuItem("Rotate left").onChange { manipulator.clipboard = manipulator.clipboard!!.rotateLeft() }
+						menuItem("Flip horizontal").onChange { manipulator.clipboard = manipulator.clipboard!!.flipHorizontal() }
+						menuItem("Flip vertical").onChange { manipulator.clipboard = manipulator.clipboard!!.flipVertical() }
+					}
+				})
+
 			}
 
 			menu("Help") {
@@ -369,6 +386,9 @@ class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 	override fun render(delta: Float) {
 		Gdx.gl.glClearColor(0.05f, 0.05f, 0.05f, 1f)
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+
+		MenuManager.updateDependency("selection", manipulator.rectangle != null)
+		MenuManager.updateDependency("clipboard", manipulator.clipboard != null)
 
 		delta1 += delta
 		if (delta1 >= 1f) {

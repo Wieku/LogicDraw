@@ -17,7 +17,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label
 import me.wieku.circuits.render.utils.FontManager
 import com.badlogic.gdx.scenes.scene2d.ui.TextField.TextFieldStyle
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane.ScrollPaneStyle
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
+import com.kotcrab.vis.ui.widget.MenuItem
 
 fun OrthographicCamera.fit(world: ClassicWorld, stage: Stage) {
 	if (stage.width * zoom > world.width) {
@@ -46,6 +48,15 @@ inline fun Actor.onClickS(crossinline consumer: () -> Unit) = addListener(object
 		consumer()
 	}
 })
+
+inline fun MenuItem.onChange(crossinline consumer: () -> Unit): MenuItem {
+	addListener(object: ChangeListener() {
+		override fun changed(event: ChangeEvent?, actor: Actor?) {
+			consumer()
+		}
+	})
+	return this
+}
 
 fun Table(color: Color): Table {
 	var table = Table()

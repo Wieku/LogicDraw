@@ -98,7 +98,7 @@ class WorldCreator:Screen {
 				arr[0] = file.name
 				var arr2 = SaveManagers.getHeader(file)
 				for(i in 1..3) arr[i] = arr2[i-1]
-				worldsTable.add(MenuMap(arr)).width(1024f*2/3).fillX().row()
+				worldsTable.add(MenuMap(arr)).width(1024f*2/3).row()
 			} catch (e: Exception){
 				e.printStackTrace()
 			}
@@ -109,7 +109,8 @@ class WorldCreator:Screen {
 		pane.setSmoothScrolling(false)
 		(pane.getChildren().get(0) as Table).top().left()
 		pane.setCancelTouchFocus(true)
-		mainTable.add(pane).fill()
+		pane.setScrollingDisabled(true, false)
+		mainTable.add(pane).width(1024f * 2/3).fill()
 		stage.addActor(mainTable)
 		mainTable.setFillParent(true)
 	}
@@ -125,7 +126,7 @@ class WorldCreator:Screen {
 
 		cell.height(banner.imageHeight)
 		mainTable.invalidate()
-
+		//mainTable.debug()
 		stage.act(delta)
 		stage.draw()
 	}

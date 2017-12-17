@@ -127,8 +127,8 @@ class ClassicWorld(val width: Int, val height: Int, val name: String):IWorld {
 	}
 
 	fun paste(position: Vector2i, clipboard: WorldClipboard) {
-		for(x in 0 until clipboard.selection.width) {
-			for (y in 0 until clipboard.selection.height) {
+		for(x in 0 until clipboard.width) {
+			for (y in 0 until clipboard.height) {
 				if(clipboard[x, y] != null)
 					placeElement(Vector2i(x, y).add(position), clipboard[x, y]!!.javaClass)
 				else
