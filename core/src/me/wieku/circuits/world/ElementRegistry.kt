@@ -30,6 +30,7 @@ object ElementRegistry {
 			for(field in clazz.declaredFields) {
 				for(annotation in field.annotations) {
 					if(annotation is Editable.Spinner) {
+						println(annotation)
 						if(!editors.containsKey(clazz))
 							editors.put(clazz, ArrayList())
 
@@ -58,8 +59,7 @@ object ElementRegistry {
 		register("pixel_red", RedPixel::class.java)
 		register("dark_wire", DarkWire::class.java)
 		register("description", Description::class.java)
-
-		//NOTE: THIS WILL BE ADDED WITH UI DESIGN UPDATE
-		//register("delay", DelayGate::class.java)
+		register("delay", DelayGate::class.java)
+		register("pwm", PWMGate::class.java)
 	}
 }

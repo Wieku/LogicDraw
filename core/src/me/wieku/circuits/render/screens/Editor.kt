@@ -25,11 +25,15 @@ import com.kotcrab.vis.ui.widget.Tooltip
 import com.kotcrab.vis.ui.widget.VisTable
 import com.kotcrab.vis.ui.widget.VisWindow
 import com.kotcrab.vis.ui.widget.spinner.IntSpinnerModel
+import com.kotcrab.vis.ui.widget.spinner.Spinner
 import com.kotcrab.vis.ui.widget.spinner.SpinnerModel
 import com.kotcrab.vis.ui.widget.toast.MessageToast
 import com.kotcrab.vis.ui.widget.toast.Toast
 import ktx.vis.*
 import me.wieku.circuits.Main
+import me.wieku.circuits.api.element.BasicElement
+import me.wieku.circuits.api.element.IElement
+import me.wieku.circuits.api.element.edit.Editable
 import me.wieku.circuits.api.math.Vector2i
 import me.wieku.circuits.api.world.clock.AsyncClock
 import me.wieku.circuits.api.world.clock.Updatable
@@ -43,6 +47,7 @@ import me.wieku.circuits.utils.asString
 import me.wieku.circuits.world.ClassicWorld
 import me.wieku.circuits.world.ElementRegistry
 import java.io.File
+import java.lang.reflect.Field
 import java.util.*
 
 class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
@@ -171,6 +176,7 @@ class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 						"LMB: Pencil\n" +
 						"RMB: Eraser\n" +
 						"Middle: Pick brush\n" +
+						"Ctrl+RMB: Edit element\n" +
 						"Scroll: Zoom\n" +
 						"Shift+LMB: Move canvas\n" +
 						"A+LMB: Draw line\n" +
@@ -314,45 +320,45 @@ class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 			}
 
 			var window: VisWindow? = null
-			configButton.onClickS {
-				if (window == null || !stage.actors.contains(window)) {
-					window = window("Simulation settings") {
-						addCloseButton()
-						val model = IntSpinnerModel(mainClock.tickRate, 1, 1000000, 10)
-						val spinner = spinner("Tickrate:", model).cell(growX = true, pad = 2f)
-						row()
+		configButton.onClickS {
+			if (window == null || !stage.actors.contains(window)) {
+				window = window("Simulation settings") {
+					addCloseButton()
+					val model = IntSpinnerModel(mainClock.tickRate, 1, 1000000, 10)
+					val spinner = spinner("Tickrate:", model).cell(growX = true, pad = 2f)
+					row()
 
-						val okButton = textButton("OK").cell(growX = true)
-						okButton.onClickS {
-							val isRunning = mainClock.isRunning()
+					val okButton = textButton("OK").cell(growX = true)
+					okButton.onClickS {
+						val isRunning = mainClock.isRunning()
 
-							if(isRunning)
-								mainClock.stop()
-							mainClock.tickRate = model.value
-							if(isRunning)
-								mainClock.start()
-							fadeOut()
-						}
-
-						val listener = object : ChangeListener() {
-							override fun changed(event: ChangeEvent?, actor: Actor?) {
-								okButton.isDisabled = !spinner.textField.isInputValid
-							}
-						}
-
-						spinner.textField.addListener(listener)
-						spinner.addListener(listener)
-
-						pack()
-
-						val vector = configButton.localToStageCoordinates(Vector2(0f, 0f))
-						setPosition(vector.x, vector.y - height)
+						if(isRunning)
+							mainClock.stop()
+						mainClock.tickRate = model.value
+						if(isRunning)
+							mainClock.start()
+						fadeOut()
 					}
-					stage.addActor(window!!.fadeIn())
+
+					val listener = object : ChangeListener() {
+						override fun changed(event: ChangeEvent?, actor: Actor?) {
+							okButton.isDisabled = !spinner.textField.isInputValid
+						}
+					}
+
+					spinner.textField.addListener(listener)
+					spinner.addListener(listener)
+
+					pack()
+
+					val vector = configButton.localToStageCoordinates(Vector2(0f, 0f))
+					setPosition(vector.x, vector.y - height)
 				}
+				stage.addActor(window!!.fadeIn())
 			}
-			pack()
 		}
+		pack()
+	}
 
 		menuBar.table.add(simulationBar).right().expandX()
 
@@ -470,6 +476,61 @@ class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 	override fun dispose() {
 		mainClock.stop()
 		renderer.dispose()
+	}
+
+
+	//TODO: Move this to other class
+	var editorWindow: VisWindow? = null
+	fun editElement(element: IElement) {
+		if(element is Editable) {
+			var fields = ElementRegistry.editors[element!!.javaClass]
+			if (editorWindow == null || !stage.actors.contains(editorWindow)) {
+				editorWindow = window("${ElementRegistry.names[element!!.javaClass]} settings") {
+					addCloseButton()
+
+					val spinners = HashMap<Spinner, Field>()
+
+					for(field in fields!!) {
+						if(field.annotation is Editable.Spinner) {
+							val amodel = field.annotation.model
+
+							val jField = element.javaClass.getDeclaredField(field.name)
+							jField.isAccessible = true
+
+							val model = IntSpinnerModel(jField.getInt(element), amodel[1], amodel[2], amodel[3])
+							val spinner = spinner(field.annotation.name, model).cell(growX = true, pad = 2f)
+							spinners.put(spinner, jField)
+							row()
+						}
+					}
+
+					val okButton = textButton("OK").cell(growX = true)
+					okButton.onClickS {
+						spinners.forEach { t, u -> u.setInt(element, (t.model as IntSpinnerModel).value) }
+						fadeOut()
+					}
+
+					val listener = object : ChangeListener() {
+						override fun changed(event: ChangeEvent?, actor: Actor?) {
+							var check = true
+							for(spinner in spinners)
+								check = check && spinner.key.textField.isInputValid
+							okButton.isDisabled = !check
+						}
+					}
+
+					spinners.forEach {
+						it.key.textField.addListener(listener)
+						it.key.addListener(listener)
+					}
+
+					pack()
+
+					centerWindow()
+				}
+				stage.addActor(editorWindow!!.fadeIn())
+			}
+		}
 	}
 
 	private var time = System.nanoTime()

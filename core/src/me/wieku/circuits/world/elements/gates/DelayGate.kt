@@ -12,10 +12,7 @@ import me.wieku.circuits.world.ClassicWorld
 import me.wieku.circuits.world.elements.input.Controller
 import java.util.*
 
-//TODO: Setting delay in UI
 class DelayGate(pos: Vector2i): SaveableGate(pos), Editable {
-
-	private var toUpdate = true
 
 	@Editable.Spinner("Delay", intArrayOf(1, 1, 10000, 1))
 	private var delay = 500
@@ -31,20 +28,16 @@ class DelayGate(pos: Vector2i): SaveableGate(pos), Editable {
 		counter = MathUtils.clamp(counter, 0, delay)
 
 		if(counter == 0) {
-			if(toUpdate) {
+			if(state.isActive()) {
 				state.setActive(false)
-				toUpdate = false
 			}
-		} else if (counter == 500) {
-			if(toUpdate) {
+		} else if (counter == delay) {
+			if(!state.isActive()) {
 				state.setActive(true)
-				toUpdate = false
 			}
-		} else {
-			toUpdate = true
 		}
 
-		setOut(state.isActive())
+		setOut(state.isActiveD())
 	}
 
 	override fun getIdleColor(): Int = 0x827717
@@ -55,14 +48,12 @@ class DelayGate(pos: Vector2i): SaveableGate(pos), Editable {
 
 	override fun load(world: ClassicWorld, manager: SaveManager) {
 		super.load(world, manager)
-		toUpdate = manager.getByte() == 1.toByte()
 		delay = manager.getInteger()
 		counter = manager.getInteger()
 	}
 
 	override fun save(manager: SaveManager) {
 		super.save(manager)
-		manager.putByte(if(toUpdate) 1 else 0)
 		manager.putInteger(delay)
 		manager.putInteger(counter)
 	}

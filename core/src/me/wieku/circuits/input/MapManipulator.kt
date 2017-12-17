@@ -87,17 +87,19 @@ class MapManipulator(val world:ClassicWorld, val camera: OrthographicCamera, val
 			return true
 		}
 
-		if(!pasteMode && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT) && rectangle != null) {
-			var upr = camera.unproject(Vector3(screenX.toFloat(), screenY.toFloat(), 0f))
+		if(!pasteMode && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
+			if(Gdx.input.isButtonPressed(Input.Buttons.LEFT) && rectangle != null) {
+				var upr = camera.unproject(Vector3(screenX.toFloat(), screenY.toFloat(), 0f))
 
-			endPos.set(upr.x.toInt(), upr.y.toInt()).clamp(0, 0, world.width-1, world.height-1)
+				endPos.set(upr.x.toInt(), upr.y.toInt()).clamp(0, 0, world.width-1, world.height-1)
 
-			beginTMP.set(beginPos)
-			endTMP.set(endPos)
+				beginTMP.set(beginPos)
+				endTMP.set(endPos)
 
-			calculate(beginTMP, endTMP)
+				calculate(beginTMP, endTMP)
 
-			rectangle!!.reshape(beginTMP, endTMP)
+				rectangle!!.reshape(beginTMP, endTMP)
+			}
 		} else {
 			processTouch(screenX, screenY, pointer, true)
 		}
@@ -159,7 +161,7 @@ class MapManipulator(val world:ClassicWorld, val camera: OrthographicCamera, val
 			}
 			lineMode = false
 			drawLine(beginPos, endPos, true)
-		} else if(Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT) && rectangle != null) {
+		} else if(Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT) && button == Input.Buttons.LEFT && rectangle != null) {
 			var upr = camera.unproject(Vector3(screenX.toFloat(), screenY.toFloat(), 0f))
 			endPos.set(upr.x.toInt(), upr.y.toInt()).clamp(0, 0, world.width-1, world.height-1)
 
@@ -185,11 +187,16 @@ class MapManipulator(val world:ClassicWorld, val camera: OrthographicCamera, val
 			lineMode = true
 			return false
 		} else if(Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
+			val upr = camera.unproject(Vector3(screenX.toFloat(), screenY.toFloat(), 0f))
 			if(button == Input.Buttons.LEFT) {
-				var upr = camera.unproject(Vector3(screenX.toFloat(), screenY.toFloat(), 0f))
 				beginPos.set(upr.x.toInt(), upr.y.toInt()).clamp(0, 0, world.width-1, world.height-1)
 				endPos.set(beginPos)
 				rectangle = Rectangle(beginPos, endPos)
+			} else if(button == Input.Buttons.RIGHT) {
+				val element = world.getElement(Vector2i(upr.x.toInt(), upr.y.toInt()))
+				if(element != null)
+					editor.editElement(element)
+				return false
 			}
 		} else if(pasteMode) {
 			if(!Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
