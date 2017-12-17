@@ -306,9 +306,13 @@ class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 
 						val okButton = textButton("OK").cell(growX = true)
 						okButton.onClickS {
-							mainClock.stop()
+							val isRunning = mainClock.isRunning()
+
+							if(isRunning)
+								mainClock.stop()
 							mainClock.tickRate = model.value
-							mainClock.start()
+							if(isRunning)
+								mainClock.start()
 							fadeOut()
 						}
 

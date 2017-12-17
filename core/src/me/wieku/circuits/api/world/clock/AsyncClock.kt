@@ -53,6 +53,8 @@ class AsyncClock (private val updatable: Updatable<*>, tickRate: Int)  {
 		task?.cancel(false)
 	}
 
+	fun isRunning() : Boolean = task != null && !task!!.isCancelled && !task!!.isDone
+
 	fun getTPS() = currentTPS
 
 	@Suppress("UNCHECKED_CAST")
