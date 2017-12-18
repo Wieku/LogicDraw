@@ -81,5 +81,5 @@ open class Wire(pos: Vector2i): BasicWire(pos), Saveable {
 		state.register()
 	}
 
-	override fun afterLoad(world: IWorld) {}
+	override fun afterLoad(world: ClassicWorld) {}
 }

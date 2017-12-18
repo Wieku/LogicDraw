@@ -7,6 +7,7 @@ import me.wieku.circuits.api.math.Rectangle
 import me.wieku.circuits.api.math.Vector2i
 import me.wieku.circuits.api.state.StateManager
 import me.wieku.circuits.api.world.IWorld
+import me.wieku.circuits.api.world.clock.AsyncClock
 import java.util.*
 
 //TODO: switch to tasks instead of locking objects
@@ -14,6 +15,8 @@ class ClassicWorld(val width: Int, val height: Int, val name: String):IWorld {
 	private val manager: ClassicStateManager = ClassicStateManager(width * height)
 	private val map: Array<Array<IElement?>> = Array(width) { Array<IElement?>(height) {null} }
 	private val tickables: HashMap<Vector2i, ITickable> = HashMap()
+
+	var clock: AsyncClock? = null
 
 	var entities = 0
 	get() = tickables.size

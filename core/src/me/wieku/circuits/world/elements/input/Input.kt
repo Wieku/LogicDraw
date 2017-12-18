@@ -77,7 +77,7 @@ class Input(pos: Vector2i):BasicInput(pos), Saveable {
 		state.register()
 	}
 
-	override fun afterLoad(world: IWorld) {
+	override fun afterLoad(world: ClassicWorld) {
 		updateI(world)
 	}
 }

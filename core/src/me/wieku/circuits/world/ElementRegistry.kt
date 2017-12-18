@@ -63,5 +63,6 @@ object ElementRegistry {
 		register("description", Description::class.java)
 		register("delay", DelayGate::class.java)
 		register("pwm", PWMGate::class.java)
+		register("debug_stop", StopGate::class.java)
 	}
 }

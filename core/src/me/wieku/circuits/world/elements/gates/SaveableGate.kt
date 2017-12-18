@@ -36,7 +36,7 @@ abstract class SaveableGate(pos: Vector2i): BasicGate(pos), Saveable {
 		state.register()
 	}
 
-	override fun afterLoad(world: IWorld) {
+	override fun afterLoad(world: ClassicWorld) {
 		updateIO(world)
 	}
 }

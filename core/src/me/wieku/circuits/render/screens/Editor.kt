@@ -79,6 +79,10 @@ class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 	private var menuBar: MenuBar
 	private lateinit var simulationBar: VisTable
 
+	private lateinit var startButton:VisImageButton
+	private lateinit var stopButton:VisImageButton
+	private lateinit var stepButton:VisImageButton
+
 	constructor(world: ClassicWorld, file: File) : this(world) {
 		this.file = file
 	}
@@ -361,17 +365,17 @@ class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 		simulationBar = table(true) {
 			//background = VisUI.getSkin().get("default", Tooltip.TooltipStyle::class.java).background
 			left()
-			val startButton = imageButton(Drawable(Gdx.files.internal("assets/icons/play.png")))
+			startButton = imageButton(Drawable(Gdx.files.internal("assets/icons/play.png")))
 			startButton.style.imageDisabled = Drawable(Gdx.files.internal("assets/icons/play_gray.png"))
 			startButton.addTextTooltip("Start the clock")
 			startButton.isDisabled = true
 
-			val stopButton = imageButton(Drawable(Gdx.files.internal("assets/icons/stop.png")))
+			stopButton = imageButton(Drawable(Gdx.files.internal("assets/icons/stop.png")))
 			stopButton.style.imageDisabled = Drawable(Gdx.files.internal("assets/icons/stop_gray.png"))
 			stopButton.addTextTooltip("Stop the clock")
 			stopButton.isDisabled = false
 
-			val stepButton = imageButton(Drawable(Gdx.files.internal("assets/icons/forward.png")))
+			stepButton = imageButton(Drawable(Gdx.files.internal("assets/icons/forward.png")))
 			stepButton.style.imageDisabled = Drawable(Gdx.files.internal("assets/icons/forward_gray.png"))
 			stepButton.addTextTooltip("Generate single tick")
 			stepButton.isDisabled = true
@@ -552,6 +556,7 @@ class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 
 	override fun show() {
 		mainClock = AsyncClock(this, 1000)
+		world.clock = mainClock
 		mainClock.start()
 	}
 
@@ -568,6 +573,11 @@ class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 
 		delta1 += delta
 		if (delta1 >= 1f) {
+			if(!mainClock.isRunning()) {
+				startButton.isDisabled = false
+				stepButton.isDisabled = false
+				stopButton.isDisabled = true
+			}
 			Gdx.graphics.setTitle("LogicDraw ${Version.version} (world: ${world.name}) (tickrate: $tickrate) (fps: ${Gdx.graphics.framesPerSecond}) (${world.getStateManager().usedNodes} nodes) (${world.entities} entities) | $lastSave")
 			delta1 = 0f
 		}

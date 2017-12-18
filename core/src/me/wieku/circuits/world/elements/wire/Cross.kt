@@ -122,5 +122,5 @@ open class Cross(pos: Vector2i): BasicWire(pos), Saveable {
 		stateV.register()
 	}
 
-	override fun afterLoad(world: IWorld) {}
+	override fun afterLoad(world: ClassicWorld) {}
 }
