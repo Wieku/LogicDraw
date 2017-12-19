@@ -15,10 +15,9 @@ class StopGate(pos: Vector2i): SaveableGate(pos) {
 		for(i in 0 until inputs.size)
 			calc = calc || inputs[i].isActive()
 
-
 		if(calc) {
 			if(toUpdate) {
-				if(world!!.clock != null){
+				if(world!!.clock != null) {
 					world!!.clock!!.stop()
 					state.setActive(true)
 				}

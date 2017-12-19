@@ -1,21 +1,24 @@
 package me.wieku.circuits.render.scene
 
-import com.kotcrab.vis.ui.widget.MenuItem
+import com.badlogic.gdx.scenes.scene2d.ui.Button
 import java.util.*
 
 object MenuManager {
 
-	val dependencies = HashMap<String, ArrayList<MenuItem>>()
-	val values = HashMap<String, Boolean>()
+	private data class ButtonHolder(val button: Button, val reverse: Boolean)
 
-	fun addDependent(dependency: String, item: MenuItem) {
+	private val dependencies = HashMap<String, ArrayList<ButtonHolder>>()
+	private val values = HashMap<String, Boolean>()
+
+	fun <T:Button> addDependent(dependency: String, item: T, reverse: Boolean = false): T {
 		if(!dependencies.containsKey(dependency)) {
 			dependencies.put(dependency, ArrayList())
 			values.put(dependency, true)
 		}
 
-		dependencies[dependency]!!.add(item)
-		item.isDisabled = !values[dependency]!!
+		dependencies[dependency]!!.add(ButtonHolder(item, reverse))
+		item.isDisabled =  if(reverse) values[dependency]!! else !values[dependency]!!
+		return item
 	}
 
 	fun updateDependency(dependency: String, value: Boolean) {
@@ -24,7 +27,7 @@ object MenuManager {
 		values[dependency] = value
 
 		dependencies[dependency]!!.forEach {
-			it.isDisabled = !value
+			it.button.isDisabled = if(it.reverse) value else !value
 		}
 	}
 

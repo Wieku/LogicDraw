@@ -36,6 +36,7 @@ import me.wieku.circuits.input.MapManipulator
 import me.wieku.circuits.utils.Palette
 import me.wieku.circuits.render.scene.*
 import me.wieku.circuits.render.scene.actors.TextTooltip
+import me.wieku.circuits.render.utils.About
 import me.wieku.circuits.save.SaveManagers
 import me.wieku.circuits.utils.Bresenham
 import me.wieku.circuits.utils.Version
@@ -77,12 +78,7 @@ class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 
 	private var file: File = File("maps/${world.name.toLowerCase().replace(" ", "_")}.ldmap")
 
-	private var menuBar: MenuBar
-	private lateinit var simulationBar: VisTable
-
-	private lateinit var startButton:VisImageButton
-	private lateinit var stopButton:VisImageButton
-	private lateinit var stepButton:VisImageButton
+	private lateinit var menuBar: MenuBar
 
 	constructor(world: ClassicWorld, file: File) : this(world) {
 		this.file = file
@@ -91,7 +87,7 @@ class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 	init {
 		camera = object : OrthographicCamera(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat()) {
 			override fun unproject(screenCoords: Vector3?): Vector3 {
-				return super.unproject(screenCoords, 0f, 0f, Gdx.graphics.width.toFloat(), Gdx.graphics.height - simulationBar.height)
+				return super.unproject(screenCoords, 0f, 0f, Gdx.graphics.width.toFloat(), Gdx.graphics.height - menuBar.table.height)
 			}
 		}
 
@@ -324,124 +320,85 @@ class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 			}
 
 			menu("Help") {
+				menuItem("About").onChange { About.showAboutWindow(this@Editor.stage) }
+			}
+
+			table.add(table(true) {
+				left()
+				val startButton = MenuManager.addDependent("clockRunning", imageButton(Drawable(Gdx.files.internal("assets/icons/play.png"))), true)
+				startButton.style.imageDisabled = Drawable(Gdx.files.internal("assets/icons/play_gray.png"))
+				startButton.addTextTooltip("Start the clock")
+				startButton.isDisabled = true
+
+				val stopButton = MenuManager.addDependent("clockRunning", imageButton(Drawable(Gdx.files.internal("assets/icons/stop.png"))))
+				stopButton.style.imageDisabled = Drawable(Gdx.files.internal("assets/icons/stop_gray.png"))
+				stopButton.addTextTooltip("Stop the clock")
+				stopButton.isDisabled = false
+
+				val stepButton = MenuManager.addDependent("clockRunning", imageButton(Drawable(Gdx.files.internal("assets/icons/forward.png"))), true)
+				stepButton.style.imageDisabled = Drawable(Gdx.files.internal("assets/icons/forward_gray.png"))
+				stepButton.addTextTooltip("Generate single tick")
+				stepButton.isDisabled = true
+
+				val configButton = imageButton(Drawable(Gdx.files.internal("assets/icons/gear.png")))
+				configButton.addTextTooltip("Simulation settings")
+
+				startButton.onClickS {
+					mainClock.start()
+				}
+
+				stopButton.onClickS {
+					mainClock.stop()
+				}
+
+				stepButton.onClickS {
+					mainClock.step()
+				}
 
 				var window: VisWindow? = null
-				menuItem("About").addListener(object : ChangeListener() {
-					override fun changed(event: ChangeEvent?, actor: Actor?) {
-						if (window == null || !this@Editor.stage.actors.contains(window)) {
-							window = window("About") {
-								addCloseButton()
-								center()
-								image(Drawable(Gdx.files.internal("assets/logo/banner_inv_320.png")), Scaling.fillX)
+				configButton.onClickS {
+					if (window == null || !stage.actors.contains(window)) {
+						window = window("Simulation settings") {
+							addCloseButton()
+							val model = IntSpinnerModel(mainClock.tickRate, 1, 1000000, 10)
+							val spinner = spinner("Tickrate:", model).cell(growX = true, pad = 2f)
+							row()
 
-								row()
-								label("Version: ${Version.version}")
+							val okButton = textButton("OK").cell(growX = true)
+							okButton.onClickS {
+								val isRunning = mainClock.isRunning()
 
-								row()
-								linkLabel("GitHub", "https://github.com/Wieku/LogicDraw")
-
-								row()
-								label("Powered by open-source")
-
-								row()
-
-								val okButton = textButton("OK").cell(growX = true)
-								okButton.onClickS {
-									fadeOut()
-								}
-								pack()
-								centerWindow()
+								if(isRunning)
+									mainClock.stop()
+								mainClock.tickRate = model.value
+								if(isRunning)
+									mainClock.start()
+								fadeOut()
 							}
-							this@Editor.stage.addActor(window!!.fadeIn())
+
+							val listener = object : ChangeListener() {
+								override fun changed(event: ChangeEvent?, actor: Actor?) {
+									okButton.isDisabled = !spinner.textField.isInputValid
+								}
+							}
+
+							spinner.textField.addListener(listener)
+							spinner.addListener(listener)
+
+							pack()
+
+							val vector = configButton.localToStageCoordinates(Vector2(0f, 0f))
+							setPosition(vector.x, vector.y - height)
 						}
+						stage.addActor(window!!.fadeIn())
 					}
-				})
-			}
+				}
+				pack()
+			}).right().expandX()
+
 		}
 
 		stage.addActor(menuBar.table)
-
-		simulationBar = table(true) {
-			//background = VisUI.getSkin().get("default", Tooltip.TooltipStyle::class.java).background
-			left()
-			startButton = imageButton(Drawable(Gdx.files.internal("assets/icons/play.png")))
-			startButton.style.imageDisabled = Drawable(Gdx.files.internal("assets/icons/play_gray.png"))
-			startButton.addTextTooltip("Start the clock")
-			startButton.isDisabled = true
-
-			stopButton = imageButton(Drawable(Gdx.files.internal("assets/icons/stop.png")))
-			stopButton.style.imageDisabled = Drawable(Gdx.files.internal("assets/icons/stop_gray.png"))
-			stopButton.addTextTooltip("Stop the clock")
-			stopButton.isDisabled = false
-
-			stepButton = imageButton(Drawable(Gdx.files.internal("assets/icons/forward.png")))
-			stepButton.style.imageDisabled = Drawable(Gdx.files.internal("assets/icons/forward_gray.png"))
-			stepButton.addTextTooltip("Generate single tick")
-			stepButton.isDisabled = true
-
-			val configButton = imageButton(Drawable(Gdx.files.internal("assets/icons/gear.png")))
-			configButton.addTextTooltip("Simulation settings")
-
-			startButton.onClickS {
-				mainClock.start()
-				startButton.isDisabled = true
-				stepButton.isDisabled = true
-				stopButton.isDisabled = false
-			}
-
-			stopButton.onClickS {
-				mainClock.stop()
-				startButton.isDisabled = false
-				stepButton.isDisabled = false
-				stopButton.isDisabled = true
-			}
-
-			stepButton.onClickS {
-				mainClock.step()
-			}
-
-			var window: VisWindow? = null
-		configButton.onClickS {
-			if (window == null || !stage.actors.contains(window)) {
-				window = window("Simulation settings") {
-					addCloseButton()
-					val model = IntSpinnerModel(mainClock.tickRate, 1, 1000000, 10)
-					val spinner = spinner("Tickrate:", model).cell(growX = true, pad = 2f)
-					row()
-
-					val okButton = textButton("OK").cell(growX = true)
-					okButton.onClickS {
-						val isRunning = mainClock.isRunning()
-
-						if(isRunning)
-							mainClock.stop()
-						mainClock.tickRate = model.value
-						if(isRunning)
-							mainClock.start()
-						fadeOut()
-					}
-
-					val listener = object : ChangeListener() {
-						override fun changed(event: ChangeEvent?, actor: Actor?) {
-							okButton.isDisabled = !spinner.textField.isInputValid
-						}
-					}
-
-					spinner.textField.addListener(listener)
-					spinner.addListener(listener)
-
-					pack()
-
-					val vector = configButton.localToStageCoordinates(Vector2(0f, 0f))
-					setPosition(vector.x, vector.y - height)
-				}
-				stage.addActor(window!!.fadeIn())
-			}
-		}
-		pack()
-	}
-
-		menuBar.table.add(simulationBar).right().expandX()
 
 		toastTable.setFillParent(true)
 		toastTable.addActor(tooltip.tooltipTable)
@@ -570,28 +527,24 @@ class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 
 		MenuManager.updateDependency("selection", manipulator.rectangle != null)
 		MenuManager.updateDependency("clipboard", manipulator.clipboard != null)
+		MenuManager.updateDependency("clockRunning", mainClock.isRunning())
 
 		delta1 += delta
 		if (delta1 >= 1f) {
-			if(!mainClock.isRunning()) {
-				startButton.isDisabled = false
-				stepButton.isDisabled = false
-				stopButton.isDisabled = true
-			}
 			Gdx.graphics.setTitle("LogicDraw ${Version.version} (world: ${world.name}) (tickrate: $tickrate) (fps: ${Gdx.graphics.framesPerSecond}) (${world.getStateManager().usedNodes} nodes) (${world.entities} entities) | $lastSave")
 			delta1 = 0f
 		}
 
-		elementTable.setBounds(if (tableShow) stage.width - 200f else stage.width, 0f, 200f, stage.height /*- simulationBar.height*/ - menuBar.table.height)
-		menuButton.setPosition(elementTable.x, stage.height /*- simulationBar.height*/ - menuBar.table.height - menuButton.width - 10)
-		menuButton.color = if (tableShow) Color.WHITE else Color.BLACK
+		elementTable.setBounds(if (tableShow) stage.width - 200f else stage.width, 0f, 200f, stage.height - menuBar.table.height)
+		menuButton.setPosition(elementTable.x, stage.height - menuBar.table.height - menuButton.width - 10)
 
 		camera.update()
 		renderer.projectionMatrix = camera.combined
 
 		Gdx.gl.glEnable(GL20.GL_BLEND)
 		Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
-		Gdx.gl.glViewport(0, 0, Gdx.graphics.width, (Gdx.graphics.height - simulationBar.height).toInt())
+		Gdx.gl.glViewport(0, 0, Gdx.graphics.width, (Gdx.graphics.height - menuBar.table.height).toInt())
+
 		renderer.begin(ShapeRenderer.ShapeType.Filled)
 		renderer.color = Color.BLACK
 		renderer.rect(0f, 0f, world.width.toFloat(), world.height.toFloat())
@@ -599,12 +552,12 @@ class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 			for (y in 0 until world.height) {
 				val el = world[x, y]
 				if (el != null) {
-					color.set((el.getColor().shl(8)) + 0xFF)
-					renderer.color = color
+					renderer.color = color.set((el.getColor().shl(8)) + 0xFF)
 					renderer.rect(x.toFloat(), y.toFloat(), 1f, 1f)
 				}
 			}
 		}
+
 		if (manipulator.pasteMode || manipulator.rectangle != null) {
 			if (manipulator.rectangle != null) {
 				renderer.color = bound
@@ -615,17 +568,13 @@ class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 				manipulator.clipboard!!.drawClipboard(manipulator.position, renderer)
 			}
 		} else {
-			if (manipulator.lineMode) {
-				if(palette.currentBrush != null) {
-					renderer.color = ElementRegistry.brushes[palette.currentBrush!!]
+			if(palette.currentBrush != null) {
+				renderer.color = ElementRegistry.brushes[palette.currentBrush!!]
+				if(manipulator.lineMode) {
 					Bresenham.iterateFast(manipulator.beginPos, manipulator.endPos) {
 						renderer.rect(it.x.toFloat(), it.y.toFloat(), 1f, 1f)
 					}
-				}
-			}
-			if (manipulator.position.isInBounds(0, 0, world.width - 1, world.height - 1)) {
-				if(palette.currentBrush != null) {
-					renderer.color = ElementRegistry.brushes[palette.currentBrush!!]
+				} else if (manipulator.position.isInBounds(0, 0, world.width - 1, world.height - 1)) {
 					renderer.rect(manipulator.position.x.toFloat(), manipulator.position.y.toFloat(), 1f, 1f)
 				}
 			}
@@ -668,13 +617,10 @@ class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 		stage.viewport.update(width, height, true)
 
 		menuBar.table.pack()
-		menuBar.table.width = width.toFloat()
+		menuBar.table.width = table.width
 		menuBar.table.setPosition(0f, stage.height - menuBar.table.height)
 
-		//simulationBar.width = width.toFloat()
-		//simulationBar.setPosition(0f, stage.height - simulationBar.height - menuBar.table.height)
-
-		camera.setToOrtho(true, width.toFloat(), height /*- simulationBar.height*/ - menuBar.table.height)
+		camera.setToOrtho(true, width.toFloat(), height - menuBar.table.height)
 		camera.position.set(camPosBefore)
 		camera.fit(world, stage)
 		toastManager.resize()
