@@ -12,7 +12,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.utils.Align
-import com.badlogic.gdx.utils.Scaling
 import com.badlogic.gdx.utils.viewport.ScreenViewport
 import com.kotcrab.vis.ui.VisUI
 import com.kotcrab.vis.ui.util.ToastManager
@@ -36,6 +35,7 @@ import me.wieku.circuits.input.MapManipulator
 import me.wieku.circuits.utils.Palette
 import me.wieku.circuits.render.scene.*
 import me.wieku.circuits.render.scene.actors.TextTooltip
+import me.wieku.circuits.render.scene.editors.HexEditor
 import me.wieku.circuits.render.utils.About
 import me.wieku.circuits.save.SaveManagers
 import me.wieku.circuits.utils.Bresenham
@@ -617,7 +617,7 @@ class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 		stage.viewport.update(width, height, true)
 
 		menuBar.table.pack()
-		menuBar.table.width = table.width
+		menuBar.table.width = stage.width
 		menuBar.table.setPosition(0f, stage.height - menuBar.table.height)
 
 		camera.setToOrtho(true, width.toFloat(), height - menuBar.table.height)
@@ -642,6 +642,7 @@ class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 					addCloseButton()
 
 					val spinners = HashMap<Spinner, Field>()
+					val hexEditors = HashMap<HexEditor, Field>()
 
 					for(field in fields!!) {
 						if(field.annotation is Editable.Spinner) {
@@ -655,11 +656,21 @@ class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 							spinners.put(spinner, jField)
 							row()
 						}
+
+						if(field.annotation is Editable.Hex){
+							val hexEditor = HexEditor()
+							val jField = element.javaClass.getDeclaredField(field.name)
+							jField.isAccessible = true
+							hexEditor.loadFromBytes(jField.get(element) as ByteArray)
+							hexEditors.put(hexEditor, jField)
+							add(hexEditor)
+						}
 					}
 
 					val okButton = textButton("OK").cell(growX = true)
 					okButton.onClickS {
 						spinners.forEach { t, u -> u.setInt(element, (t.model as IntSpinnerModel).value) }
+						hexEditors.forEach { t, u -> u.set(element, t.saveToBytes()) }
 						fadeOut()
 					}
 

@@ -36,12 +36,15 @@ object ElementRegistry {
 		if(Editable::class.java.isAssignableFrom(clazz)) {
 			for(field in clazz.declaredFields) {
 				for(annotation in field.annotations) {
-					if(annotation is Editable.Spinner) {
-						println(annotation)
-						if(!editors.containsKey(clazz))
-							editors.put(clazz, ArrayList())
+					when(annotation){
+						is Editable.Spinner,
+						is Editable.Hex ->{
+							println(annotation)
+							if(!editors.containsKey(clazz))
+								editors.put(clazz, ArrayList())
 
-						editors[clazz]!!.add(Field(field.name, annotation))
+							editors[clazz]!!.add(Field(field.name, annotation))
+						}
 					}
 				}
 			}
@@ -70,5 +73,6 @@ object ElementRegistry {
 		register("delay", DelayGate::class.java)
 		register("pwm", PWMGate::class.java)
 		register("debug_stop", StopGate::class.java)
+		register("programmer", ProgramInputGate::class.java)
 	}
 }
