@@ -15,7 +15,7 @@ class WorldClipboard(/*selection: Rectangle, world: ClassicWorld*/val objects: A
 	fun drawClipboard(loc: Vector2i, renderer: ShapeRenderer) {
 		renderer.setColor(0.1f, 0.1f, 0.1f, 0.5f)
 		location.set(loc).sub(width/2, height/2)
-		renderer.rect(location.x.toFloat(), location.y.toFloat(), 1f, 1f)
+		renderer.rect(location.x.toFloat(), location.y.toFloat(), width.toFloat(), height.toFloat())
 		for(x in 0 until width) {
 			for(y in 0 until height) {
 				val el = objects[x][y]

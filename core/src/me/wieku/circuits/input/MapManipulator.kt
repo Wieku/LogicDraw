@@ -27,7 +27,6 @@ class MapManipulator(val world:ClassicWorld, val camera: OrthographicCamera, val
 		MOVE_PASTE;
 	}
 
-	var toPlace = "wire"
 	private var last = Vector2i(-1, -1)
 	var position = Vector2i()
 
@@ -46,8 +45,14 @@ class MapManipulator(val world:ClassicWorld, val camera: OrthographicCamera, val
 
 	private var brushState = STATE.NONE
 
+	var pause = false
+
 	override fun keyDown(keycode: Int): Boolean {
 		if(editor.stage.keyDown(keycode)) return true
+
+		if(keycode in Input.Keys.NUM_1..Input.Keys.NUM_9) {
+			editor.palette.select(keycode-Input.Keys.NUM_1)
+		}
 
 		if(brushState == STATE.SELECTION){
 			when (keycode) {
@@ -67,11 +72,12 @@ class MapManipulator(val world:ClassicWorld, val camera: OrthographicCamera, val
 
 		if(brushState != STATE.NONE) return false
 
-		if(Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
+		if(keycode == Input.Keys.CONTROL_LEFT || keycode == Input.Keys.CONTROL_RIGHT) {
 			brushState = STATE.SELECTION
 		} else if(keycode == Input.Keys.F) {
 			if(rectangle != null) {
-				world.fill(rectangle!!, toPlace)
+				if(editor.palette.currentBrush != null)
+					world.fill(rectangle!!, editor.palette.currentBrush!!)
 			}
 		} else if(rectangle != null && keycode == Input.Keys.FORWARD_DEL) {
 			world.clear(rectangle!!)
@@ -103,7 +109,7 @@ class MapManipulator(val world:ClassicWorld, val camera: OrthographicCamera, val
 			}
 		}
 
-		if(keycode == Input.Keys.CONTROL_LEFT) {
+		if(brushState == STATE.SELECTION && ((keycode == Input.Keys.CONTROL_LEFT && !Gdx.input.isKeyPressed(Input.Keys.CONTROL_RIGHT)) || (!Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT) && keycode == Input.Keys.CONTROL_RIGHT))) {
 			if(lastTooltip != "") {
 				editor.tooltip.hide()
 				lastTooltip = ""
@@ -113,7 +119,7 @@ class MapManipulator(val world:ClassicWorld, val camera: OrthographicCamera, val
 			}
 		}
 
-		if((brushState == STATE.MOVE_PASTE || brushState == STATE.MOVE) && (keycode == Input.Keys.SHIFT_LEFT && !Gdx.input.isKeyPressed(Input.Keys.SHIFT_RIGHT)) || (!Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT) && keycode == Input.Keys.SHIFT_RIGHT)) {
+		if((brushState == STATE.MOVE_PASTE || brushState == STATE.MOVE) && ((keycode == Input.Keys.SHIFT_LEFT && !Gdx.input.isKeyPressed(Input.Keys.SHIFT_RIGHT)) || (!Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT) && keycode == Input.Keys.SHIFT_RIGHT))) {
 			brushState = if(brushState == STATE.MOVE_PASTE) {
 				STATE.PASTE
 			} else STATE.NONE
@@ -154,6 +160,11 @@ class MapManipulator(val world:ClassicWorld, val camera: OrthographicCamera, val
 	override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
 		if(editor.stage.touchUp(screenX, screenY, pointer, button)) return true
 
+		if(pause) {
+			pause = false
+			return false
+		}
+
 		var upr = camera.unproject(Vector3(screenX.toFloat(), screenY.toFloat(), 0f))
 		endPos.set(upr.x.toInt(), upr.y.toInt()).clamp(0, 0, world.width-1, world.height-1)
 
@@ -186,6 +197,7 @@ class MapManipulator(val world:ClassicWorld, val camera: OrthographicCamera, val
 		} else if(brushState == STATE.DRAWING) {
 			brushState = STATE.NONE
 		}
+
 		return false
 	}
 
@@ -194,10 +206,20 @@ class MapManipulator(val world:ClassicWorld, val camera: OrthographicCamera, val
 	private var lastMY = -1
 	override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
 		if(editor.stage.touchDown(screenX, screenY, pointer, button)) return true
+
+		if(button == Input.Buttons.BACK) {
+			editor.palette.back()
+			return false
+		} else if(button == Input.Buttons.FORWARD) {
+			editor.palette.forward()
+			return false
+		}
+
 		lastMX = screenX
 		lastMY = screenY
-		println(brushState)
 		val upr = camera.unproject(Vector3(screenX.toFloat(), screenY.toFloat(), 0f))
+		position.set(upr.x.toInt(), upr.y.toInt()).clamp(0, 0, world.width-1, world.height-1)
+		if(pause) return false
 		if(brushState == STATE.LINE || brushState == STATE.AXIS_LINE) {
 			beginPos.set(upr.x.toInt(), upr.y.toInt()).clamp(0, 0, world.width-1, world.height-1)
 			endPos.set(beginPos)
@@ -224,12 +246,12 @@ class MapManipulator(val world:ClassicWorld, val camera: OrthographicCamera, val
 			} else if(button == Input.Buttons.MIDDLE) {
 				val element = world.getElement(Vector2i(upr.x.toInt(), upr.y.toInt()))
 				if(element != null) {
-					toPlace = ElementRegistry.names[element.javaClass]!!
+					editor.palette.put(ElementRegistry.names[element.javaClass]!!)
 				}
 			} else {
 				brushState = STATE.DRAWING
 
-				last.set(position.set(upr.x.toInt(), upr.y.toInt()).clamp(0, 0, world.width-1, world.height-1))
+				last.set(position)
 
 				if(button == Input.Buttons.LEFT) {
 					drawLine(last, position, true)
@@ -248,7 +270,8 @@ class MapManipulator(val world:ClassicWorld, val camera: OrthographicCamera, val
 	override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
 		if(editor.stage.touchDragged(screenX, screenY, pointer)) return true
 		val upr = camera.unproject(Vector3(screenX.toFloat(), screenY.toFloat(), 0f))
-
+		position.set(upr.x.toInt(), upr.y.toInt()).clamp(0, 0, world.width-1, world.height-1)
+		if(pause) return false
 		if(brushState == STATE.LINE || brushState == STATE.AXIS_LINE) {
 			endPos.set(upr.x.toInt(), upr.y.toInt()).clamp(0, 0, world.width-1, world.height-1)
 			if(brushState == STATE.AXIS_LINE) {
@@ -279,7 +302,6 @@ class MapManipulator(val world:ClassicWorld, val camera: OrthographicCamera, val
 			lastMX = screenX
 			lastMY = screenY
 		} else if(brushState == STATE.DRAWING) {
-			position.set(upr.x.toInt(), upr.y.toInt()).clamp(0, 0, world.width-1, world.height-1)
 			if(position != last) {
 				if(Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
 					drawLine(last, position, true)
@@ -304,7 +326,8 @@ class MapManipulator(val world:ClassicWorld, val camera: OrthographicCamera, val
 
 	private fun makeAction(posx: Int, posy: Int, place: Boolean) {
 		if (place) {
-			world.placeElement(Vector2i(posx, posy), toPlace)
+			if(editor.palette.currentBrush != null)
+				world.placeElement(Vector2i(posx, posy), editor.palette.currentBrush!!)
 		} else {
 			world.removeElement(Vector2i(posx, posy))
 		}

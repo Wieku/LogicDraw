@@ -33,6 +33,7 @@ import me.wieku.circuits.api.math.Vector2i
 import me.wieku.circuits.api.world.clock.AsyncClock
 import me.wieku.circuits.api.world.clock.Updatable
 import me.wieku.circuits.input.MapManipulator
+import me.wieku.circuits.utils.Palette
 import me.wieku.circuits.render.scene.*
 import me.wieku.circuits.render.scene.actors.TextTooltip
 import me.wieku.circuits.save.SaveManagers
@@ -66,7 +67,7 @@ class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 	private var elementTable: Table
 	private var tableShow: Boolean = false
 
-	private var brushes: HashMap<String, Color> = HashMap()
+	var palette = Palette()
 
 	var tooltip: TextTooltip
 
@@ -128,15 +129,12 @@ class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 		var count = 0
 
 		ElementRegistry.classes.forEach {
-			var color = Color(it.value.getConstructor(Vector2i::class.java).newInstance(Vector2i()).getIdleColor().shl(8) + 0xff)
-			var color1 = color.cpy()
-			color1.a = 0.5f
-			brushes.put(it.key, color1)
-			var button = me.wieku.circuits.render.scene.ColorButton(color)
+			val color = Color(it.value.getConstructor(Vector2i::class.java).newInstance(Vector2i()).getIdleColor().shl(8) + 0xff)
+			val button = me.wieku.circuits.render.scene.ColorButton(color)
 			button.addListener(object : ClickListener() {
 				override fun clicked(event: InputEvent?, x: Float, y: Float) {
 					super.clicked(event, x, y)
-					manipulator.toPlace = it.key
+					palette.put(it.key)
 				}
 			})
 			button.addListener(tooltip.getListener(it.key))
@@ -180,6 +178,7 @@ class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 						"LMB: Pencil\n" +
 						"RMB: Eraser\n" +
 						"Middle: Pick brush\n" +
+						"1..9: Pick from palette\n" +
 						"Ctrl+RMB: Edit element\n" +
 						"Scroll: Zoom\n" +
 						"Shift+LMB: Move canvas\n" +
@@ -563,6 +562,7 @@ class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 
 	private var color = Color()
 	private val bound = Color(0.2f, 0.2f, 0.2f, 0.6f)
+	private val paletteColor = Color(0x212121ef)
 	private var delta1 = 0f
 	override fun render(delta: Float) {
 		Gdx.gl.glClearColor(0.05f, 0.05f, 0.05f, 1f)
@@ -616,22 +616,50 @@ class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 			}
 		} else {
 			if (manipulator.lineMode) {
-				renderer.color = brushes[manipulator.toPlace]
-				Bresenham.iterateFast(manipulator.beginPos, manipulator.endPos) {
-					renderer.rect(it.x.toFloat(), it.y.toFloat(), 1f, 1f)
+				if(palette.currentBrush != null) {
+					renderer.color = ElementRegistry.brushes[palette.currentBrush!!]
+					Bresenham.iterateFast(manipulator.beginPos, manipulator.endPos) {
+						renderer.rect(it.x.toFloat(), it.y.toFloat(), 1f, 1f)
+					}
 				}
 			}
 			if (manipulator.position.isInBounds(0, 0, world.width - 1, world.height - 1)) {
-				renderer.color = brushes[manipulator.toPlace]
-				renderer.rect(manipulator.position.x.toFloat(), manipulator.position.y.toFloat(), 1f, 1f)
+				if(palette.currentBrush != null) {
+					renderer.color = ElementRegistry.brushes[palette.currentBrush!!]
+					renderer.rect(manipulator.position.x.toFloat(), manipulator.position.y.toFloat(), 1f, 1f)
+				}
 			}
 		}
 
 		renderer.end()
 		Gdx.gl.glViewport(0, 0, Gdx.graphics.width, Gdx.graphics.height)
-		Gdx.gl.glDisable(GL20.GL_BLEND)
+
 		stage.act(delta)
 		stage.draw()
+
+		Gdx.gl.glEnable(GL20.GL_BLEND)
+		Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
+		renderer.projectionMatrix = stage.camera.combined
+		renderer.begin(ShapeRenderer.ShapeType.Filled)
+
+		renderer.color = paletteColor
+
+		val baseX = (stage.width-40*palette.palette.size-if(tableShow) 200 else 0)/2f
+		renderer.rect(baseX, 10f,40f*palette.palette.size, 40f)
+
+		for(i in 0 until palette.palette.size) {
+			if(i==palette.current) {
+				renderer.color = bound
+				renderer.rect(baseX + i*40f, 10f, 40f, 40f)
+			}
+			if(palette.palette[i] != null) {
+				renderer.color = ElementRegistry.brushes[palette.palette[i]]
+				renderer.rect(baseX +5f+i*40f, 15f, 30f, 30f)
+			}
+		}
+
+		renderer.end()
+		Gdx.gl.glDisable(GL20.GL_BLEND)
 	}
 
 	override fun resize(width: Int, height: Int) {
@@ -725,7 +753,9 @@ class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 
 	override fun hide() {}
 
-	override fun pause() {}
+	override fun pause() {
+		manipulator.pause = true
+	}
 
 	override fun resume() {}
 }
