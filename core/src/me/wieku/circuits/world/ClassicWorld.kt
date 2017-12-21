@@ -15,6 +15,7 @@ class ClassicWorld(val width: Int, val height: Int, val name: String):IWorld {
 	private val manager: ClassicStateManager = ClassicStateManager(width * height)
 	private val map: Array<Array<IElement?>> = Array(width) { Array<IElement?>(height) {null} }
 	private val tickables: HashMap<Vector2i, ITickable> = HashMap()
+	private val tasks = ArrayDeque<Runnable>()
 
 	var clock: AsyncClock? = null
 
@@ -23,16 +24,13 @@ class ClassicWorld(val width: Int, val height: Int, val name: String):IWorld {
 	private set
 
 	override fun update(tick: Long) {
-		try {
-			synchronized(tickables) {
-				tickables.entries.forEach { it.value.update(tick) }
-				synchronized(manager) {
-					manager.swap()
-				}
-			}
-		} catch (i: Exception) {
-			i.printStackTrace()
-		}
+		updateTasks()
+		tickables.entries.forEach { it.value.update(tick) }
+		manager.swap()
+	}
+
+	fun updateTasks() {
+		while(tasks.isNotEmpty()) tasks.poll().run()
 	}
 
 	override fun placeElement(position: Vector2i, name: String) {
@@ -43,22 +41,32 @@ class ClassicWorld(val width: Int, val height: Int, val name: String):IWorld {
 		}
 	}
 
+	private fun placeElementNT(position: Vector2i, name: String) {
+		if(ElementRegistry.classes.containsKey(name)) {
+			placeElementNT(position, ElementRegistry.classes[name]!!)
+		} else {
+			println("[ERROR] Element doesn't exist!")
+		}
+	}
+
 	private fun placeElement(position: Vector2i, clazz: Class<out IElement>) {
+		tasks.add(Runnable {
+			placeElementNT(position, clazz)
+		})
+	}
+
+	private fun placeElementNT(position: Vector2i, clazz: Class<out IElement>) {
 		if(!position.isInBounds(0, 0, width-1, height-1)) return
 		if(map[position.x][position.y] != null) {
 			if(map[position.x][position.y]!!.javaClass != clazz) {
-				removeElement(position)
+				removeElementNT(position)
 			} else return
 		}
 		var el:IElement = clazz.getConstructor(Vector2i::class.java).newInstance(position)
-		synchronized(map) {
-			map[position.x][position.y] = el
-			el.onPlace(this)
-			if(el is ITickable) {
-				synchronized(tickables) {
-					tickables.put(position, el)
-				}
-			}
+		map[position.x][position.y] = el
+		el.onPlace(this)
+		if(el is ITickable) {
+			tickables.put(position, el)
 		}
 	}
 
@@ -78,43 +86,78 @@ class ClassicWorld(val width: Int, val height: Int, val name: String):IWorld {
 
 	private var tempVec = Vector2i()
 	fun clear(rectangle: Rectangle) {
-		for (x in rectangle.x until rectangle.x + rectangle.width) {
+		tasks.add(Runnable {
+			clearNT(rectangle)
+		})
+	}
+
+	private fun clearNT(rectangle: Rectangle) {
+		if(rectangle.width > 2 && rectangle.height > 2) {
+			lock = true
+			for (x in rectangle.x+1 until rectangle.x + rectangle.width-1) {
+				for (y in rectangle.y+1 until rectangle.y + rectangle.height-1) {
+					removeElementNT(tempVec.set(x, y))
+				}
+			}
+			lock = false
+
+			for (x in rectangle.x until rectangle.x + rectangle.width) {
+				removeElementNT(tempVec.set(x, rectangle.y))
+				removeElementNT(tempVec.set(x, rectangle.y + rectangle.height-1))
+			}
+
 			for (y in rectangle.y until rectangle.y + rectangle.height) {
-				removeElement(tempVec.set(x, y))
+				removeElementNT(tempVec.set(rectangle.x, y))
+				removeElementNT(tempVec.set(rectangle.x + rectangle.width - 1, y))
+			}
+
+		} else {
+			for (x in rectangle.x until rectangle.x + rectangle.width) {
+				for (y in rectangle.y until rectangle.y + rectangle.height) {
+					removeElementNT(tempVec.set(x, y))
+				}
 			}
 		}
 	}
 
 	fun fill(rectangle: Rectangle, toPlace: String) {
-		for (x in rectangle.x until rectangle.x + rectangle.width) {
-			for (y in rectangle.y until rectangle.y + rectangle.height) {
-				placeElement(Vector2i(x, y), toPlace)
+		tasks.add(Runnable {
+			clearNT(rectangle)
+			for (x in rectangle.x until rectangle.x + rectangle.width) {
+				for (y in rectangle.y until rectangle.y + rectangle.height) {
+					placeElementNT(Vector2i(x, y), toPlace)
+				}
 			}
-		}
+		})
 	}
 
 	fun paste(position: Vector2i, clipboard: WorldClipboard) {
-		for(x in 0 until clipboard.width) {
-			for (y in 0 until clipboard.height) {
-				if(clipboard[x, y] != null)
-					placeElement(Vector2i(x, y).add(position), clipboard[x, y]!!.javaClass)
-				else
-					removeElement(Vector2i(x, y).add(position))
+		tasks.add(Runnable {
+			clearNT(Rectangle(position, Vector2i(position.x+clipboard.width, position.y + clipboard.height)))
+			for(x in 0 until clipboard.width) {
+				for (y in 0 until clipboard.height) {
+					if(clipboard[x, y] != null)
+						placeElementNT(Vector2i(x, y).add(position), clipboard[x, y]!!.javaClass)
+					else
+						removeElementNT(Vector2i(x, y).add(position))
+				}
 			}
-		}
+		})
 	}
 
 	override fun removeElement(position: Vector2i) {
+		tasks.add(Runnable {
+			removeElementNT(position)
+		})
+	}
+
+	private fun removeElementNT(position: Vector2i) {
 		if(!position.isInBounds(0, 0, width-1, height-1)) return
 		var element: IElement? = map[position.x][position.y] ?: return
 
-		synchronized(map) {
-			synchronized(tickables) {
-				tickables.remove(position)
-			}
-			map[position.x][position.y] = null
-			element!!.onRemove(this)
-		}
+		tickables.remove(position)
+		map[position.x][position.y] = null
+		element!!.onRemove(this)
 	}
 
 	override fun getElement(position: Vector2i) = if(position.isInBounds(0, 0, width - 1, height - 1)) map[position.x][position.y] else null
@@ -135,7 +178,9 @@ class ClassicWorld(val width: Int, val height: Int, val name: String):IWorld {
 	private val stack = ArrayDeque<Vector2i>()
 	private var first = true
 	private var tempVector = Vector2i()
+	private var lock = false
 	override fun updateNeighboursOf(pos: Vector2i) {
+		if(lock) return
 		stack.push(pos)
 		if(first) {
 			first = false

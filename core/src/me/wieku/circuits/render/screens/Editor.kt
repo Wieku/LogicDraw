@@ -563,6 +563,10 @@ class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 		Gdx.gl.glClearColor(0.05f, 0.05f, 0.05f, 1f)
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
 
+		if(!mainClock.isRunning()) {
+			world.updateTasks()
+		}
+
 		MenuManager.updateDependency("selection", manipulator.rectangle != null)
 		MenuManager.updateDependency("clipboard", manipulator.clipboard != null)
 		MenuManager.updateDependency("clockRunning", mainClock.isRunning())

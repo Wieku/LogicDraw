@@ -11,7 +11,7 @@ import me.wieku.circuits.world.ClassicWorld
 
 abstract class SaveableGate(pos: Vector2i): BasicGate(pos), Saveable {
 
-	protected lateinit var state: State
+	protected var state: State? = null
 
 	override fun onPlace(world: IWorld) {
 		super.onPlace(world)
@@ -20,20 +20,22 @@ abstract class SaveableGate(pos: Vector2i): BasicGate(pos), Saveable {
 
 	override fun onRemove(world: IWorld) {
 		setOut(false)
-		state.unregister()
+		state!!.unregister()
 	}
 
 	override fun setState(state: State, axis: Axis) {}
 
-	override fun getState(axis: Axis): State = state
+	override fun getState(axis: Axis): State? = state
+
+	override fun getColor(): Int = if (state!= null && state!!.isActiveD()) getActiveColor() else getIdleColor()
 
 	override fun save(manager: SaveManager) {
-		manager.putInteger(state.id)
+		manager.putInteger(state!!.id)
 	}
 
 	override fun load(world: ClassicWorld, manager: SaveManager) {
 		state = world.getStateManager().getState(manager.getInteger())!!
-		state.register()
+		state!!.register()
 	}
 
 	override fun afterLoad(world: ClassicWorld) {

@@ -9,14 +9,12 @@ class AndGate(pos: Vector2i): SaveableGate(pos) {
 		for(i in 0 until inputs.size)
 			calc = calc && inputs[i].isActive()
 
-		state.setActive(calc)
+		state!!.setActive(calc)
 		setOut(calc)
 	}
 
 	override fun getIdleColor(): Int = 0x00BFA5
 
 	override fun getActiveColor(): Int = 0x1DE9B6
-
-	override fun getColor(): Int = if (state.isActiveD()) getActiveColor() else getIdleColor()
 
 }

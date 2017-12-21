@@ -28,23 +28,21 @@ class DelayGate(pos: Vector2i): SaveableGate(pos), Editable {
 		counter = MathUtils.clamp(counter, 0, delay)
 
 		if(counter == 0) {
-			if(state.isActive()) {
-				state.setActive(false)
+			if(state!!.isActive()) {
+				state!!.setActive(false)
 			}
 		} else if (counter == delay) {
-			if(!state.isActive()) {
-				state.setActive(true)
+			if(!state!!.isActive()) {
+				state!!.setActive(true)
 			}
 		}
 
-		setOut(state.isActiveD())
+		setOut(state!!.isActiveD())
 	}
 
 	override fun getIdleColor(): Int = 0x827717
 
 	override fun getActiveColor(): Int = 0x9E9D24
-
-	override fun getColor(): Int = if (state.isActiveD()) getActiveColor() else getIdleColor()
 
 	override fun load(world: ClassicWorld, manager: SaveManager) {
 		super.load(world, manager)

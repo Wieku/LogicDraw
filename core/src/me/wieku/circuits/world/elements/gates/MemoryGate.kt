@@ -27,21 +27,21 @@ class MemoryGate(pos: Vector2i): SaveableGate(pos) {
 				var calc2 = false
 				for(i in 0 until inputs.size)
 					calc2 = calc2 || inputs[i].isActive()
-				state.setActive(calc2)
+				state!!.setActive(calc2)
 				toUpdate = false
 			}
 		} else {
 			toUpdate = true
 		}
 
-		setOut(state.isActive())
+		setOut(state!!.isActive())
 	}
 
 	override fun getIdleColor(): Int = 0x37474F
 
 	override fun getActiveColor(): Int = 0x455A64
 
-	override fun getColor(): Int = if (state.isActiveD()) getActiveColor() else getIdleColor()
+	override fun getColor(): Int = if (state!!.isActiveD()) getActiveColor() else getIdleColor()
 
 	override protected fun updateIO(world: IWorld) {
 		inputs.clear()

@@ -22,7 +22,7 @@ class PWMGate(pos: Vector2i): SaveableGate(pos), Editable {
 			calc = calc || inputs[i].isActive()
 
 		if(calc) {
-			state.setActive(false)
+			state!!.setActive(false)
 			counter = 0
 		} else {
 			counter += 1
@@ -31,11 +31,11 @@ class PWMGate(pos: Vector2i): SaveableGate(pos), Editable {
 			val ticks = period * duty / 100
 
 			if(counter <= ticks) {
-				if(!state.isActive())
-					state.setActive(true)
+				if(!state!!.isActive())
+					state!!.setActive(true)
 			} else {
-				if(state.isActive())
-					state.setActive(false)
+				if(state!!.isActive())
+					state!!.setActive(false)
 			}
 
 			if (counter == period) {
@@ -43,14 +43,12 @@ class PWMGate(pos: Vector2i): SaveableGate(pos), Editable {
 			}
 		}
 
-		setOut(state.isActiveD())
+		setOut(state!!.isActiveD())
 	}
 
 	override fun getIdleColor(): Int = 0xAA00FF
 
 	override fun getActiveColor(): Int = 0xD500F9
-
-	override fun getColor(): Int = if (state.isActiveD()) getActiveColor() else getIdleColor()
 
 	override fun load(world: ClassicWorld, manager: SaveManager) {
 		super.load(world, manager)

@@ -4,36 +4,29 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Screen
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
-import com.badlogic.gdx.graphics.Texture
-import com.badlogic.gdx.math.MathUtils
-import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.Stage
-import com.badlogic.gdx.scenes.scene2d.ui.*
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
-import com.badlogic.gdx.utils.Scaling
-import com.badlogic.gdx.utils.viewport.ExtendViewport
-import me.wieku.circuits.Main
-import me.wieku.circuits.world.ClassicWorld
-import java.io.File
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.utils.Align
+import com.badlogic.gdx.utils.Scaling
 import com.badlogic.gdx.utils.viewport.ScreenViewport
+import com.kotcrab.vis.ui.VisUI
 import com.kotcrab.vis.ui.util.adapter.ArrayListAdapter
+import com.kotcrab.vis.ui.util.form.FormInputValidator
+import com.kotcrab.vis.ui.util.form.SimpleFormValidator
 import com.kotcrab.vis.ui.widget.ListView
 import com.kotcrab.vis.ui.widget.VisTable
 import com.kotcrab.vis.ui.widget.spinner.IntSpinnerModel
-import com.kotcrab.vis.ui.widget.spinner.Spinner
 import ktx.vis.table
-import me.wieku.circuits.render.scene.*
-import me.wieku.circuits.render.scene.actors.MenuMap
+import ktx.vis.window
+import me.wieku.circuits.Main
+import me.wieku.circuits.render.scene.Drawable
+import me.wieku.circuits.render.scene.getTxRegion
+import me.wieku.circuits.render.scene.onChange
 import me.wieku.circuits.save.SaveManagers
 import me.wieku.circuits.utils.Version
+import me.wieku.circuits.world.ClassicWorld
+import java.io.File
 import java.util.*
-import com.kotcrab.vis.ui.VisUI
-import com.kotcrab.vis.ui.util.form.FormInputValidator
-import com.kotcrab.vis.ui.util.form.SimpleFormValidator
-import com.kotcrab.vis.ui.widget.toast.MessageToast
-import ktx.vis.window
 
 
 class WorldCreator:Screen {
@@ -41,81 +34,13 @@ class WorldCreator:Screen {
 	private var stage: Stage = Stage(ScreenViewport())
 
 	private var mainTable = Table()
-	private var bannerTexture: Texture = Texture(Gdx.files.internal("assets/logo/banner_inv.png"), true)
-	private var banner: Image = Image(bannerTexture)
-
-	//private var cell: Cell<Image>
 
 	init {
 		File("maps/").mkdir()
 		File("blueprints/").mkdir()
 		mainTable.top().left()
-		bannerTexture.setFilter(Texture.TextureFilter.MipMapLinearLinear, Texture.TextureFilter.Linear)
-		banner.setScaling(Scaling.fillX)
-		/*
 
-
-		mainTable.top()
-		cell = mainTable.add(banner).top().pad(20f).width(1024f*2/3).fill(true, false)
-		mainTable.row()
-
-		var creatorTable = Table()
-
-		creatorTable.add(Label("Create new world:", Color.WHITE, 24)).left().fillX().expandX().colspan(4).row()
-
-		creatorTable.add(Label("World name:", Color.WHITE, 12)).left()
-		var nameField = TextField("Test", getTextFieldStyle(Color(0.07f, 0.07f, 0.07f, 1f), Color.WHITE, 12))
-		creatorTable.add(nameField).colspan(3).padBottom(2f).fillX().row()
-
-		creatorTable.add(Label("World size:", Color.WHITE, 12)).left()
-
-		val widthModel = IntSpinnerModel(1024, 100, 8192, 1)
-		val heightModel = IntSpinnerModel(1024, 100, 8192, 1)
-
-		var widthSpinner = Spinner(null, widthModel)
-		var heightSpinner = Spinner(null, heightModel)
-
-		creatorTable.add(widthSpinner).left()
-		creatorTable.add(Label("x", Color.WHITE, 12)).left()
-		creatorTable.add(heightSpinner).left().row()
-
-		var createButton = TextButton("Create!", getTextButtonStyle(Color(0.1f, 0.1f, 0.1f, 1f), Color.WHITE, 14))
-		createButton.addListener(object: ClickListener(){
-			override fun clicked(event: InputEvent?, x: Float, y: Float) {
-				super.clicked(event, x, y)
-				val width = widthModel.value
-				val height = heightModel.value
-				Main.screen = Editor(ClassicWorld(width, height, nameField.text))
-			}
-		})
-		creatorTable.add(createButton).colspan(4).fillX()
-
-		mainTable.add(creatorTable)*//*.width(1024f*2/3)*//*.center().colspan(3).row()
-		mainTable.add(Label("Load world:", Color.WHITE, 24)).left().colspan(3).row()
-
-		var worldsTable = Table()
-
-		for(file in File("maps/").listFiles()) {
-			try {
-				var arr = Array<String>(4) { ""}
-				arr[0] = file.name
-				var arr2 = SaveManagers.getHeader(file)
-				for(i in 1..3) arr[i] = arr2[i-1]
-				worldsTable.add(MenuMap(arr))*//*.width(1024f*2/3)*//*.fillX().row()
-			} catch (e: Exception){
-				e.printStackTrace()
-			}
-		}
-
-		var pane = ScrollPane(worldsTable, getScrollPaneStyle(Color.BLACK, Color.WHITE))
-		pane.setFadeScrollBars(false)
-		pane.setSmoothScrolling(false)
-		(pane.getChildren().get(0) as Table).top().left()
-		pane.setCancelTouchFocus(true)
-		pane.setScrollingDisabled(true, false)
-		mainTable.add(pane)*//*.width(1024f * 2/3)*//*.fill().colspan(3)*/
-
-		val adapter = object: ArrayListAdapter<String, VisTable>(File("maps/").listFiles().map { it.name }.toMutableList() as ArrayList<String>?) {
+		val adapter = object: ArrayListAdapter<String, VisTable>(File("maps/").listFiles().filter{it.extension == "ldmap"}.map { it.name }.toMutableList() as ArrayList<String>?) {
 			private val bg = VisUI.getSkin().getDrawable("window-bg")
 			private val selection = VisUI.getSkin().getDrawable("list-selection")
 
@@ -127,13 +52,20 @@ class WorldCreator:Screen {
 				var arr2 = SaveManagers.getHeader(File("maps/$item"))
 				return table {
 					background = bg
-					left()
-					label(arr2[0]).cell(padBottom = 3f, align = Align.top)
+
+					image(getTxRegion(Color.WHITE), Scaling.stretchX).cell(fillX = true)
 					row()
-					label("Size: ${arr2[1]}x${arr2[2]}").cell(align = Align.left, growX = true)
+					table {
+						left()
+						label(arr2[0]).cell(padBottom = 3f, align = Align.top)
+						row()
+						label("Size: ${arr2[1]}x${arr2[2]}").cell(align = Align.left, growX = true)
+						row()
+						label("File: $item").cell(align = Align.left, growX = true)
+						pad(5f)
+					}.cell(growX = true)
 					row()
-					label("File: $item").cell(align = Align.left, growX = true)
-					pad(5f)
+					image(getTxRegion(Color.WHITE), Scaling.stretchX).cell(fillX = true)
 				}
 			}
 
@@ -235,7 +167,6 @@ class WorldCreator:Screen {
 
 	override fun resize(width: Int, height: Int) {
 		stage.viewport.update(width, height, true)
-		//mainTable.setBounds(0f, 0f, stage.width, stage.height)
 	}
 
 	override fun dispose() {

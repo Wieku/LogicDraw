@@ -9,14 +9,12 @@ class XorGate(pos: Vector2i): SaveableGate(pos) {
 		for(i in 0 until inputs.size)
 			calc = calc.xor(inputs[i].isActive())
 
-		state.setActive(calc)
+		state!!.setActive(calc)
 		setOut(calc)
 	}
 
 	override fun getIdleColor(): Int = 0xC51162
 
 	override fun getActiveColor(): Int = 0xF50057
-
-	override fun getColor(): Int = if (state.isActiveD()) getActiveColor() else getIdleColor()
 
 }

@@ -11,7 +11,7 @@ import me.wieku.circuits.world.ClassicWorld
 
 open class Wire(pos: Vector2i): BasicWire(pos), Saveable {
 
-	lateinit var state:State
+	var state:State? = null
 
 	override fun onPlace(world: IWorld) {
 		var list = world.getNeighboursOf(this)
@@ -31,34 +31,34 @@ open class Wire(pos: Vector2i): BasicWire(pos), Saveable {
 			} else {
 				world.getStateManager()()
 			}
-			state.register()
+			state!!.register()
 			world.updateNeighboursOf(pos)
 		} else {
 			state = world.getStateManager()()
-			state.register()
+			state!!.register()
 		}
 
 	}
 
 	override fun onNeighbourChange(position: Vector2i, world: IWorld) {
 		if (world.getElement(position) == null) {
-			state.unregister()
+			state!!.unregister()
 			state = world.getStateManager()()
-			state.register()
+			state!!.register()
 			world.updateNeighboursOf(pos)
 		} else if (world.getElement(position) is BasicWire){
 			var stateU = world.getElement(position)!!.getState(Axis.getAxis(pos, position))
 			if(state != stateU) {
-				state.unregister()
+				state!!.unregister()
 				state = stateU!!
-				state.register()
+				state!!.register()
 				world.updateNeighboursOf(pos)
 			}
 		}
 	}
 
 	override fun onRemove(world: IWorld) {
-		state.unregister()
+		state!!.unregister()
 		world.updateNeighboursOf(pos)
 	}
 
@@ -66,19 +66,19 @@ open class Wire(pos: Vector2i): BasicWire(pos), Saveable {
 
 	override fun getActiveColor(): Int = 0xD50000
 
-	override fun getColor(): Int = if(state.isActiveD()) getActiveColor() else getIdleColor()
+	override fun getColor(): Int = if(state != null && state!!.isActiveD()) getActiveColor() else getIdleColor()
 
 	override fun setState(state: State, axis: Axis) {}
 
-	override fun getState(axis: Axis): State = state
+	override fun getState(axis: Axis): State? = state
 
 	override fun save(manager: SaveManager) {
-		manager.putInteger(state.id)
+		manager.putInteger(state!!.id)
 	}
 
 	override fun load(world: ClassicWorld, manager: SaveManager) {
 		state = world.getStateManager().getState(manager.getInteger())!!
-		state.register()
+		state!!.register()
 	}
 
 	override fun afterLoad(world: ClassicWorld) {}

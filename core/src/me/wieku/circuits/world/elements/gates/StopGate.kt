@@ -19,23 +19,21 @@ class StopGate(pos: Vector2i): SaveableGate(pos) {
 			if(toUpdate) {
 				if(world!!.clock != null) {
 					world!!.clock!!.stop()
-					state.setActive(true)
+					state!!.setActive(true)
 				}
 				toUpdate = false
 			}
 		} else {
 			toUpdate = true
-			state.setActive(false)
+			state!!.setActive(false)
 		}
 
-		setOut(state.isActive())
+		setOut(state!!.isActive())
 	}
 
 	override fun getIdleColor(): Int = 0xBF360C
 
 	override fun getActiveColor(): Int = 0xD84315
-
-	override fun getColor(): Int = if (state.isActiveD()) getActiveColor() else getIdleColor()
 
 	override fun onPlace(world: IWorld) {
 		this.world = world as ClassicWorld

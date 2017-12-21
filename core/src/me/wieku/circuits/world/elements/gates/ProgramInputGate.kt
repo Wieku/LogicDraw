@@ -48,14 +48,14 @@ class ProgramInputGate(pos: Vector2i) : SaveableGate(pos), Editable {
 
 		if (calc2) {
 			if (toUpdate2) {
-				state.setActive(nextBit())
+				state!!.setActive(nextBit())
 				toUpdate2 = false
 			}
 		} else {
 			toUpdate2 = true
 		}
 
-		setOut(state.isActive())
+		setOut(state!!.isActive())
 	}
 
 	fun nextBit(): Boolean {
@@ -71,8 +71,6 @@ class ProgramInputGate(pos: Vector2i) : SaveableGate(pos), Editable {
 	override fun getIdleColor(): Int = 0x21274F
 
 	override fun getActiveColor(): Int = 0x424A64
-
-	override fun getColor(): Int = if (state.isActiveD()) getActiveColor() else getIdleColor()
 
 	override protected fun updateIO(world: IWorld) {
 		inputs.clear()

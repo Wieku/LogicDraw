@@ -9,7 +9,7 @@ class NandGate(pos: Vector2i): SaveableGate(pos) {
 		for(i in 0 until inputs.size)
 			calc = calc && inputs[i].isActive()
 
-		state.setActive(!calc)
+		state!!.setActive(!calc)
 		setOut(!calc)
 	}
 
@@ -17,5 +17,4 @@ class NandGate(pos: Vector2i): SaveableGate(pos) {
 
 	override fun getActiveColor(): Int = 0x00695C
 
-	override fun getColor(): Int = if (state.isActiveD()) getActiveColor() else getIdleColor()
 }

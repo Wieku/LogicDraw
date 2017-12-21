@@ -27,7 +27,7 @@ class TFFGate(pos: Vector2i): SaveableGate(pos) {
 		if(calc) {
 			if(toUpdate) {
 				if(!calc2)
-					state.setActive(!state.isActive())
+					state!!.setActive(!state!!.isActive())
 				toUpdate = false
 			}
 		} else {
@@ -35,17 +35,17 @@ class TFFGate(pos: Vector2i): SaveableGate(pos) {
 		}
 
 		if(calc2) {
-			state.setActive(false)
+			state!!.setActive(false)
 		}
 
-		setOut(state.isActive())
+		setOut(state!!.isActive())
 	}
 
 	override fun getIdleColor(): Int = 0x311B92
 
 	override fun getActiveColor(): Int = 0x4527A0
 
-	override fun getColor(): Int = if (state.isActiveD()) getActiveColor() else getIdleColor()
+	override fun getColor(): Int = if (state!!.isActiveD()) getActiveColor() else getIdleColor()
 
 	override protected fun updateIO(world: IWorld) {
 		inputs.clear()

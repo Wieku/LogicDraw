@@ -11,8 +11,8 @@ import me.wieku.circuits.world.ClassicWorld
 
 open class Cross(pos: Vector2i): BasicWire(pos), Saveable {
 
-	lateinit var stateH:State
-	lateinit var stateV:State
+	var stateH:State? = null
+	var stateV:State? = null
 
 	override fun onPlace(world: IWorld) {
 		var list = world.getNeighboursOf(this)
@@ -46,14 +46,14 @@ open class Cross(pos: Vector2i): BasicWire(pos), Saveable {
 			} else {
 				world.getStateManager()()
 			}
-			stateH.register()
-			stateV.register()
+			stateH!!.register()
+			stateV!!.register()
 			world.updateNeighboursOf(pos)
 		} else {
 			stateH = world.getStateManager()()
 			stateV = world.getStateManager()()
-			stateH.register()
-			stateV.register()
+			stateH!!.register()
+			stateV!!.register()
 		}
 
 	}
@@ -62,31 +62,31 @@ open class Cross(pos: Vector2i): BasicWire(pos), Saveable {
 		var axis = Axis.getAxis(pos, position)
 		if(axis==Axis.HORIZONTAL) {
 			if (world.getElement(position) == null) {
-				stateH.unregister()
+				stateH!!.unregister()
 				stateH = world.getStateManager()()
-				stateH.register()
+				stateH!!.register()
 				world.updateNeighboursOf(pos)
 			} else if (world.getElement(position) is BasicWire){
 				var stateU = world.getElement(position)!!.getState(axis)
 				if(stateH != stateU) {
-					stateH.unregister()
+					stateH!!.unregister()
 					stateH = stateU!!
-					stateH.register()
+					stateH!!.register()
 					world.updateNeighboursOf(pos)
 				}
 			}
 		} else if(axis==Axis.VERTICAL) {
 			if (world.getElement(position) == null) {
-				stateV.unregister()
+				stateV!!.unregister()
 				stateV = world.getStateManager()()
-				stateV.register()
+				stateV!!.register()
 				world.updateNeighboursOf(pos)
 			} else if (world.getElement(position) is BasicWire){
 				var stateU = world.getElement(position)!!.getState(axis)
 				if(stateV != stateU) {
-					stateV.unregister()
+					stateV!!.unregister()
 					stateV = stateU!!
-					stateV.register()
+					stateV!!.register()
 					world.updateNeighboursOf(pos)
 				}
 			}
@@ -95,8 +95,8 @@ open class Cross(pos: Vector2i): BasicWire(pos), Saveable {
 	}
 
 	override fun onRemove(world: IWorld) {
-		stateH.unregister()
-		stateV.unregister()
+		stateH!!.unregister()
+		stateV!!.unregister()
 		world.updateNeighboursOf(pos)
 	}
 
@@ -104,22 +104,22 @@ open class Cross(pos: Vector2i): BasicWire(pos), Saveable {
 
 	override fun getActiveColor(): Int = 0x9E9E9E
 
-	override fun getColor(): Int = if(stateH.isActiveD() || stateV.isActiveD()) getActiveColor() else getIdleColor()
+	override fun getColor(): Int = if((stateH != null && stateH!!.isActiveD()) || (stateV != null && stateV!!.isActiveD())) getActiveColor() else getIdleColor()
 
 	override fun setState(state: State, axis: Axis) {}
 
-	override fun getState(axis: Axis): State = if(axis == Axis.HORIZONTAL) stateH else stateV
+	override fun getState(axis: Axis): State? = if(axis == Axis.HORIZONTAL) stateH else stateV
 
 	override fun save(manager: SaveManager) {
-		manager.putInteger(stateH.id)
-		manager.putInteger(stateV.id)
+		manager.putInteger(stateH!!.id)
+		manager.putInteger(stateV!!.id)
 	}
 
 	override fun load(world: ClassicWorld, manager: SaveManager) {
 		stateH = world.getStateManager().getState(manager.getInteger())!!
-		stateH.register()
+		stateH!!.register()
 		stateV = world.getStateManager().getState(manager.getInteger())!!
-		stateV.register()
+		stateV!!.register()
 	}
 
 	override fun afterLoad(world: ClassicWorld) {}
