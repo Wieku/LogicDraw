@@ -2,18 +2,15 @@ package me.wieku.circuits.render.scene
 
 import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.graphics.*
-import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import com.badlogic.gdx.graphics.Texture.TextureFilter
 import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.Stage
-import com.badlogic.gdx.scenes.scene2d.ui.ImageButton
+import com.badlogic.gdx.scenes.scene2d.ui.*
 import me.wieku.circuits.world.ClassicWorld
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton
-import com.badlogic.gdx.scenes.scene2d.ui.Label
 import me.wieku.circuits.render.utils.FontManager
 import com.badlogic.gdx.scenes.scene2d.ui.TextField.TextFieldStyle
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane.ScrollPaneStyle
@@ -49,7 +46,7 @@ inline fun Actor.onClickS(crossinline consumer: () -> Unit) = addListener(object
 	}
 })
 
-inline fun MenuItem.onChange(crossinline consumer: () -> Unit): MenuItem {
+inline fun <T: Button> T.onChange(crossinline consumer: () -> Unit): T {
 	addListener(object: ChangeListener() {
 		override fun changed(event: ChangeEvent?, actor: Actor?) {
 			consumer()

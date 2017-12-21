@@ -1,11 +1,12 @@
 package me.wieku.circuits.render.scene
 
 import com.badlogic.gdx.scenes.scene2d.ui.Button
+import java.lang.reflect.Field
 import java.util.*
 
 object MenuManager {
 
-	private data class ButtonHolder(val button: Button, val reverse: Boolean)
+	private data class ButtonHolder(val button: Button, val reverse: Boolean, val field: Field)
 
 	private val dependencies = HashMap<String, ArrayList<ButtonHolder>>()
 	private val values = HashMap<String, Boolean>()
@@ -16,7 +17,15 @@ object MenuManager {
 			values.put(dependency, true)
 		}
 
-		dependencies[dependency]!!.add(ButtonHolder(item, reverse))
+		var claz1: Class<in T> = item.javaClass
+		while(claz1 != Button::class.java) {
+			claz1 = claz1.superclass
+		}
+
+		val field = claz1.getDeclaredField("isDisabled")
+		field.isAccessible = true
+
+		dependencies[dependency]!!.add(ButtonHolder(item, reverse, field))
 		item.isDisabled =  if(reverse) values[dependency]!! else !values[dependency]!!
 		return item
 	}
@@ -27,7 +36,7 @@ object MenuManager {
 		values[dependency] = value
 
 		dependencies[dependency]!!.forEach {
-			it.button.isDisabled = if(it.reverse) value else !value
+			it.field.setBoolean(it.button, if(it.reverse) value else !value)
 		}
 	}
 

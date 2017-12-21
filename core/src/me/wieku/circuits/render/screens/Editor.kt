@@ -18,6 +18,7 @@ import com.kotcrab.vis.ui.util.ToastManager
 import com.kotcrab.vis.ui.util.dialog.Dialogs
 import com.kotcrab.vis.ui.util.dialog.InputDialogListener
 import com.kotcrab.vis.ui.util.dialog.OptionDialogAdapter
+import com.kotcrab.vis.ui.util.form.FormInputValidator
 import com.kotcrab.vis.ui.util.form.SimpleFormValidator
 import com.kotcrab.vis.ui.widget.*
 import com.kotcrab.vis.ui.widget.spinner.IntSpinnerModel
@@ -304,11 +305,8 @@ class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 						super.enter(event, x, y, pointer, fromActor)
 						if(load.subMenu == menu) {
 							load.subMenu = createBPMenu()
-							for(listener in load.listeners) {
-								if(listener is InputListener) run {
-									listener.enter(event, x, y, pointer, fromActor)
-								}
-							}
+
+							load.listeners.filter { it is InputListener }.forEach { (it as InputListener).enter(event, x, y, pointer, fromActor) }
 						}
 					}
 
@@ -368,11 +366,11 @@ class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 							okButton.onClickS {
 								val isRunning = mainClock.isRunning()
 
-								if(isRunning)
-									mainClock.stop()
+								if(isRunning) mainClock.stop()
+
 								mainClock.tickRate = model.value
-								if(isRunning)
-									mainClock.start()
+
+								if(isRunning) mainClock.start()
 								fadeOut()
 							}
 
@@ -407,8 +405,6 @@ class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 
 	private fun createBPMenu() : PopupMenu {
 		return popupMenu {
-
-			//menuItem("Import blueprint (IPFS").isDisabled = true
 			val dir = File("blueprints/")
 			dir.mkdirs()
 			dir.listFiles().filter { it.extension == "ldbp" }.forEach {
@@ -447,17 +443,59 @@ class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 		}
 	}
 
-	fun downloadBlueprint(gist: String) {
+	fun downloadBlueprint(id: String) {
 		try {
-			val client = GitHubClient()
 			val service = GistService()
-			var gist = service.getGist(gist)
+			var gist = service.getGist(id.split("/").last())
 			for(file in gist.files) {
 				if(file.key.endsWith(".ldbp.b64")) {
 					var binFile = File("blueprints/"+file.key.replace(".b64", ""))
 					if(!binFile.exists()) {
 						binFile.writeBytes(Base64.getDecoder().decode(file.value.content))
 						toastManager.show(MessageToast("Blueprint ${binFile.name} imported!"), 5f)
+					} else {
+						Dialogs.showOptionDialog(this@Editor.stage, "Blueprint exists", "Blueprint with that name exists.\n Do you want to overwrite?", Dialogs.OptionDialogType.YES_NO_CANCEL, object: OptionDialogAdapter() {
+							@Override
+							override fun yes () {
+								binFile.writeBytes(Base64.getDecoder().decode(file.value.content))
+								toastManager.show(MessageToast("Blueprint ${binFile.name} imported!"), 5f)
+							}
+
+							@Override
+							override fun no () {
+								stage.addActor(window("Blueprint exists") {
+									addCloseButton()
+									center()
+									label("Please put alternative name")
+									row()
+									val textField = validatableTextField {name = "Blueprint name"}
+									val okButton = textButton("OK").cell(growX = true)
+									okButton.onChange {
+										binFile = File("blueprints/"+textField.text+".ldbp")
+										binFile.writeBytes(Base64.getDecoder().decode(file.value.content))
+										toastManager.show(MessageToast("Blueprint ${binFile.name} imported!"), 5f)
+										fadeOut()
+									}
+
+									var validator = SimpleFormValidator(okButton)
+									validator.notEmpty(textField, "")
+									validator.custom(textField, object: FormInputValidator("File with that name exists") {
+										val dir = File("blueprints/")
+										override fun validate(input: String?): Boolean {
+											if(input != null) {
+												dir.listFiles().forEach {
+													if(it.name == input + ".ldbp") return false }
+											}
+											return true
+										}
+
+									})
+									pack()
+									centerWindow()
+								}.fadeIn())
+							}
+
+						})
 					}
 				}
 			}
@@ -657,13 +695,14 @@ class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 							row()
 						}
 
-						if(field.annotation is Editable.Hex){
+						if(field.annotation is Editable.Hex) {
 							val hexEditor = HexEditor()
 							val jField = element.javaClass.getDeclaredField(field.name)
 							jField.isAccessible = true
 							hexEditor.loadFromBytes(jField.get(element) as ByteArray)
 							hexEditors.put(hexEditor, jField)
 							add(hexEditor)
+							row()
 						}
 					}
 

@@ -127,5 +127,6 @@ Thumbs.db
 /version/build/
 
 /android/assets/maps/*
+/android/assets/programs
 /android/assets/blueprints
 !/android/assets/maps/test.ldmap

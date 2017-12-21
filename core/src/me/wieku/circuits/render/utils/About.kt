@@ -41,7 +41,7 @@ object About {
 				pack()
 				centerWindow()
 			}
-			window!!.touchable = Touchable.enabled
+			/*window!!.touchable = Touchable.enabled
 			window!!.addListener(object: InputListener() {
 				override fun touchDown(event: InputEvent?, x: Float, y: Float, pointer: Int, button: Int): Boolean {
 					super.touchDown(event, x, y, pointer, button)
@@ -49,7 +49,7 @@ object About {
 				}
 
 
-			})
+			})*/
 			stage.addActor(window!!.fadeIn())
 		}
 	}

@@ -24,19 +24,18 @@ class HexEditor : VisTable(true) {
 		val toolTable = VisTable()
 		//region wordLengthSpinner
 		val wordLengthSpinnerModel = IntSpinnerModel(8, 2, 32, 2)
-		val wordLengthSpinner = Spinner("World length: ", wordLengthSpinnerModel)
+		val wordLengthSpinner = Spinner("Word length: ", wordLengthSpinnerModel)
 		wordLengthSpinner.textField.setFocusTraversal(false)
 		wordLengthSpinner.addListener {
 			when (it) {
 				is ChangeListener.ChangeEvent -> {
-					onWorldLengthChanged(wordLengthSpinnerModel.value)
+					onWordLengthChanged(wordLengthSpinnerModel.value)
 					true
 				}
 				else -> false
 			}
 		}
 		toolTable.add(wordLengthSpinner)
-		toolTable.addSeparator(true)
 		//endregion
 
 		//region select file
@@ -52,8 +51,7 @@ class HexEditor : VisTable(true) {
 		}
 		toolTable.add(VisLabel(" Select Program: "))
 		toolTable.add(programSelectorTable)
-		toolTable.add(loadButton)
-		toolTable.addSeparator(true)
+		toolTable.add(loadButton).padLeft(2f)
 
 		//endregion
 //        val okButton = VisTextButton("Save & Apply")
@@ -88,9 +86,9 @@ class HexEditor : VisTable(true) {
 		byteArea.loadFromBytes(file.readBytes())
 	}
 
-	private fun onWorldLengthChanged(newValue: Int) {
+	private fun onWordLengthChanged(newValue: Int) {
 		val saved = byteArea.saveToBytes()
-		byteArea.worldLength = newValue
+		byteArea.wordLength = newValue
 
 		if(saved.isEmpty()){
 			byteArea.loadFromBytes(ByteArray(1))
@@ -110,7 +108,7 @@ class HexEditor : VisTable(true) {
 	}
 }
 
-class ByteArea(var worldLength: Int) : VisTable(true) {
+class ByteArea(var wordLength: Int) : VisTable(true) {
 	private var currColumn = 0
 	private var rowIndex = 0
 
@@ -144,7 +142,7 @@ class ByteArea(var worldLength: Int) : VisTable(true) {
 		field.addListener(ByteEditorFocusListener())
 		add(field)
 		currColumn++
-		if (currColumn == worldLength) {
+		if (currColumn == wordLength) {
 			row()
 			add(VisLabel(toHex4(rowIndex++)))
 			currColumn = 0
@@ -162,7 +160,7 @@ class ByteArea(var worldLength: Int) : VisTable(true) {
 				if (children.last { it is ByteField } == actor) {
 					addByteField("")
 				}
-			}catch (e: NoSuchElementException){
+			}catch (e: NoSuchElementException) {
 				//ignore
 			}
 

@@ -12,14 +12,14 @@ import me.wieku.circuits.world.ClassicWorld
 import me.wieku.circuits.world.elements.input.Controller
 import java.util.*
 
-class ProgramInputGate(pos: Vector2i): SaveableGate(pos), Editable {
+class ProgramInputGate(pos: Vector2i) : SaveableGate(pos), Editable {
 
 	@Editable.Hex("Program")
 	private var bytes: ByteArray = ByteArray(1)
-	set(value) {
-		field = value
-		index = -1
-	}
+		set(value) {
+			field = value
+			index = -1
+		}
 
 	private var index = -1
 
@@ -29,11 +29,11 @@ class ProgramInputGate(pos: Vector2i): SaveableGate(pos), Editable {
 
 	override fun update(tick: Long) {
 		var calc = false
-		for(i in 0 until controllers.size)
+		for (i in 0 until controllers.size)
 			calc = calc || controllers[i].isActive()
 
-		if(calc) {
-			if(toUpdate) {
+		if (calc) {
+			if (toUpdate) {
 				index = -1
 			}
 		} else {
@@ -41,14 +41,13 @@ class ProgramInputGate(pos: Vector2i): SaveableGate(pos), Editable {
 		}
 
 
-
 		var calc2 = false
-		for(i in 0 until inputs.size)
+		for (i in 0 until inputs.size)
 			calc2 = calc2 || inputs[i].isActive()
 
 
-		if(calc2) {
-			if(toUpdate2) {
+		if (calc2) {
+			if (toUpdate2) {
 				state.setActive(nextBit())
 				toUpdate2 = false
 			}
@@ -59,14 +58,14 @@ class ProgramInputGate(pos: Vector2i): SaveableGate(pos), Editable {
 		setOut(state.isActive())
 	}
 
-	fun nextBit(): Boolean{
+	fun nextBit(): Boolean {
 		index++
-		val byteIndex = index/8
+		val byteIndex = index / 8
 		var bit = 0
-		if(byteIndex<bytes.size){
-			bit = bytes[byteIndex].toInt().ushr(7-(index%8)).and(1)
+		if (byteIndex < bytes.size) {
+			bit = bytes[byteIndex].toInt().ushr(7 - (index % 8)).and(1)
 		}
-		return bit>0
+		return bit > 0
 	}
 
 	override fun getIdleColor(): Int = 0x21274F
@@ -81,9 +80,9 @@ class ProgramInputGate(pos: Vector2i): SaveableGate(pos), Editable {
 		controllers.clear()
 
 		world.getNeighboursOf(this) {
-			when(it) {
+			when (it) {
 				is BasicInput -> {
-					if(it is Controller) controllers += it else inputs += it
+					if (it is Controller) controllers += it else inputs += it
 				}
 				is BasicWire -> {
 					outputs += it.getState(Axis.getAxis(getPosition(), it.getPosition()))!!
@@ -98,18 +97,18 @@ class ProgramInputGate(pos: Vector2i): SaveableGate(pos), Editable {
 		toUpdate2 = manager.getByte() == 1.toByte()
 		index = manager.getInteger()
 		bytes = ByteArray(manager.getInteger())
-		for (i in 0 until bytes.size){
+		for (i in 0 until bytes.size) {
 			bytes[i] = manager.getByte()
 		}
 	}
 
 	override fun save(manager: SaveManager) {
 		super.save(manager)
-		manager.putByte(if(toUpdate) 1 else 0)
-		manager.putByte(if(toUpdate2) 1 else 0)
+		manager.putByte(if (toUpdate) 1 else 0)
+		manager.putByte(if (toUpdate2) 1 else 0)
 		manager.putInteger(index)
 		manager.putInteger(bytes.size)
-		for (byte in bytes){
+		for (byte in bytes) {
 			manager.putByte(byte)
 		}
 	}
