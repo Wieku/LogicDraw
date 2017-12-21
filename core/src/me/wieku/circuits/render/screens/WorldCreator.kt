@@ -122,8 +122,6 @@ class WorldCreator:Screen {
 					val okButton = textButton("OK").cell(growX = true, colspan = 2)
 					okButton.onChange {
 						fadeOut()
-						widthSpinner.validate()
-						heightSpinner.validate()
 						Main.screen = Editor(ClassicWorld(widthModel.value, heightModel.value, nameField.text))
 					}
 

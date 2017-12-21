@@ -12,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.utils.Align
+import com.badlogic.gdx.utils.GdxRuntimeException
 import com.badlogic.gdx.utils.viewport.ScreenViewport
 import com.kotcrab.vis.ui.VisUI
 import com.kotcrab.vis.ui.util.ToastManager
@@ -50,6 +51,7 @@ import org.eclipse.egit.github.core.GistFile
 import org.eclipse.egit.github.core.client.GitHubClient
 import org.eclipse.egit.github.core.service.GistService
 import java.io.File
+import java.io.IOException
 import java.lang.reflect.Field
 import java.util.*
 
@@ -146,30 +148,6 @@ class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 		}
 		elementTable.row()
 
-		//NOTE: THIS WILL BE ADDED WITH UI DESIGN UPDATE
-		/*var imageButton = TextButton("Export as image", getTextButtonStyle(Color.BLACK, Color.WHITE, 13))
-		imageButton.addListener(object: ClickListener(){
-			override fun clicked(event: InputEvent?, x: Float, y: Float) {
-				mainClock.stop()
-				var pixmap = Pixmap(world.width*8, world.height*8, Pixmap.Format.RGBA8888)
-				pixmap.setColor(Color.BLACK)
-				pixmap.fillRectangle(0, 0, pixmap.width-1, pixmap.height-1)
-				for(x in 0 until world.width) {
-					for (y in 0 until world.height) {
-						val el = world[x, y]
-						if (el != null) {
-							pixmap.setColor(el.getColor().shl(8)+255)
-							pixmap.fillRectangle(x*8, y*8, 8, 8)
-						}
-					}
-				}
-				PixmapIO.writePNG(Gdx.files.local(file.name.split(".")[0]+".png"), pixmap)
-				mainClock.start()
-			}
-		})
-
-		elementTable.add(imageButton).fillX().center().padTop(10f).colspan(4).row()*/
-
 		var controls = Label(
 				"Controls:\n" +
 						"LMB: Pencil\n" +
@@ -222,6 +200,62 @@ class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 						saveFile()
 					}
 				})
+
+				menuItem("Export as image").onChange {
+					this@Editor.stage.addActor(window("Export image"){
+						addCloseButton()
+						val sizeModel = IntSpinnerModel(1, 1, 16, 1)
+
+						label("Size: ")
+
+						spinner("", sizeModel).cell(growX = true, padBottom = 2f)
+
+						row()
+
+						val okButton = textButton("OK").cell(growX = true, colspan = 2)
+						okButton.onChange {
+							val isRunning = mainClock.isRunning()
+
+							if(isRunning)
+								mainClock.stop()
+
+							var pixmap = Pixmap(world.width*sizeModel.value, world.height*sizeModel.value, Pixmap.Format.RGBA8888)
+							pixmap.setColor(Color.BLACK)
+							pixmap.fillRectangle(0, 0, pixmap.width-1, pixmap.height-1)
+							for(x in 0 until world.width) {
+								for (y in 0 until world.height) {
+									val el = world[x, y]
+									if (el != null) {
+										pixmap.setColor(el.getColor().shl(8)+255)
+										pixmap.fillRectangle(x*sizeModel.value, y*sizeModel.value, sizeModel.value, sizeModel.value)
+									}
+								}
+							}
+							val path = "exports/${world.name.toLowerCase()}_${sizeModel.value}.png"
+							try {
+								val writer = PixmapIO.PNG((pixmap.width.toFloat() * pixmap.height.toFloat() * 1.5f).toInt()) // Guess at deflated size.
+								try {
+									writer.setFlipY(false)
+									writer.write(Gdx.files.local(path), pixmap)
+									toastManager.show(MessageToast("$path exported successfully!"), 5f)
+								} finally {
+									writer.dispose()
+								}
+							} catch (ex: IOException) {
+								ex.printStackTrace()
+								toastManager.show(MessageToast("$path export failed!"), 5f)
+							}
+
+							if(isRunning)
+								mainClock.start()
+
+							fadeOut()
+						}
+
+						pack()
+						centerWindow()
+					}.fadeIn())
+				}
 
 				menuItem("Close project").addListener(object : ChangeListener() {
 					override fun changed(event: ChangeEvent?, actor: Actor?) {
