@@ -133,16 +133,20 @@ class ClassicWorld(val width: Int, val height: Int, val name: String):IWorld {
 
 	fun paste(position: Vector2i, clipboard: WorldClipboard) {
 		tasks.add(Runnable {
-			clearNT(Rectangle(position, Vector2i(position.x+clipboard.width, position.y + clipboard.height)))
-			for(x in 0 until clipboard.width) {
-				for (y in 0 until clipboard.height) {
-					if(clipboard[x, y] != null)
-						placeElementNT(Vector2i(x, y).add(position), clipboard[x, y]!!.javaClass)
-					else
-						removeElementNT(Vector2i(x, y).add(position))
-				}
-			}
+			pasteNT(position, clipboard)
 		})
+	}
+
+	fun pasteNT(position: Vector2i, clipboard: WorldClipboard) {
+		clearNT(Rectangle(position, Vector2i(position.x+clipboard.width, position.y + clipboard.height)))
+		for(x in 0 until clipboard.width) {
+			for (y in 0 until clipboard.height) {
+				if(clipboard[x, y] != null)
+					placeElementNT(Vector2i(x, y).add(position), clipboard[x, y]!!.javaClass)
+				else
+					removeElementNT(Vector2i(x, y).add(position))
+			}
+		}
 	}
 
 	override fun removeElement(position: Vector2i) {

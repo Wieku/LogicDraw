@@ -555,7 +555,7 @@ class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 		if(manipulator.clipboard != null) {
 			try {
 				val blueprint = ClassicWorld(manipulator.clipboard!!.width, manipulator.clipboard!!.height, file.nameWithoutExtension)
-				blueprint.paste(Vector2i(0, 0), manipulator.clipboard!!)
+				blueprint.pasteNT(Vector2i(0, 0), manipulator.clipboard!!)
 				SaveManagers.saveBlueprint(blueprint, file)
 				toastManager.show(MessageToast("Blueprint saved!"), 5f)
 			} catch (e: Exception) {
