@@ -210,7 +210,7 @@ class HexFilter : VisTextField.TextFieldFilter {
 	override fun acceptChar(textField: VisTextField?, c: Char): Boolean {
 		return when (c.toUpperCase()) {
 			in CharRange('0', '9') -> true
-			'A', 'B', 'C', 'D', 'F', ' ' -> true
+			'A', 'B', 'C', 'D', 'E', 'F', ' ' -> true
 			else -> false
 		}
 	}
