@@ -11,7 +11,7 @@ import me.wieku.circuits.save.Saveable
 import me.wieku.circuits.world.ClassicWorld
 import java.util.*
 
-class Input(pos: Vector2i):BasicInput(pos), Saveable {
+open class Input(pos: Vector2i):BasicInput(pos), Saveable {
 
 	private lateinit var state: State
 	private val inputs = ArrayList<State>()

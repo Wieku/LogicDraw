@@ -49,6 +49,7 @@ allprojects {
         visuiVersion = "1.4.0"
         ktxVisVersion = "1.9.7-b1"
         githubVersion = "1.90"
+        guavaVersion = "23.6"
     }
 
     repositories {
@@ -120,8 +121,9 @@ project(":core") {
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
         compile "com.kotcrab.vis:vis-ui:$visuiVersion"
         compile "io.github.libktx:ktx-vis:$ktxVisVersion"
-        compile 'org.eclipse.mylyn.github:org.eclipse.egit.github.core:2.1.5'
+        compile "org.eclipse.mylyn.github:org.eclipse.egit.github.core:2.1.5"
         compile "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
+        compile "com.google.guava:guava:$guavaVersion-android"
     }
 }
 

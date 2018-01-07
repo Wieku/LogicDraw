@@ -50,8 +50,14 @@ Flip-flops react to rising-edge signal (option to change it will be added in the
 |Delay gate|![](https://placehold.it/15/827717/000000?text=+)|![](https://placehold.it/15/9E9D24/000000?text=+)|
 |PWM generator|![](https://placehold.it/15/AA00FF/000000?text=+)|![](https://placehold.it/15/D500F9/000000?text=+)|
 |Stop gate|![](https://placehold.it/15/BF360C/000000?text=+)|![](https://placehold.it/15/D84315/000000?text=+)|
+|Key gate|![](https://placehold.it/15/3E2723/000000?text=+)|![](https://placehold.it/15/4E342E/000000?text=+)|
+|Programmer gate|![](https://placehold.it/15/21274F/000000?text=+)|![](https://placehold.it/15/424A64/000000?text=+)|
 
 Stop gate is for circuit debug purposes, so it should not be generally used. It stops the world clock on rising-edge signal.
+
+Key gate is a binding to real-world keyboard, high-level signal disables it.
+
+Programmer gate outputs stored data bit by bit on rising-edge signal.
 
 #### Display
 

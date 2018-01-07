@@ -1,5 +1,6 @@
 package me.wieku.circuits.world
 
+import com.google.common.eventbus.EventBus
 import me.wieku.circuits.api.element.IElement
 import me.wieku.circuits.api.element.ITickable
 import me.wieku.circuits.api.math.Direction
@@ -16,6 +17,7 @@ class ClassicWorld(val width: Int, val height: Int, val name: String):IWorld {
 	private val map: Array<Array<IElement?>> = Array(width) { Array<IElement?>(height) {null} }
 	private val tickables: HashMap<Vector2i, ITickable> = HashMap()
 	private val tasks = ArrayDeque<Runnable>()
+	val eventBus = EventBus("buttons")
 
 	var clock: AsyncClock? = null
 

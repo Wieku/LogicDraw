@@ -38,6 +38,8 @@ object ElementRegistry {
 				for(annotation in field.annotations) {
 					when(annotation){
 						is Editable.Spinner,
+						is Editable.Boolean,
+						is Editable.Key,
 						is Editable.Hex ->{
 							println(annotation)
 							if(!editors.containsKey(clazz))
@@ -74,5 +76,6 @@ object ElementRegistry {
 		register("pwm", PWMGate::class.java)
 		register("debug_stop", StopGate::class.java)
 		register("programmer", ProgramInputGate::class.java)
+		register("key", KeyGate::class.java)
 	}
 }

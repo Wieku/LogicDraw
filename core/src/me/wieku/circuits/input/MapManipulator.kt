@@ -7,6 +7,8 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.math.Vector3
 import me.wieku.circuits.api.math.Rectangle
 import me.wieku.circuits.api.math.Vector2i
+import me.wieku.circuits.input.event.KeyDownEvent
+import me.wieku.circuits.input.event.KeyUpEvent
 import me.wieku.circuits.render.scene.fit
 import me.wieku.circuits.render.screens.Editor
 import me.wieku.circuits.utils.Bresenham
@@ -89,6 +91,8 @@ class MapManipulator(val world:ClassicWorld, val camera: OrthographicCamera, val
 			lastMX = Gdx.input.x
 			lastMY = Gdx.input.y
 			brushState = STATE.MOVE
+		} else {
+			world.eventBus.post(KeyDownEvent(world, keycode))
 		}
 
 		return false
@@ -107,22 +111,20 @@ class MapManipulator(val world:ClassicWorld, val camera: OrthographicCamera, val
 					brushState = STATE.NONE
 				}
 			}
-		}
-
-		if(brushState == STATE.SELECTION && ((keycode == Input.Keys.CONTROL_LEFT && !Gdx.input.isKeyPressed(Input.Keys.CONTROL_RIGHT)) || (!Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT) && keycode == Input.Keys.CONTROL_RIGHT))) {
-			if(lastTooltip != "") {
+		} else if(brushState == STATE.SELECTION && ((keycode == Input.Keys.CONTROL_LEFT && !Gdx.input.isKeyPressed(Input.Keys.CONTROL_RIGHT)) || (!Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT) && keycode == Input.Keys.CONTROL_RIGHT))) {
+			if (lastTooltip != "") {
 				editor.tooltip.hide()
 				lastTooltip = ""
 			}
-			if(brushState == STATE.SELECTION && !Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
+			if (brushState == STATE.SELECTION && !Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
 				brushState = STATE.NONE
 			}
-		}
-
-		if((brushState == STATE.MOVE_PASTE || brushState == STATE.MOVE) && ((keycode == Input.Keys.SHIFT_LEFT && !Gdx.input.isKeyPressed(Input.Keys.SHIFT_RIGHT)) || (!Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT) && keycode == Input.Keys.SHIFT_RIGHT))) {
+		} else if((brushState == STATE.MOVE_PASTE || brushState == STATE.MOVE) && ((keycode == Input.Keys.SHIFT_LEFT && !Gdx.input.isKeyPressed(Input.Keys.SHIFT_RIGHT)) || (!Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT) && keycode == Input.Keys.SHIFT_RIGHT))) {
 			brushState = if(brushState == STATE.MOVE_PASTE) {
 				STATE.PASTE
 			} else STATE.NONE
+		} else {
+			world.eventBus.post(KeyUpEvent(world, keycode))
 		}
 
 		return false

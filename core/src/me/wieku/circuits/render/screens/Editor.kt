@@ -718,6 +718,11 @@ class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 					addCloseButton()
 
 					val spinners = HashMap<Spinner, Field>()
+					val radioButtons = HashMap<VisRadioButton, Field>()
+
+					val keyStore = HashMap<VisTextButton, Int>()
+					val keySelectors = HashMap<VisTextButton, Field>()
+
 					val hexEditors = HashMap<HexEditor, Field>()
 
 					for(field in fields!!) {
@@ -742,11 +747,59 @@ class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 							add(hexEditor)
 							row()
 						}
+
+						if(field.annotation is Editable.Boolean) {
+							val jField = element.javaClass.getDeclaredField(field.name)
+							jField.isAccessible = true
+
+							radioButtons.put(radioButton(field.annotation.name) {isChecked = jField.getBoolean(element)}, jField)
+
+							row()
+						}
+
+						if(field.annotation is Editable.Key) {
+							val jField = element.javaClass.getDeclaredField(field.name)
+							jField.isAccessible = true
+
+							table {
+								label(field.annotation.name+": ")
+								val button = textButton(Input.Keys.toString(jField.getInt(element))).cell(width = 100f)
+
+								keyStore.put(button, jField.getInt(element))
+								keySelectors.put(button, jField)
+
+								button.onChange {
+									if(!button.isDisabled){
+										button.isDisabled = true
+									}
+								}
+
+								this@Editor.stage.addListener(object: InputListener() {
+									override fun keyDown(event: InputEvent?, keycode: Int): Boolean {
+										if(button.isDisabled) {
+											if(keycode != Input.Keys.ESCAPE) {
+												keyStore.put(button, keycode)
+												button.setText(Input.Keys.toString(keycode))
+											}
+											button.isDisabled = false
+											return true
+										}
+										return super.keyDown(event, keycode)
+									}
+								})
+
+							}
+
+							row()
+						}
+
 					}
 
 					val okButton = textButton("OK").cell(growX = true)
 					okButton.onClickS {
 						spinners.forEach { t, u -> u.setInt(element, (t.model as IntSpinnerModel).value) }
+						radioButtons.forEach { t, u -> u.setBoolean(element, t.isChecked) }
+						keySelectors.forEach { t, u -> u.setInt(element, keyStore[t]!!) }
 						hexEditors.forEach { t, u -> u.set(element, t.saveToBytes()) }
 						fadeOut()
 					}
