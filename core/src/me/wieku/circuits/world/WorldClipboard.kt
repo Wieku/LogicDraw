@@ -3,8 +3,7 @@ package me.wieku.circuits.world
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import me.wieku.circuits.api.element.IElement
-import me.wieku.circuits.api.math.Rectangle
-import me.wieku.circuits.api.math.Vector2i
+import me.wieku.circuits.api.math.*
 
 class WorldClipboard(/*selection: Rectangle, world: ClassicWorld*/val objects: Array<Array<IElement?>>) {
 	val width = objects.size
@@ -31,43 +30,19 @@ class WorldClipboard(/*selection: Rectangle, world: ClassicWorld*/val objects: A
 	operator fun get(x:Int, y:Int) = objects[x][y]
 
 	fun rotateLeft(): WorldClipboard {
-		var map = Array(height) { Array<IElement?>(width) {null}}
-		for(y in 0 until height) {
-			for (x in 0 until width) {
-				map[y][width-1-x] = objects[x][y]
-			}
-		}
-		return WorldClipboard(map)
+		return WorldClipboard(objects.rotateLeft())
 	}
 
 	fun rotateRight(): WorldClipboard {
-		var map = Array(height) { Array<IElement?>(width) {null}}
-		for(y in 0 until height) {
-			for (x in 0 until width) {
-				map[height-1-y][x] = objects[x][y]
-			}
-		}
-		return WorldClipboard(map)
+		return WorldClipboard(objects.rotateRight())
 	}
 
 	fun flipHorizontal(): WorldClipboard {
-		var map = Array(width) { Array<IElement?>(height) {null}}
-		for(y in 0 until height) {
-			for (x in 0 until width) {
-				map[width-1-x][y] = objects[x][y]
-			}
-		}
-		return WorldClipboard(map)
+		return WorldClipboard(objects.flipHorizontal())
 	}
 
 	fun flipVertical(): WorldClipboard {
-		var map = Array(width) { Array<IElement?>(height) {null}}
-		for (x in 0 until width) {
-			for(y in 0 until height) {
-				map[x][height-1-y] = objects[x][y]
-			}
-		}
-		return WorldClipboard(map)
+		return WorldClipboard(objects.flipVertical())
 	}
 
 	companion object {

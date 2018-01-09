@@ -42,12 +42,12 @@ class StopGate(pos: Vector2i): SaveableGate(pos) {
 
 	override fun load(world: ClassicWorld, manager: SaveManager) {
 		super.load(world, manager)
-		toUpdate = manager.getByte() == 1.toByte()
+		toUpdate = manager.getBoolean()
 	}
 
 	override fun save(manager: SaveManager) {
 		super.save(manager)
-		manager.putByte(if(toUpdate) 1 else 0)
+		manager.putBoolean(toUpdate)
 	}
 
 	override fun afterLoad(world: ClassicWorld) {

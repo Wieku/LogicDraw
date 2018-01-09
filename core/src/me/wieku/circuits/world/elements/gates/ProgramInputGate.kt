@@ -91,8 +91,8 @@ class ProgramInputGate(pos: Vector2i) : SaveableGate(pos), Editable {
 
 	override fun load(world: ClassicWorld, manager: SaveManager) {
 		super.load(world, manager)
-		toUpdate = manager.getByte() == 1.toByte()
-		toUpdate2 = manager.getByte() == 1.toByte()
+		toUpdate = manager.getBoolean()
+		toUpdate2 = manager.getBoolean()
 		index = manager.getInteger()
 		bytes = ByteArray(manager.getInteger())
 		for (i in 0 until bytes.size) {
@@ -102,8 +102,8 @@ class ProgramInputGate(pos: Vector2i) : SaveableGate(pos), Editable {
 
 	override fun save(manager: SaveManager) {
 		super.save(manager)
-		manager.putByte(if (toUpdate) 1 else 0)
-		manager.putByte(if (toUpdate2) 1 else 0)
+		manager.putBoolean(toUpdate)
+		manager.putBoolean(toUpdate2)
 		manager.putInteger(index)
 		manager.putInteger(bytes.size)
 		for (byte in bytes) {

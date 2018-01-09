@@ -1,6 +1,7 @@
 package me.wieku.circuits.world
 
 import com.badlogic.gdx.graphics.Color
+import me.wieku.circuits.api.element.BasicElement
 import me.wieku.circuits.api.element.IElement
 import me.wieku.circuits.api.element.edit.Editable
 import me.wieku.circuits.api.math.Vector2i
@@ -24,7 +25,7 @@ object ElementRegistry {
 
 	val brushes: LinkedHashMap<String, Color> = LinkedHashMap()
 
-	data class Field(val name: String, val annotation: Annotation)
+	data class Field(val field: java.lang.reflect.Field, val annotation: Annotation)
 
 	fun get(name: String) = classes[name]
 
@@ -33,24 +34,30 @@ object ElementRegistry {
 		names.put(clazz, name)
 		brushes.put(name, Color(clazz.getConstructor(Vector2i::class.java).newInstance(Vector2i()).getIdleColor().shl(8) + 0x9f))
 
-		if(Editable::class.java.isAssignableFrom(clazz)) {
-			for(field in clazz.declaredFields) {
-				for(annotation in field.annotations) {
-					when(annotation){
-						is Editable.Spinner,
-						is Editable.Boolean,
-						is Editable.Key,
-						is Editable.Hex ->{
-							println(annotation)
-							if(!editors.containsKey(clazz))
-								editors.put(clazz, ArrayList())
-
-							editors[clazz]!!.add(Field(field.name, annotation))
+		println(name)
+		var claz1: Class<out Any?> = clazz
+		while(claz1 != Any::class.java) {
+			if(Editable::class.java.isAssignableFrom(claz1)) {
+				for(field in claz1.declaredFields) {
+					for(annotation in field.annotations) {
+						when(annotation){
+							is Editable.Spinner,
+							is Editable.Boolean,
+							is Editable.Key,
+							is Editable.Hex ->{
+								println(annotation)
+								if(!editors.containsKey(clazz))
+									editors.put(clazz, ArrayList())
+								field.isAccessible = true
+								editors[clazz]!!.add(Field(field, annotation))
+							}
 						}
 					}
 				}
 			}
+			claz1 = claz1.superclass
 		}
+		println()
 	}
 
 	init {

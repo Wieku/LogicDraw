@@ -41,7 +41,7 @@ Flip-flops react to rising-edge signal (option to change it will be added in the
 
 |Element|Idle color|Active color|
 |-------|----------|------------|
-|Or gate|![](https://placehold.it/15/F57F17/000000?text=+)|![](https://placehold.it/15/4E342E/000000?text=+)|
+|Or gate|![](https://placehold.it/15/F57F17/000000?text=+)|![](https://placehold.it/15/F9A825/000000?text=+)|
 |Nor gate|![](https://placehold.it/15/FFD600/000000?text=+)|![](https://placehold.it/15/FFEA00/000000?text=+)|
 |And gate|![](https://placehold.it/15/00BFA5/000000?text=+)|![](https://placehold.it/15/1DE9B6/000000?text=+)|
 |Nand gate|![](https://placehold.it/15/004D40/000000?text=+)|![](https://placehold.it/15/00695C/000000?text=+)|

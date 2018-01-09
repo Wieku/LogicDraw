@@ -1,6 +1,7 @@
 package me.wieku.circuits.save
 
 import me.wieku.circuits.save.managers.SaveManagerVer01
+import me.wieku.circuits.save.managers.SaveManagerVer02
 import me.wieku.circuits.world.ClassicWorld
 import sun.plugin.dom.exception.InvalidStateException
 import java.io.*
@@ -8,7 +9,7 @@ import java.util.zip.GZIPInputStream
 import java.util.zip.GZIPOutputStream
 
 object SaveManagers {
-	val latest = 1
+	val latest = 2
 
 	fun loadMap(file: File) : ClassicWorld {
 		if(file.exists() && file.extension == "ldmap") {
@@ -42,8 +43,9 @@ object SaveManagers {
 		if(file.exists() && file.extension == "ldmap") {
 			var inputStream = DataInputStream(GZIPInputStream(FileInputStream(file)))
 			if(inputStream.readUTF() == "LogicDraw Map") {
-				inputStream.readInt()
-				var array = arrayOf(inputStream.readUTF(), inputStream.readUTF(), inputStream.readUTF())
+				var version = inputStream.readInt()
+				val array = getSaveManager(version).loadHeader(inputStream)
+				if(version < latest) array[0] = array[0] + " (old)"
 				inputStream.close()
 				return array
 			}
@@ -57,9 +59,6 @@ object SaveManagers {
 		var outputStream = DataOutputStream(GZIPOutputStream(FileOutputStream(file)))
 		outputStream.writeUTF("LogicDraw Map")
 		outputStream.writeInt(latest)
-		outputStream.writeUTF(world.name)
-		outputStream.writeUTF(world.width.toString())
-		outputStream.writeUTF(world.height.toString())
 		getSaveManager(latest).saveMap(world, outputStream)
 		outputStream.close()
 		println("Saved!")
@@ -83,6 +82,8 @@ object SaveManagers {
 	fun getSaveManager(version: Int): SaveManager {
 		if(version == 1) {
 			return SaveManagerVer01()
+		} else if(version == 2) {
+			return SaveManagerVer02()
 		} else throw InvalidStateException("You have too old version of LogicDraw to open that world")
 	}
 }

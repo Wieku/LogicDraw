@@ -444,6 +444,16 @@ class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 			dir.listFiles().filter { it.extension == "ldbp" }.forEach {
 				menuItem(it.nameWithoutExtension).subMenu {
 
+					menuItem("Convert").onChange {
+						try {
+							val blueprint = SaveManagers.loadBlueprint(it)
+							SaveManagers.saveBlueprint(blueprint, file)
+							toastManager.show(MessageToast("Blueprint converted!"), 5f)
+						} catch (e: Exception) {
+							toastManager.show(MessageToast("Error saving blueprint!"), 5f)
+						}
+					}
+
 					menuItem("Load").onChange { loadBlueprint(it) }
 
 					menuItem("Upload to gist").subMenu {
@@ -729,7 +739,7 @@ class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 						if(field.annotation is Editable.Spinner) {
 							val amodel = field.annotation.model
 
-							val jField = element.javaClass.getDeclaredField(field.name)
+							val jField = field.field
 							jField.isAccessible = true
 
 							val model = IntSpinnerModel(jField.getInt(element), amodel[1], amodel[2], amodel[3])
@@ -740,7 +750,7 @@ class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 
 						if(field.annotation is Editable.Hex) {
 							val hexEditor = HexEditor()
-							val jField = element.javaClass.getDeclaredField(field.name)
+							val jField = field.field
 							jField.isAccessible = true
 							hexEditor.loadFromBytes(jField.get(element) as ByteArray)
 							hexEditors.put(hexEditor, jField)
@@ -749,7 +759,7 @@ class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 						}
 
 						if(field.annotation is Editable.Boolean) {
-							val jField = element.javaClass.getDeclaredField(field.name)
+							val jField = field.field
 							jField.isAccessible = true
 
 							radioButtons.put(radioButton(field.annotation.name) {isChecked = jField.getBoolean(element)}, jField)
@@ -758,7 +768,7 @@ class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 						}
 
 						if(field.annotation is Editable.Key) {
-							val jField = element.javaClass.getDeclaredField(field.name)
+							val jField = field.field
 							jField.isAccessible = true
 
 							table {
