@@ -450,7 +450,7 @@ class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 							SaveManagers.saveBlueprint(blueprint, file)
 							toastManager.show(MessageToast("Blueprint converted!"), 5f)
 						} catch (e: Exception) {
-							toastManager.show(MessageToast("Error saving blueprint!"), 5f)
+							toastManager.show(MessageToast("Error converting blueprint!"), 5f)
 						}
 					}
 
