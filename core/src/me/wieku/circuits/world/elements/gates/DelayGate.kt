@@ -55,4 +55,17 @@ class DelayGate(pos: Vector2i): SaveableGate(pos), Editable {
 		manager.putInteger(delay)
 		manager.putInteger(counter)
 	}
+
+	override fun copyData(): HashMap<String, Any> {
+		val map =  super.copyData()
+		map.put("delay", delay)
+		map.put("counter", counter)
+		return map
+	}
+
+	override fun pasteData(data: HashMap<String, Any>) {
+		super.pasteData(data)
+		delay = data["delay"] as Int
+		counter = data["counter"] as Int
+	}
 }

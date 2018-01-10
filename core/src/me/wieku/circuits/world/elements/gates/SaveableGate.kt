@@ -1,6 +1,7 @@
 package me.wieku.circuits.world.elements.gates
 
 import me.wieku.circuits.api.element.BasicGate
+import me.wieku.circuits.api.element.edit.Copyable
 import me.wieku.circuits.api.math.Axis
 import me.wieku.circuits.api.math.Vector2i
 import me.wieku.circuits.api.state.State
@@ -9,7 +10,7 @@ import me.wieku.circuits.save.SaveManager
 import me.wieku.circuits.save.Saveable
 import me.wieku.circuits.world.ClassicWorld
 
-abstract class SaveableGate(pos: Vector2i): BasicGate(pos), Saveable {
+abstract class SaveableGate(pos: Vector2i): BasicGate(pos), Saveable, Copyable {
 
 	protected var state: State? = null
 
@@ -41,4 +42,18 @@ abstract class SaveableGate(pos: Vector2i): BasicGate(pos), Saveable {
 	override fun afterLoad(world: ClassicWorld) {
 		updateIO(world)
 	}
+
+	override fun copyData(): HashMap<String, Any> {
+		val map = HashMap<String, Any>()
+		map.put("state", state!!.isActive())
+		return map
+	}
+
+	override fun pasteData(data: HashMap<String, Any>) {
+		val bool = data["state"] as Boolean
+		println(bool)
+		state?.setActive(bool)
+		setOut(state!!.isActiveD())
+	}
+
 }

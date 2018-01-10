@@ -55,7 +55,7 @@ class ProgramInputGate(pos: Vector2i) : SaveableGate(pos), Editable {
 			toUpdate2 = true
 		}
 
-		setOut(state!!.isActive())
+		setOut(state!!.isActiveD())
 	}
 
 	fun nextBit(): Boolean {

@@ -9,6 +9,7 @@ import me.wieku.circuits.save.SaveManager
 import me.wieku.circuits.world.ClassicWorld
 import me.wieku.circuits.world.elements.input.Controller
 import java.util.*
+import kotlin.collections.HashMap
 
 class MemoryGate(pos: Vector2i): SaveableGate(pos) {
 
@@ -20,7 +21,6 @@ class MemoryGate(pos: Vector2i): SaveableGate(pos) {
 		var calc = false
 		for(i in 0 until controllers.size)
 			calc = calc || controllers[i].isActive()
-
 
 		if(calc) {
 			if(toUpdate) {
@@ -34,7 +34,7 @@ class MemoryGate(pos: Vector2i): SaveableGate(pos) {
 			toUpdate = true
 		}
 
-		setOut(state!!.isActive())
+		setOut(state!!.isActiveD())
 	}
 
 	override fun getIdleColor(): Int = 0x37474F
@@ -69,4 +69,17 @@ class MemoryGate(pos: Vector2i): SaveableGate(pos) {
 		super.save(manager)
 		manager.putBoolean(toUpdate)
 	}
+
+	override fun copyData(): HashMap<String, Any> {
+		val map = super.copyData()
+		map.put("toUpdate", toUpdate)
+		return map
+	}
+
+	override fun pasteData(data: HashMap<String, Any>) {
+		super.pasteData(data)
+		toUpdate = data["toUpdate"] as Boolean
+		println("toupdate: " + toUpdate)
+	}
+
 }

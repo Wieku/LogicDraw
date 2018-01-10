@@ -38,7 +38,7 @@ class TFFGate(pos: Vector2i): SaveableGate(pos) {
 			state!!.setActive(false)
 		}
 
-		setOut(state!!.isActive())
+		setOut(state!!.isActiveD())
 	}
 
 	override fun getIdleColor(): Int = 0x311B92

@@ -2,6 +2,7 @@ package me.wieku.circuits.world.elements.gates
 
 import com.badlogic.gdx.Input
 import com.google.common.eventbus.Subscribe
+import com.sun.org.apache.xpath.internal.operations.Bool
 import me.wieku.circuits.api.element.edit.Editable
 import me.wieku.circuits.api.math.Vector2i
 import me.wieku.circuits.api.world.IWorld
@@ -32,7 +33,7 @@ class KeyGate(pos: Vector2i): SaveableGate(pos), Editable {
 			locked = false
 		}
 
-		setOut(state!!.isActive())
+		setOut(state!!.isActiveD())
 	}
 
 	override fun getIdleColor(): Int = 0x3E2723
@@ -80,6 +81,21 @@ class KeyGate(pos: Vector2i): SaveableGate(pos), Editable {
 	override fun afterLoad(world: ClassicWorld) {
 		super.afterLoad(world)
 		(world as ClassicWorld).eventBus.register(this)
+	}
+
+	override fun copyData(): HashMap<String, Any> {
+		val map =  super.copyData()
+		map.put("keycode", keycode)
+		map.put("bistable", bistable)
+		map.put("locked", locked)
+		return map
+	}
+
+	override fun pasteData(data: HashMap<String, Any>) {
+		super.pasteData(data)
+		keycode = data["keycode"] as Int
+		bistable = data["bistable"] as Boolean
+		locked = data["locked"] as Boolean
 	}
 
 }

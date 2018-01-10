@@ -5,6 +5,7 @@ import me.wieku.circuits.api.element.edit.Editable
 import me.wieku.circuits.api.math.Vector2i
 import me.wieku.circuits.save.SaveManager
 import me.wieku.circuits.world.ClassicWorld
+import java.util.HashMap
 
 class PWMGate(pos: Vector2i): SaveableGate(pos), Editable {
 
@@ -63,4 +64,20 @@ class PWMGate(pos: Vector2i): SaveableGate(pos), Editable {
 		manager.putInteger(duty)
 		manager.putInteger(counter)
 	}
+
+	override fun copyData(): HashMap<String, Any> {
+		val map =  super.copyData()
+		map.put("period", period)
+		map.put("duty", duty)
+		map.put("counter", counter)
+		return map
+	}
+
+	override fun pasteData(data: HashMap<String, Any>) {
+		super.pasteData(data)
+		period = data["period"] as Int
+		duty = data["duty"] as Int
+		counter = data["counter"] as Int
+	}
+
 }

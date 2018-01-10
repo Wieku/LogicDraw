@@ -3,6 +3,7 @@ package me.wieku.circuits.world
 import com.google.common.eventbus.EventBus
 import me.wieku.circuits.api.element.IElement
 import me.wieku.circuits.api.element.ITickable
+import me.wieku.circuits.api.element.edit.Copyable
 import me.wieku.circuits.api.math.Direction
 import me.wieku.circuits.api.math.Rectangle
 import me.wieku.circuits.api.math.Vector2i
@@ -143,11 +144,27 @@ class ClassicWorld(val width: Int, val height: Int, val name: String):IWorld {
 		clearNT(Rectangle(position, Vector2i(position.x+clipboard.width, position.y + clipboard.height)))
 		for(x in 0 until clipboard.width) {
 			for (y in 0 until clipboard.height) {
-				if(clipboard[x, y] != null)
-					placeElementNT(Vector2i(x, y).add(position), clipboard[x, y]!!.javaClass)
-				else
+				if(clipboard[x, y] != null) {
+					val pos = Vector2i(x, y).add(position)
+					placeElementNT(pos, clipboard[x, y]!!.javaClass)
+				} else
 					removeElementNT(Vector2i(x, y).add(position))
 			}
+		}
+
+		if(clipboard.data != null) {
+			for(x in 0 until clipboard.width) {
+				for (y in 0 until clipboard.height) {
+					val pos = Vector2i(x, y).add(position)
+					val element = getElement(pos)
+					if(element is Copyable) {
+						if(clipboard.data[x][y] != null) {
+							element.pasteData(clipboard.data[x][y]!!)
+						}
+					}
+				}
+			}
+			manager.swap()
 		}
 	}
 

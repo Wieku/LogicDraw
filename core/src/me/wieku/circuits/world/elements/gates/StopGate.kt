@@ -4,6 +4,7 @@ import me.wieku.circuits.api.math.Vector2i
 import me.wieku.circuits.api.world.IWorld
 import me.wieku.circuits.save.SaveManager
 import me.wieku.circuits.world.ClassicWorld
+import java.util.HashMap
 
 class StopGate(pos: Vector2i): SaveableGate(pos) {
 
@@ -28,7 +29,7 @@ class StopGate(pos: Vector2i): SaveableGate(pos) {
 			state!!.setActive(false)
 		}
 
-		setOut(state!!.isActive())
+		setOut(state!!.isActiveD())
 	}
 
 	override fun getIdleColor(): Int = 0xBF360C
@@ -53,6 +54,17 @@ class StopGate(pos: Vector2i): SaveableGate(pos) {
 	override fun afterLoad(world: ClassicWorld) {
 		super.afterLoad(world)
 		this.world = world
+	}
+
+	override fun copyData(): HashMap<String, Any> {
+		val map =  super.copyData()
+		map.put("toUpdate", toUpdate)
+		return map
+	}
+
+	override fun pasteData(data: HashMap<String, Any>) {
+		super.pasteData(data)
+		toUpdate = data["toUpdate"] as Boolean
 	}
 
 }
