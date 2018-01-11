@@ -79,7 +79,6 @@ class MemoryGate(pos: Vector2i): SaveableGate(pos) {
 	override fun pasteData(data: HashMap<String, Any>) {
 		super.pasteData(data)
 		toUpdate = data["toUpdate"] as Boolean
-		println("toupdate: " + toUpdate)
 	}
 
 }

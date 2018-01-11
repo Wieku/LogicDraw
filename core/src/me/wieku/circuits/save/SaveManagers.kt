@@ -30,7 +30,9 @@ object SaveManagers {
 			var inputStream = DataInputStream(GZIPInputStream(FileInputStream(file)))
 			if(inputStream.readUTF() == "LogicDraw Blueprint") {
 				println("Loading ${file.name} started...")
-				var world = getSaveManager(inputStream.readInt()).loadMap(inputStream)
+				var version = inputStream.readInt()
+				println(version)
+				var world = getSaveManager(version).loadMap(inputStream)
 				inputStream.close()
 				println(("Loading ${file.name} finished!"))
 				return world
@@ -70,9 +72,6 @@ object SaveManagers {
 		var outputStream = DataOutputStream(GZIPOutputStream(FileOutputStream(file)))
 		outputStream.writeUTF("LogicDraw Blueprint")
 		outputStream.writeInt(latest)
-		outputStream.writeUTF(world.name)
-		outputStream.writeUTF(world.width.toString())
-		outputStream.writeUTF(world.height.toString())
 		getSaveManager(latest).saveMap(world, outputStream)
 		outputStream.close()
 		println("Saved!")

@@ -14,19 +14,19 @@ import java.util.*
 
 open class Input(pos: Vector2i):BasicInput(pos), Saveable, Editable {
 
-	private lateinit var state: State
+	private var state: State? = null
 	private val inputs = ArrayList<State>()
 
 	@Editable.Boolean("Inverted signal")
 	private var inverted = false
 
 	override fun isActive(): Boolean {
-		state.setActive(inverted)
+		state!!.setActive(inverted)
 		if(inputs.isNotEmpty()) {
 			for(i in 0 until inputs.size) {
 				if(inputs[i].isActive()) {
 					var intSt = !inverted
-					state.setActive(intSt)
+					state!!.setActive(intSt)
 					return intSt
 				}
 			}
@@ -59,7 +59,7 @@ open class Input(pos: Vector2i):BasicInput(pos), Saveable, Editable {
 	}
 
 	override fun onRemove(world: IWorld) {
-		state.unregister()
+		state!!.unregister()
 		world.updateNeighboursOf(pos)
 	}
 
@@ -67,14 +67,14 @@ open class Input(pos: Vector2i):BasicInput(pos), Saveable, Editable {
 
 	override fun getActiveColor(): Int = 0x0277BD
 
-	override fun getColor(): Int = if(isActive()) getActiveColor() else getIdleColor()
+	override fun getColor(): Int = if(state != null && isActive()) getActiveColor() else getIdleColor()
 
 	override fun setState(state: State, axis: Axis) {}
 
-	override fun getState(axis: Axis): State = state
+	override fun getState(axis: Axis): State? = state
 
 	override fun save(manager: SaveManager) {
-		manager.putInteger(state.id)
+		manager.putInteger(state!!.id)
 		if(manager.getVersion() >= 2) {
 			manager.putBoolean(inverted)
 		}
@@ -82,7 +82,7 @@ open class Input(pos: Vector2i):BasicInput(pos), Saveable, Editable {
 
 	override fun load(world: ClassicWorld, manager: SaveManager) {
 		state = world.getStateManager().getState(manager.getInteger())!!
-		state.register()
+		state!!.register()
 		if(manager.getVersion() >= 2) {
 			inverted = manager.getBoolean()
 		}

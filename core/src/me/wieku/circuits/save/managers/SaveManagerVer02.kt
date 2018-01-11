@@ -21,9 +21,15 @@ class SaveManagerVer02 : SaveManager {
 		inputStream = file
 		var name = file.readUTF()
 		println("World name: $name")
-		var world = ClassicWorld(file.readInt(), file.readInt(), name)
 
-		println("World size: ${world.width}x${world.height}")
+		val width = file.readInt()
+		val height = file.readInt()
+
+		println("World size: ${width}x${height}")
+
+		var world = ClassicWorld(width, height, name)
+
+
 
 		(world.getStateManager() as ClassicStateManager).load(this)
 

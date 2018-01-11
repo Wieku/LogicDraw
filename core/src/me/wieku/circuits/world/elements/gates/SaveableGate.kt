@@ -51,7 +51,6 @@ abstract class SaveableGate(pos: Vector2i): BasicGate(pos), Saveable, Copyable {
 
 	override fun pasteData(data: HashMap<String, Any>) {
 		val bool = data["state"] as Boolean
-		println(bool)
 		state?.setActive(bool)
 		setOut(state!!.isActiveD())
 	}
