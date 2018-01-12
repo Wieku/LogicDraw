@@ -92,7 +92,7 @@ class WorldCreator:Screen {
 		view.mainTable.background = getTxRegion(Color(0.08f, 0.08f, 0.08f, 1f))
 
 		view.setItemClickListener {
-			var file = File("maps/$it")
+			var file = it.file
 			Main.screen = Editor(SaveManagers.loadMap(file), file)
 		}
 

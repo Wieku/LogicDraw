@@ -14,7 +14,6 @@ object SaveManagers {
 	fun loadMap(file: File) : ClassicWorld {
 		if(file.exists() && file.extension == "ldmap") {
 			var inputStream = DataInputStream(GZIPInputStream(FileInputStream(file)))
-			inputStream.readUTF()
 			if(inputStream.readUTF() == "LogicDraw Map") {
 				println("Loading ${file.name} started...")
 				var world = getSaveManager(inputStream.readInt()).loadMap(inputStream)
