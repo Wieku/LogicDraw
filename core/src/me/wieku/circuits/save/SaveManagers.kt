@@ -43,20 +43,14 @@ object SaveManagers {
 	}
 
 	fun getHeader(file: File) : Array<String>? {
-		println(file.name)
 		if(file.exists() && file.extension == "ldmap") {
 			var inputStream = DataInputStream(GZIPInputStream(FileInputStream(file)))
-			val str = inputStream.readUTF()
-			println(str)
-			if(str == "LogicDraw Map") {
+			if(inputStream.readUTF() == "LogicDraw Map") {
 				var version = inputStream.readInt()
 				val array = getSaveManager(version).loadHeader(inputStream)
 				if(version < latest) array[0] = array[0] + " (old)"
 				inputStream.close()
 				return array
-			} else {
-				var version = inputStream.readInt()
-				println("Error version: $version")
 			}
 		}
 		println("[ERROR] Invaild file: ${file.name}")
