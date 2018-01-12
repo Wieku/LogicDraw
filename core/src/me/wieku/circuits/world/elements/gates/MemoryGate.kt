@@ -41,8 +41,6 @@ class MemoryGate(pos: Vector2i): SaveableGate(pos) {
 
 	override fun getActiveColor(): Int = 0x455A64
 
-	override fun getColor(): Int = if (state!!.isActiveD()) getActiveColor() else getIdleColor()
-
 	override protected fun updateIO(world: IWorld) {
 		inputs.clear()
 		outputs.clear()

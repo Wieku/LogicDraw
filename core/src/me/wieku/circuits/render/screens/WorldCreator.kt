@@ -35,12 +35,21 @@ class WorldCreator:Screen {
 
 	private var mainTable = Table()
 
+	data class LDMap(val file: File, val description: Array<String>)
+
 	init {
 		File("maps/").mkdir()
 		File("blueprints/").mkdir()
 		mainTable.top().left()
 
-		val adapter = object: ArrayListAdapter<String, VisTable>(File("maps/").listFiles().filter{it.extension == "ldmap"}.map { it.name }.toMutableList() as ArrayList<String>?) {
+		val maps: ArrayList<LDMap>? = File("maps/").listFiles().filter{it.extension == "ldmap"}.mapNotNull {
+			val array = SaveManagers.getHeader(it)
+			if(array != null) {
+				LDMap(it, array)
+			} else null
+		}.toMutableList() as ArrayList<LDMap>
+
+		val adapter = object: ArrayListAdapter<LDMap, VisTable>(maps) {
 			private val bg = VisUI.getSkin().getDrawable("window-bg")
 			private val selection = VisUI.getSkin().getDrawable("list-selection")
 
@@ -48,8 +57,7 @@ class WorldCreator:Screen {
 				selectionMode = SelectionMode.SINGLE
 			}
 
-			override fun createView(item: String?): VisTable {
-				var arr2 = SaveManagers.getHeader(File("maps/$item"))
+			override fun createView(item: LDMap): VisTable {
 				return table {
 					background = bg
 
@@ -57,11 +65,11 @@ class WorldCreator:Screen {
 					row()
 					table {
 						left()
-						label(arr2[0]).cell(padBottom = 3f, align = Align.top)
+						label(item.description[0]).cell(padBottom = 3f, align = Align.top)
 						row()
-						label("Size: ${arr2[1]}x${arr2[2]}").cell(align = Align.left, growX = true)
+						label("Size: ${item.description[1]}x${item.description[2]}").cell(align = Align.left, growX = true)
 						row()
-						label("File: $item").cell(align = Align.left, growX = true)
+						label("File: ${item.file.name}").cell(align = Align.left, growX = true)
 						pad(5f)
 					}.cell(growX = true)
 					row()
@@ -79,7 +87,7 @@ class WorldCreator:Screen {
 
 		}
 
-		val view = ListView<String>(adapter)
+		val view = ListView<LDMap>(adapter)
 
 		view.mainTable.background = getTxRegion(Color(0.08f, 0.08f, 0.08f, 1f))
 

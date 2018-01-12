@@ -447,7 +447,7 @@ class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 					menuItem("Convert").onChange {
 						try {
 							val blueprint = SaveManagers.loadBlueprint(it)
-							SaveManagers.saveBlueprint(blueprint, file)
+							SaveManagers.saveBlueprint(blueprint, it)
 							toastManager.show(MessageToast("Blueprint converted!"), 5f)
 						} catch (e: Exception) {
 							toastManager.show(MessageToast("Error converting blueprint!"), 5f)
