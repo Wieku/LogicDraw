@@ -28,7 +28,7 @@ abstract class SaveableGate(pos: Vector2i): BasicGate(pos), Saveable, Copyable {
 
 	override fun getState(axis: Axis): State? = state
 
-	override fun getColor(): Int = if (state!= null && state!!.isActiveD()) getActiveColor() else getIdleColor()
+	override fun getColor(): Int = if (state!= null && state!!.isActive()) getActiveColor() else getIdleColor()
 
 	override fun save(manager: SaveManager) {
 		manager.putInteger(state!!.id)

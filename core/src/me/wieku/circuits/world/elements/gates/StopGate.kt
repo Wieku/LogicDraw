@@ -12,9 +12,7 @@ class StopGate(pos: Vector2i): SaveableGate(pos) {
 	private var world: ClassicWorld? = null
 
 	override fun update(tick: Long) {
-		var calc = false
-		for(i in 0 until inputs.size)
-			calc = calc || inputs[i].isActive()
+		var calc = inputs.isActive()
 
 		if(calc) {
 			if(toUpdate) {

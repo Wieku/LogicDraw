@@ -5,9 +5,7 @@ import me.wieku.circuits.api.math.Vector2i
 class AndGate(pos: Vector2i): SaveableGate(pos) {
 
 	override fun update(tick: Long) {
-		var calc = inputs.size > 1
-		for(i in 0 until inputs.size)
-			calc = calc && inputs[i].isActive()
+		var calc = inputs.isAllActive()
 
 		state!!.setActive(calc)
 		setOut(calc)

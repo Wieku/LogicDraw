@@ -15,23 +15,34 @@ import java.util.*
 open class Input(pos: Vector2i):BasicInput(pos), Saveable, Editable {
 
 	private var state: State? = null
-	private val inputs = ArrayList<State>()
+
+	val array = Array<State?>(4) { null }
+	var size = 0
 
 	@Editable.Boolean("Inverted signal")
 	private var inverted = false
 
 	override fun isActive(): Boolean {
 		state!!.setActive(inverted)
-		if(inputs.isNotEmpty()) {
-			for(i in 0 until inputs.size) {
-				if(inputs[i].isActive()) {
-					var intSt = !inverted
-					state!!.setActive(intSt)
-					return intSt
-				}
+
+		for(i in 0 until size) {
+			if(array[i]!!.isActive()) {
+				val intSt = !inverted
+				state!!.setActive(intSt)
+				return intSt
 			}
 		}
+
 		return inverted
+	}
+
+	private fun isActiveF(): Boolean {
+		for(i in 0 until size) {
+			if (array[i]!!.isActive()) {
+				return true
+			}
+		}
+		return false
 	}
 
 	override fun onPlace(world: IWorld) {
@@ -45,14 +56,15 @@ open class Input(pos: Vector2i):BasicInput(pos), Saveable, Editable {
 	}
 
 	private fun updateI(world: IWorld) {
-		inputs.clear()
+		size = 0
+		array.fill(null)
 
 		world.getNeighboursOf(this) {
 			when(it) {
 				is BasicWire -> {
 					var intSt = it.getState(Axis.getAxis(getPosition(), it.getPosition()))
 					if(intSt != null)
-						inputs += intSt
+						array[size++] = intSt
 				}
 			}
 		}
@@ -67,7 +79,7 @@ open class Input(pos: Vector2i):BasicInput(pos), Saveable, Editable {
 
 	override fun getActiveColor(): Int = 0x0277BD
 
-	override fun getColor(): Int = if(state != null && isActive()) getActiveColor() else getIdleColor()
+	override fun getColor(): Int = if(state != null && isActiveF()) getActiveColor() else getIdleColor()
 
 	override fun setState(state: State, axis: Axis) {}
 

@@ -20,9 +20,7 @@ class DelayGate(pos: Vector2i): SaveableGate(pos), Editable {
 	private var counter = 0
 
 	override fun update(tick: Long) {
-		var calc = false
-		for(i in 0 until inputs.size)
-			calc = calc || inputs[i].isActive()
+		var calc = inputs.isActive()
 
 		counter += if(calc) 1 else -1
 		counter = MathUtils.clamp(counter, 0, delay)

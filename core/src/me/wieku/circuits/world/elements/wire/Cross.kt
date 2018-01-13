@@ -104,7 +104,7 @@ open class Cross(pos: Vector2i): BasicWire(pos), Saveable {
 
 	override fun getActiveColor(): Int = 0x9E9E9E
 
-	override fun getColor(): Int = if((stateH != null && stateH!!.isActiveD()) || (stateV != null && stateV!!.isActiveD())) getActiveColor() else getIdleColor()
+	override fun getColor(): Int = if((stateH != null && stateH!!.isActive()) || (stateV != null && stateV!!.isActive())) getActiveColor() else getIdleColor()
 
 	override fun setState(state: State, axis: Axis) {}
 

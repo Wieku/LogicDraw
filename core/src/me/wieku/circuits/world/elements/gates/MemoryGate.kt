@@ -2,31 +2,27 @@ package me.wieku.circuits.world.elements.gates
 
 import me.wieku.circuits.api.element.BasicInput
 import me.wieku.circuits.api.element.BasicWire
+import me.wieku.circuits.api.element.holders.Inputs
 import me.wieku.circuits.api.math.Axis
 import me.wieku.circuits.api.math.Vector2i
 import me.wieku.circuits.api.world.IWorld
 import me.wieku.circuits.save.SaveManager
 import me.wieku.circuits.world.ClassicWorld
 import me.wieku.circuits.world.elements.input.Controller
-import java.util.*
 import kotlin.collections.HashMap
 
 class MemoryGate(pos: Vector2i): SaveableGate(pos) {
 
 	private var toUpdate = true
 
-	protected val controllers = ArrayList<BasicInput>()
+	protected val controllers = Inputs()
 
 	override fun update(tick: Long) {
-		var calc = false
-		for(i in 0 until controllers.size)
-			calc = calc || controllers[i].isActive()
+		var calc = controllers.isActive()
 
 		if(calc) {
 			if(toUpdate) {
-				var calc2 = false
-				for(i in 0 until inputs.size)
-					calc2 = calc2 || inputs[i].isActive()
+				var calc2 = inputs.isActive()
 				state!!.setActive(calc2)
 				toUpdate = false
 			}

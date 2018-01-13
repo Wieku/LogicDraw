@@ -1,8 +1,8 @@
 package me.wieku.circuits.world.elements.gates
 
-import com.badlogic.gdx.math.MathUtils
 import me.wieku.circuits.api.element.BasicInput
 import me.wieku.circuits.api.element.BasicWire
+import me.wieku.circuits.api.element.holders.Inputs
 import me.wieku.circuits.api.element.edit.Editable
 import me.wieku.circuits.api.math.Axis
 import me.wieku.circuits.api.math.Vector2i
@@ -10,7 +10,6 @@ import me.wieku.circuits.api.world.IWorld
 import me.wieku.circuits.save.SaveManager
 import me.wieku.circuits.world.ClassicWorld
 import me.wieku.circuits.world.elements.input.Controller
-import java.util.*
 
 class ProgramInputGate(pos: Vector2i) : SaveableGate(pos), Editable {
 
@@ -25,12 +24,10 @@ class ProgramInputGate(pos: Vector2i) : SaveableGate(pos), Editable {
 
 	private var toUpdate = true
 	private var toUpdate2 = true
-	protected val controllers = ArrayList<BasicInput>()
+	protected val controllers = Inputs()
 
 	override fun update(tick: Long) {
-		var calc = false
-		for (i in 0 until controllers.size)
-			calc = calc || controllers[i].isActive()
+		var calc = controllers.isActive()
 
 		if (calc) {
 			if (toUpdate) {
@@ -41,10 +38,7 @@ class ProgramInputGate(pos: Vector2i) : SaveableGate(pos), Editable {
 		}
 
 
-		var calc2 = false
-		for (i in 0 until inputs.size)
-			calc2 = calc2 || inputs[i].isActive()
-
+		var calc2 = inputs.isActive()
 
 		if (calc2) {
 			if (toUpdate2) {

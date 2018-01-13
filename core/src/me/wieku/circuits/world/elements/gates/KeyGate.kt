@@ -22,9 +22,7 @@ class KeyGate(pos: Vector2i): SaveableGate(pos), Editable {
 	var locked = false
 
 	override fun update(tick: Long) {
-		var calc = false
-		for(i in 0 until inputs.size)
-			calc = calc || inputs[i].isActive()
+		var calc = inputs.isActive()
 
 		if(calc) {
 			state!!.setActive(false)
