@@ -1,12 +1,16 @@
 package me.wieku.circuits.world.elements.gates
 
+import me.wieku.circuits.api.element.edit.Editable
 import me.wieku.circuits.api.math.Vector2i
 import me.wieku.circuits.api.world.IWorld
 import me.wieku.circuits.save.SaveManager
 import me.wieku.circuits.world.ClassicWorld
 import java.util.HashMap
 
-class StopGate(pos: Vector2i): SaveableGate(pos) {
+class StopGate(pos: Vector2i): SaveableGate(pos), Editable {
+
+	@Editable.Boolean("Enabled")
+	private var enabled = true
 
 	private var toUpdate = true
 	private var world: ClassicWorld? = null
@@ -16,9 +20,11 @@ class StopGate(pos: Vector2i): SaveableGate(pos) {
 
 		if(calc) {
 			if(toUpdate) {
-				if(world!!.clock != null) {
-					world!!.clock!!.stop()
-					state!!.setActive(true)
+				if(enabled) {
+					if(world!!.clock != null) {
+						world!!.clock!!.stop()
+						state!!.setActive(true)
+					}
 				}
 				toUpdate = false
 			}
