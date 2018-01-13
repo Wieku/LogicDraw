@@ -78,7 +78,7 @@ class KeyGate(pos: Vector2i): SaveableGate(pos), Editable {
 
 	override fun afterLoad(world: ClassicWorld) {
 		super.afterLoad(world)
-		(world as ClassicWorld).eventBus.register(this)
+		world.eventBus.register(this)
 	}
 
 	override fun copyData(): HashMap<String, Any> {

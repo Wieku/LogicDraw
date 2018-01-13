@@ -603,6 +603,11 @@ class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 	private val bound = Color(0.2f, 0.2f, 0.2f, 0.6f)
 	private val paletteColor = Color(0x212121ef)
 	private var delta1 = 0f
+
+	private var tempVector = Vector3()
+	private var corner0 = Vector2i()
+	private var corner1 = Vector2i()
+
 	override fun render(delta: Float) {
 		Gdx.gl.glClearColor(0.05f, 0.05f, 0.05f, 1f)
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
@@ -625,6 +630,11 @@ class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 		menuButton.setPosition(elementTable.x, stage.height - menuBar.table.height - menuButton.width - 10)
 
 		camera.update()
+		camera.unproject(tempVector.set(0f, 0f, 0f))
+		corner0.set(tempVector.x.toInt(), tempVector.y.toInt()).clamp(0, 0, world.width-1, world.height-1)
+		camera.unproject(tempVector.set(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat(), 0f))
+		corner1.set(tempVector.x.toInt(), tempVector.y.toInt()).clamp(0, 0, world.width-1, world.height-1)
+
 		renderer.projectionMatrix = camera.combined
 
 		Gdx.gl.glEnable(GL20.GL_BLEND)
@@ -634,8 +644,8 @@ class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 		renderer.begin(ShapeRenderer.ShapeType.Filled)
 		renderer.color = Color.BLACK
 		renderer.rect(0f, 0f, world.width.toFloat(), world.height.toFloat())
-		for (x in 0 until world.width) {
-			for (y in 0 until world.height) {
+		for (x in corner0.x..corner1.x) {
+			for (y in corner0.y..corner1.y) {
 				val el = world[x, y]
 				if (el != null) {
 					renderer.color = color.set((el.getColor().shl(8)) + 0xFF)

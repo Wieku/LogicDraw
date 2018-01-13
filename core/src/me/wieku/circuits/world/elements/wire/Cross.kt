@@ -104,7 +104,18 @@ open class Cross(pos: Vector2i): BasicWire(pos), Saveable {
 
 	override fun getActiveColor(): Int = 0x9E9E9E
 
-	override fun getColor(): Int = if((stateH != null && stateH!!.isActive()) || (stateV != null && stateV!!.isActive())) getActiveColor() else getIdleColor()
+	open fun getActiveColor2(): Int = 0xBDBDBD
+
+	override fun getColor(): Int {
+		val hNull = stateH != null
+		val vNull = stateV != null
+		if(hNull && vNull && stateH!!.isActive() && stateV!!.isActive()) {
+			return getActiveColor2()
+		} else if((hNull && stateH!!.isActive()) || (vNull && stateV!!.isActive())) {
+			return getActiveColor()
+		}
+		return getIdleColor()
+	}
 
 	override fun setState(state: State, axis: Axis) {}
 

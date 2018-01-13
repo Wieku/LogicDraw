@@ -8,4 +8,6 @@ class DarkCross(pos: Vector2i): Cross(pos) {
 
 	override fun getActiveColor(): Int = 0x171717
 
+	override fun getActiveColor2(): Int = 0x181818
+
 }
