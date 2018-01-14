@@ -266,22 +266,22 @@ class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 
 			menu("Edit") {
 
-				MenuManager.addDependent("selection", menuItem("Cut").onChange { manipulator.makeCut() })
-				MenuManager.addDependent("selection", menuItem("Copy").onChange { manipulator.makeCopy() })
-				MenuManager.addDependent("clipboard", menuItem("Paste").onChange { manipulator.makePaste() })
+				MenuManager.addDependent("selection", menuItem("Cut", Drawable(Gdx.files.internal("assets/icons/cut.png"))).onChange { manipulator.makeCut() })
+				MenuManager.addDependent("selection", menuItem("Copy", Drawable(Gdx.files.internal("assets/icons/copy.png"))).onChange { manipulator.makeCopy() })
+				MenuManager.addDependent("clipboard", menuItem("Paste", Drawable(Gdx.files.internal("assets/icons/paste.png"))).onChange { manipulator.makePaste() })
 
 				MenuManager.addDependent("clipboard", menuItem("Transform") {
 					subMenu {
-						menuItem("Rotate right").onChange { manipulator.clipboard = manipulator.clipboard!!.rotateRight() }
-						menuItem("Rotate left").onChange { manipulator.clipboard = manipulator.clipboard!!.rotateLeft() }
-						menuItem("Flip horizontal").onChange { manipulator.clipboard = manipulator.clipboard!!.flipHorizontal() }
-						menuItem("Flip vertical").onChange { manipulator.clipboard = manipulator.clipboard!!.flipVertical() }
+						menuItem("Rotate right", Drawable(Gdx.files.internal("assets/icons/rotate-right.png"))).onChange { manipulator.clipboard = manipulator.clipboard!!.rotateRight() }
+						menuItem("Rotate left", Drawable(Gdx.files.internal("assets/icons/rotate-left.png"))).onChange { manipulator.clipboard = manipulator.clipboard!!.rotateLeft() }
+						menuItem("Flip horizontal", Drawable(Gdx.files.internal("assets/icons/arrows-h.png"))).onChange { manipulator.clipboard = manipulator.clipboard!!.flipHorizontal() }
+						menuItem("Flip vertical", Drawable(Gdx.files.internal("assets/icons/arrows-v.png"))).onChange { manipulator.clipboard = manipulator.clipboard!!.flipVertical() }
 					}
 				})
 
 				addSeparator()
 
-				menuItem("Import blueprint...").onChange {
+				menuItem("Import blueprint...", Drawable(Gdx.files.internal("assets/icons/cloud-download.png"))).onChange {
 					Dialogs.showInputDialog(this@Editor.stage, "Import", "Gist id", true, object: InputDialogListener {
 						override fun canceled() {}
 
@@ -292,7 +292,7 @@ class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 				}
 
 				var window: VisWindow? = null
-				MenuManager.addDependent("clipboard", menuItem("Save blueprint").onChange {
+				MenuManager.addDependent("clipboard", menuItem("Save blueprint", Drawable(Gdx.files.internal("assets/icons/download.png"))).onChange {
 					if (window == null || !this@Editor.stage.actors.contains(window)) {
 						window = window("Save blueprint") {
 							addCloseButton()
@@ -352,7 +352,7 @@ class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 			}
 
 			menu("Help") {
-				menuItem("About").onChange { About.showAboutWindow(this@Editor.stage) }
+				menuItem("About", Drawable(Gdx.files.internal("assets/icons/info-circle.png"))).onChange { About.showAboutWindow(this@Editor.stage) }
 			}
 
 			table.add(table(true) {
@@ -454,9 +454,9 @@ class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 						}
 					}
 
-					menuItem("Load").onChange { loadBlueprint(it) }
+					menuItem("Load", Drawable(Gdx.files.internal("assets/icons/upload.png"))).onChange { loadBlueprint(it) }
 
-					menuItem("Upload to gist").subMenu {
+					menuItem("Upload to gist", Drawable(Gdx.files.internal("assets/icons/cloud-upload.png"))).subMenu {
 						menuItem("Public").onChange {
 							uploadBlueprint(it, true)
 						}
