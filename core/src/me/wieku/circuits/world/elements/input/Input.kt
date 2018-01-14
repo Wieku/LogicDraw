@@ -10,7 +10,6 @@ import me.wieku.circuits.api.world.IWorld
 import me.wieku.circuits.save.SaveManager
 import me.wieku.circuits.save.Saveable
 import me.wieku.circuits.world.ClassicWorld
-import java.util.*
 
 open class Input(pos: Vector2i):BasicInput(pos), Saveable, Editable {
 

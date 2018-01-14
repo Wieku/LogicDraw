@@ -34,15 +34,12 @@ import me.wieku.circuits.api.math.Vector2i
 import me.wieku.circuits.api.world.clock.AsyncClock
 import me.wieku.circuits.api.world.clock.Updatable
 import me.wieku.circuits.input.MapManipulator
-import me.wieku.circuits.utils.Palette
 import me.wieku.circuits.render.scene.*
 import me.wieku.circuits.render.scene.actors.TextTooltip
 import me.wieku.circuits.render.scene.editors.HexEditor
 import me.wieku.circuits.render.utils.About
 import me.wieku.circuits.save.SaveManagers
-import me.wieku.circuits.utils.Bresenham
-import me.wieku.circuits.utils.Version
-import me.wieku.circuits.utils.asString
+import me.wieku.circuits.utils.*
 import me.wieku.circuits.world.ClassicWorld
 import me.wieku.circuits.world.ElementRegistry
 import me.wieku.circuits.world.WorldClipboard
@@ -566,10 +563,15 @@ class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 			try {
 				val blueprint = ClassicWorld(manipulator.clipboard!!.width, manipulator.clipboard!!.height, file.nameWithoutExtension)
 				blueprint.pasteNT(Vector2i(0, 0), manipulator.clipboard!!)
+				file.makeBackup()
 				SaveManagers.saveBlueprint(blueprint, file)
+				file.removeBackup()
 				toastManager.show(MessageToast("Blueprint saved!"), 5f)
 			} catch (e: Exception) {
 				toastManager.show(MessageToast("Error saving blueprint!"), 5f)
+				if(file.backupExists()) {
+					file.restoreBackup()
+				}
 			}
 		}
 	}
@@ -580,11 +582,23 @@ class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 			mainClock.stop()
 
 		try {
+			try {
+				file.makeBackup(true)
+			} catch(e: Exception) {
+				e.printStackTrace()
+			}
 			SaveManagers.saveMap(world, file)
 			lastSave = "Last saved: " + Date().asString()
 			toastManager.show(MessageToast("File saved succesfully!"), 5f)
 		} catch (err: Exception) {
+			err.printStackTrace()
 			lastSave = "Error saving file!!!"
+			if(file.backupExists(true)) {
+				println("Restoring save from backup...")
+				file.restoreBackup(true)
+				println("Backup restored!")
+			}
+
 		}
 
 		if(isRunning)

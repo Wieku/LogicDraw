@@ -42,7 +42,7 @@ class WorldCreator:Screen {
 		File("blueprints/").mkdir()
 		mainTable.top().left()
 
-		val maps: ArrayList<LDMap>? = File("maps/").listFiles().filter{it.extension == "ldmap"}.mapNotNull {
+		val maps: ArrayList<LDMap>? = File("maps/").listFiles().filter{!it.isDirectory && it.extension == "ldmap"}.mapNotNull {
 			val array = SaveManagers.getHeader(it)
 			if(array != null) {
 				LDMap(it, array)
