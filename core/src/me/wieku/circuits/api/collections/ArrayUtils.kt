@@ -1,4 +1,4 @@
-package me.wieku.circuits.api.math
+package me.wieku.circuits.api.collections
 
 typealias Array2D<T> = Array<Array<T>>
 
@@ -13,7 +13,7 @@ val <T> Array2D<T>.height: Int
 inline fun <reified T:Any?> Array<Array<T?>>.rotateRight(): Array<Array<T?>> {
 	val width = size
 	val height = get(0).size
-	var map = Array2D<T?>(height, width)//Array(size) { Array<T?>(get(0).size) {null}}
+	var map = Array2D<T?>(height, width)//Array(arraySize) { Array<T?>(get(0).arraySize) {null}}
 	for(y in 0 until map.height) {
 		for (x in 0 until width) {
 			map[height-1-y][x] = get(x)[y]

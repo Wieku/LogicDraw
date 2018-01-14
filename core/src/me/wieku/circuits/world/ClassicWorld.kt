@@ -5,6 +5,7 @@ import me.wieku.circuits.api.element.IElement
 import me.wieku.circuits.api.element.ITickable
 import me.wieku.circuits.api.element.edit.Copyable
 import me.wieku.circuits.api.math.Direction
+import me.wieku.circuits.api.collections.MappedArray
 import me.wieku.circuits.api.math.Rectangle
 import me.wieku.circuits.api.math.Vector2i
 import me.wieku.circuits.api.state.StateManager
@@ -12,23 +13,23 @@ import me.wieku.circuits.api.world.IWorld
 import me.wieku.circuits.api.world.clock.AsyncClock
 import java.util.*
 
-//TODO: switch to tasks instead of locking objects
 class ClassicWorld(val width: Int, val height: Int, val name: String):IWorld {
 	private val manager: ClassicStateManager = ClassicStateManager(width * height)
 	private val map: Array<Array<IElement?>> = Array(width) { Array<IElement?>(height) {null} }
-	private val tickables: HashMap<Vector2i, ITickable> = HashMap()
+	private val tickables = MappedArray<Vector2i, ITickable>(width * height)
+
 	private val tasks = ArrayDeque<Runnable>()
 	val eventBus = EventBus("buttons")
 
 	var clock: AsyncClock? = null
 
 	var entities = 0
-	get() = tickables.size
+	get() = tickables.currentElements
 	private set
 
 	override fun update(tick: Long) {
 		updateTasks()
-		tickables.entries.forEach { it.value.update(tick) }
+		for(i in 0 until tickables.size) tickables[i]?.update(tick)
 		manager.swap()
 	}
 

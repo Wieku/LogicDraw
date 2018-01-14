@@ -8,7 +8,7 @@ class Inputs {
 	var size = 0
 
 	operator fun plusAssign(input: BasicInput) {
-		if(size >= 4) error("Registered too many size!")
+		if(size >= 4) error("Registered too many inputs!")
 		array[size++] = input
 	}
 

@@ -2,6 +2,7 @@ package me.wieku.circuits.world
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
+import me.wieku.circuits.api.collections.*
 import me.wieku.circuits.api.element.IElement
 import me.wieku.circuits.api.element.edit.Copyable
 import me.wieku.circuits.api.math.*
