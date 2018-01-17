@@ -13,8 +13,8 @@ val <T> Array2D<T>.height: Int
 inline fun <reified T:Any?> Array<Array<T?>>.rotateRight(): Array<Array<T?>> {
 	val width = size
 	val height = get(0).size
-	var map = Array2D<T?>(height, width)//Array(arraySize) { Array<T?>(get(0).arraySize) {null}}
-	for(y in 0 until map.height) {
+	val map = Array2D<T?>(height, width)
+	for(y in 0 until height) {
 		for (x in 0 until width) {
 			map[height-1-y][x] = get(x)[y]
 		}
@@ -25,7 +25,7 @@ inline fun <reified T:Any?> Array<Array<T?>>.rotateRight(): Array<Array<T?>> {
 inline fun <reified T:Any?> Array<Array<T?>>.rotateLeft(): Array<Array<T?>> {
 	val width = size
 	val height = get(0).size
-	var map = Array2D<T?>(height, width)
+	val map = Array2D<T?>(height, width)
 	for(y in 0 until height) {
 		for (x in 0 until width) {
 			map[y][width-1-x] = get(x)[y]
@@ -37,7 +37,7 @@ inline fun <reified T:Any?> Array<Array<T?>>.rotateLeft(): Array<Array<T?>> {
 inline fun <reified T:Any?> Array<Array<T?>>.flipHorizontal(): Array<Array<T?>> {
 	val width = size
 	val height = get(0).size
-	var map = Array2D<T?>(width, height)
+	val map = Array2D<T?>(width, height)
 	for(y in 0 until height) {
 		for (x in 0 until width) {
 			map[width-1-x][y] = get(x)[y]
@@ -49,7 +49,7 @@ inline fun <reified T:Any?> Array<Array<T?>>.flipHorizontal(): Array<Array<T?>> 
 inline fun <reified T:Any?> Array<Array<T?>>.flipVertical(): Array<Array<T?>> {
 	val width = size
 	val height = get(0).size
-	var map = Array2D<T?>(width, height)
+	val map = Array2D<T?>(width, height)
 	for (x in 0 until width) {
 		for(y in 0 until height) {
 			map[x][height-1-y] = get(x)[y]

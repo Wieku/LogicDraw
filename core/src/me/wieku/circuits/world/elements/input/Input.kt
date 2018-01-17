@@ -22,8 +22,6 @@ open class Input(pos: Vector2i):BasicInput(pos), Saveable, Editable {
 	private var inverted = false
 
 	override fun isActive(): Boolean {
-		state!!.setActive(inverted)
-
 		for(i in 0 until size) {
 			if(array[i]!!.isActive()) {
 				val intSt = !inverted
@@ -31,6 +29,8 @@ open class Input(pos: Vector2i):BasicInput(pos), Saveable, Editable {
 				return intSt
 			}
 		}
+
+		state!!.setActive(inverted)
 
 		return inverted
 	}
