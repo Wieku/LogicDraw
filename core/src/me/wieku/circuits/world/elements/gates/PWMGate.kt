@@ -21,7 +21,7 @@ class PWMGate(pos: Vector2i): SaveableGate(pos), Editable {
 		var calc = inputs.isActive()
 
 		if(calc) {
-			state!!.setActive(false)
+			state!!.setActiveU(false)
 			counter = 0
 		} else {
 			counter += 1
@@ -31,10 +31,10 @@ class PWMGate(pos: Vector2i): SaveableGate(pos), Editable {
 
 			if(counter <= ticks) {
 				if(!state!!.isActive())
-					state!!.setActive(true)
+					state!!.setActiveU(true)
 			} else {
 				if(state!!.isActive())
-					state!!.setActive(false)
+					state!!.setActiveU(false)
 			}
 
 			if (counter == period) {

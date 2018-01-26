@@ -22,7 +22,7 @@ class AsyncClock (private val updatable: Updatable<*>, tickRate: Int)  {
 
 	@Suppress("UNCHECKED_CAST")
 	fun start() {
-		if(task != null && !task!!.isCancelled) IllegalStateException("AsyncClock is already running!")
+		if(task != null && (!task!!.isCancelled || !task!!.isDone) ) IllegalStateException("AsyncClock is already running!")
 
 		var lastCheck = System.nanoTime()
 		var timeCheck = 0L
@@ -50,7 +50,11 @@ class AsyncClock (private val updatable: Updatable<*>, tickRate: Int)  {
 	}
 
 	fun stop() {
-		task?.cancel(false)
+		if(task != null) {
+			var switch = false
+			while(!switch)
+				switch = task!!.cancel(false)
+		}
 	}
 
 	fun isRunning() : Boolean = task != null && !task!!.isCancelled && !task!!.isDone

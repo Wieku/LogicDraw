@@ -7,8 +7,9 @@ import me.wieku.circuits.api.element.edit.Editable
 import me.wieku.circuits.api.math.Vector2i
 import me.wieku.circuits.world.elements.Description
 import me.wieku.circuits.world.elements.gates.*
-import me.wieku.circuits.world.elements.input.Controller
-import me.wieku.circuits.world.elements.input.Input
+import me.wieku.circuits.world.elements.io.Controller
+import me.wieku.circuits.world.elements.io.Input
+import me.wieku.circuits.world.elements.io.Output
 import me.wieku.circuits.world.elements.wire.Cross
 import me.wieku.circuits.world.elements.wire.DarkCross
 import me.wieku.circuits.world.elements.wire.DarkWire
@@ -65,6 +66,7 @@ object ElementRegistry {
 		register("cross", Cross::class.java)
 		register("input", Input::class.java)
 		register("controller", Controller::class.java)
+		register("out", Output::class.java)
 		register("memory", MemoryGate::class.java)
 		register("tflipflop", TFFGate::class.java)
 		register("or", OrGate::class.java)
@@ -73,6 +75,7 @@ object ElementRegistry {
 		register("nand", NandGate::class.java)
 		register("xor", XorGate::class.java)
 		register("xnor", XnorGate::class.java)
+		register("half_adder", HalfAdderGate::class.java)
 		register("pixel_white", WhitePixel::class.java)
 		register("pixel_green", GreenPixel::class.java)
 		register("pixel_red", RedPixel::class.java)

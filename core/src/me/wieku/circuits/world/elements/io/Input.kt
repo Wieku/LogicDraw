@@ -1,4 +1,4 @@
-package me.wieku.circuits.world.elements.input
+package me.wieku.circuits.world.elements.io
 
 import me.wieku.circuits.api.element.BasicInput
 import me.wieku.circuits.api.element.BasicWire
@@ -25,19 +25,19 @@ open class Input(pos: Vector2i):BasicInput(pos), Saveable, Editable {
 		for(i in 0 until size) {
 			if(array[i]!!.isActive()) {
 				val intSt = !inverted
-				state!!.setActive(intSt)
+				state!!.setActiveU(intSt)
 				return intSt
 			}
 		}
 
-		state!!.setActive(inverted)
+		state!!.setActiveU(inverted)
 
 		return inverted
 	}
 
 	private fun isActiveF(): Boolean {
 		for(i in 0 until size) {
-			if (array[i]!!.isActive()) {
+			if (array[i] != null && array[i]!!.isActive()) {
 				return true
 			}
 		}
@@ -99,7 +99,7 @@ open class Input(pos: Vector2i):BasicInput(pos), Saveable, Editable {
 		}
 	}
 
-	override fun afterLoad(world: ClassicWorld) {
+	override fun afterLoad(world: IWorld) {
 		updateI(world)
 	}
 }

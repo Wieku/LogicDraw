@@ -187,9 +187,9 @@ class ClassicWorld(val width: Int, val height: Int, val name: String):IWorld {
 	override fun getElement(position: Vector2i) = if(position.isInBounds(0, 0, width - 1, height - 1)) map[position.x][position.y] else null
 
 	private fun getNeighboursOf(position: Vector2i): Array<IElement> {
-		var list = ArrayList<IElement>()
+		val list = ArrayList<IElement>()
 		Direction.VALID_DIRECTIONS.forEach {
-			var tmpE = getElement(position + it.asVector)
+			val tmpE = getElement(position + it.asVector)
 			if (tmpE != null) list.add(tmpE)
 		}
 		return list.toTypedArray()
@@ -212,8 +212,7 @@ class ClassicWorld(val width: Int, val height: Int, val name: String):IWorld {
 				val position = stack.pop()
 				for(i in 0 until Direction.VALID_DIRECTIONS.size) {
 					tempVector.set(position).add(Direction.VALID_DIRECTIONS[i].asVector)
-					val tmpE = getElement(tempVector)
-					if (tmpE != null) tmpE.onNeighbourChange(position, this)
+					getElement(tempVector)?.onNeighbourChange(position, this)
 				}
 			}
 			first = true

@@ -23,14 +23,14 @@ class StopGate(pos: Vector2i): SaveableGate(pos), Editable {
 				if(enabled) {
 					if(world!!.clock != null) {
 						world!!.clock!!.stop()
-						state!!.setActive(true)
+						state!!.setActiveU(true)
 					}
 				}
 				toUpdate = false
 			}
 		} else {
 			toUpdate = true
-			state!!.setActive(false)
+			state!!.setActiveU(false)
 		}
 
 		setOut(state!!.isActiveD())
@@ -55,9 +55,9 @@ class StopGate(pos: Vector2i): SaveableGate(pos), Editable {
 		manager.putBoolean(toUpdate)
 	}
 
-	override fun afterLoad(world: ClassicWorld) {
+	override fun afterLoad(world: IWorld) {
 		super.afterLoad(world)
-		this.world = world
+		this.world = world as ClassicWorld
 	}
 
 	override fun copyData(): HashMap<String, Any> {

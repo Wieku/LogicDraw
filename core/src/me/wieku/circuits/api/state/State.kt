@@ -13,6 +13,10 @@ open class State(val id: Int, private val manager: StateManager) {
 		manager.used[id] = 1
 	}
 
+	fun setActiveU(value: Boolean) {
+		manager[id] = value
+	}
+
 	fun isActive() = manager[id]
 
 	fun isActiveD() = manager.getDirty(id)

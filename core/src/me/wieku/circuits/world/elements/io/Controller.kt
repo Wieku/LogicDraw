@@ -1,4 +1,4 @@
-package me.wieku.circuits.world.elements.input
+package me.wieku.circuits.world.elements.io
 
 import me.wieku.circuits.api.math.Vector2i
 import me.wieku.circuits.save.Saveable

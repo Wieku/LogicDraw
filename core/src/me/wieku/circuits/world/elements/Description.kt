@@ -24,4 +24,5 @@ class Description(pos: Vector2i): BasicElement(pos) {
 
 	override fun getState(axis: Axis): State? = null
 
+	override fun afterLoad(world: IWorld) {}
 }

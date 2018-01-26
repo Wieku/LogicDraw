@@ -14,6 +14,7 @@ interface IElement {
 
 	fun onPlace(world: IWorld)
 	fun onRemove(world: IWorld)
+	fun afterLoad(world: IWorld)
 	fun onNeighbourChange(position: Vector2i, world: IWorld)
 
 	fun getIdleColor(): Int

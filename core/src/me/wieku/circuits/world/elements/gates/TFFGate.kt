@@ -8,7 +8,7 @@ import me.wieku.circuits.api.math.Vector2i
 import me.wieku.circuits.api.world.IWorld
 import me.wieku.circuits.save.SaveManager
 import me.wieku.circuits.world.ClassicWorld
-import me.wieku.circuits.world.elements.input.Controller
+import me.wieku.circuits.world.elements.io.Controller
 
 class TFFGate(pos: Vector2i): SaveableGate(pos) {
 
@@ -23,7 +23,7 @@ class TFFGate(pos: Vector2i): SaveableGate(pos) {
 		if(calc) {
 			if(toUpdate) {
 				if(!calc2)
-					state!!.setActive(!state!!.isActive())
+					state!!.setActiveU(!state!!.isActive())
 				toUpdate = false
 			}
 		} else {
@@ -31,7 +31,7 @@ class TFFGate(pos: Vector2i): SaveableGate(pos) {
 		}
 
 		if(calc2) {
-			state!!.setActive(false)
+			state!!.setActiveU(false)
 		}
 
 		setOut(state!!.isActiveD())

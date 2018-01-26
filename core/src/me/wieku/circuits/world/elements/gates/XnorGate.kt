@@ -7,7 +7,7 @@ class XnorGate(pos: Vector2i): SaveableGate(pos) {
 	override fun update(tick: Long) {
 		var calc = inputs.isXORActive()
 
-		state!!.setActive(!calc)
+		state!!.setActiveU(!calc)
 		setOut(!calc)
 	}
 

@@ -38,7 +38,7 @@ class SaveManagerVer02 : SaveManager {
 		var counter = file.readInt()
 		println("Loading $counter elements started...")
 		while (counter>0) {
-			var element = world.forcePlace(file.readInt(), file.readInt(), file.readUTF())
+			world.forcePlace(file.readInt(), file.readInt(), file.readUTF())
 			--counter
 		}
 
@@ -57,10 +57,7 @@ class SaveManagerVer02 : SaveManager {
 
 		for (x in 0 until world.width) {
 			for (y in 0 until world.height) {
-				var element = world[x, y]
-				if (element != null && element is Saveable) {
-					(element as Saveable).afterLoad(world)
-				}
+				world[x, y]?.afterLoad(world)
 			}
 		}
 		return world

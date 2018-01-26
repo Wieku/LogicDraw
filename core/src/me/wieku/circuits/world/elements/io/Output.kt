@@ -1,7 +1,6 @@
-package me.wieku.circuits.world.elements.gates
+package me.wieku.circuits.world.elements.io
 
-import me.wieku.circuits.api.element.BasicGate
-import me.wieku.circuits.api.element.edit.Copyable
+import me.wieku.circuits.api.element.BasicOutput
 import me.wieku.circuits.api.math.Axis
 import me.wieku.circuits.api.math.Vector2i
 import me.wieku.circuits.api.state.State
@@ -10,25 +9,38 @@ import me.wieku.circuits.save.SaveManager
 import me.wieku.circuits.save.Saveable
 import me.wieku.circuits.world.ClassicWorld
 
-abstract class SaveableGate(pos: Vector2i): BasicGate(pos), Saveable, Copyable {
+open class Output(pos: Vector2i): BasicOutput(pos), Saveable {
 
-	protected var state: State? = null
+	private var state: State? = null
 
 	override fun onPlace(world: IWorld) {
-		super.onPlace(world)
 		state = world.getStateManager()()
+		updateIO(world)
+		world.updateNeighboursOf(pos)
+	}
+
+	override fun onNeighbourChange(position: Vector2i, world: IWorld) {
+		updateIO(world)
 	}
 
 	override fun onRemove(world: IWorld) {
-		setOut(false)
-		state!!.unregister()
+		world.updateNeighboursOf(pos)
 	}
+
+	override fun setOut(value: Boolean) {
+		state!!.setActiveU(value)
+		super.setOut(value)
+	}
+
+	override fun getIdleColor(): Int = 0xAEEA00
+
+	override fun getActiveColor(): Int = 0xC6FF00
+
+	override fun getColor(): Int = if(state != null && state!!.isActive()) getActiveColor() else getIdleColor()
 
 	override fun setState(state: State, axis: Axis) {}
 
 	override fun getState(axis: Axis): State? = state
-
-	override fun getColor(): Int = if (state!= null && state!!.isActive()) getActiveColor() else getIdleColor()
 
 	override fun save(manager: SaveManager) {
 		manager.putInteger(state!!.id)
@@ -42,17 +54,4 @@ abstract class SaveableGate(pos: Vector2i): BasicGate(pos), Saveable, Copyable {
 	override fun afterLoad(world: IWorld) {
 		updateIO(world)
 	}
-
-	override fun copyData(): HashMap<String, Any> {
-		val map = HashMap<String, Any>()
-		map.put("state", state!!.isActive())
-		return map
-	}
-
-	override fun pasteData(data: HashMap<String, Any>) {
-		val bool = data["state"] as Boolean
-		state?.setActive(bool)
-		setOut(state!!.isActiveD())
-	}
-
 }

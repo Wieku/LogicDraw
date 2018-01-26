@@ -25,7 +25,7 @@ class KeyGate(pos: Vector2i): SaveableGate(pos), Editable {
 		var calc = inputs.isActive()
 
 		if(calc) {
-			state!!.setActive(false)
+			state!!.setActiveU(false)
 			locked = true
 		} else {
 			locked = false
@@ -42,15 +42,15 @@ class KeyGate(pos: Vector2i): SaveableGate(pos), Editable {
 		if(locked) return
 		if(event.keycode == keycode) {
 			if(bistable) {
-				state!!.setActive(!state!!.isActive())
-			} else state!!.setActive(true)
+				state!!.setActiveU(!state!!.isActive())
+			} else state!!.setActiveU(true)
 		}
 	}
 
 	@Subscribe fun onKeyUp(event: KeyUpEvent) {
 		if(locked) return
 		if(event.keycode == keycode) {
-			if(!bistable) state!!.setActive(false)
+			if(!bistable) state!!.setActiveU(false)
 		}
 	}
 
@@ -76,9 +76,9 @@ class KeyGate(pos: Vector2i): SaveableGate(pos), Editable {
 		(world as ClassicWorld).eventBus.unregister(this)
 	}
 
-	override fun afterLoad(world: ClassicWorld) {
+	override fun afterLoad(world: IWorld) {
 		super.afterLoad(world)
-		world.eventBus.register(this)
+		(world as ClassicWorld).eventBus.register(this)
 	}
 
 	override fun copyData(): HashMap<String, Any> {

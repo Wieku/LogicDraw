@@ -9,7 +9,7 @@ import me.wieku.circuits.api.math.Vector2i
 import me.wieku.circuits.api.world.IWorld
 import me.wieku.circuits.save.SaveManager
 import me.wieku.circuits.world.ClassicWorld
-import me.wieku.circuits.world.elements.input.Controller
+import me.wieku.circuits.world.elements.io.Controller
 import java.util.*
 
 class DelayGate(pos: Vector2i): SaveableGate(pos), Editable {
@@ -27,11 +27,11 @@ class DelayGate(pos: Vector2i): SaveableGate(pos), Editable {
 
 		if(counter == 0) {
 			if(state!!.isActive()) {
-				state!!.setActive(false)
+				state!!.setActiveU(false)
 			}
 		} else if (counter == delay) {
 			if(!state!!.isActive()) {
-				state!!.setActive(true)
+				state!!.setActiveU(true)
 			}
 		}
 

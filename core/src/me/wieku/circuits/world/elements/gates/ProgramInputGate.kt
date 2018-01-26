@@ -9,7 +9,7 @@ import me.wieku.circuits.api.math.Vector2i
 import me.wieku.circuits.api.world.IWorld
 import me.wieku.circuits.save.SaveManager
 import me.wieku.circuits.world.ClassicWorld
-import me.wieku.circuits.world.elements.input.Controller
+import me.wieku.circuits.world.elements.io.Controller
 
 class ProgramInputGate(pos: Vector2i) : SaveableGate(pos), Editable {
 
@@ -42,7 +42,7 @@ class ProgramInputGate(pos: Vector2i) : SaveableGate(pos), Editable {
 
 		if (calc2) {
 			if (toUpdate2) {
-				state!!.setActive(nextBit())
+				state!!.setActiveU(nextBit())
 				toUpdate2 = false
 			}
 		} else {

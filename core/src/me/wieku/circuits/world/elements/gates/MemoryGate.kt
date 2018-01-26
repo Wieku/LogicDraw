@@ -8,7 +8,7 @@ import me.wieku.circuits.api.math.Vector2i
 import me.wieku.circuits.api.world.IWorld
 import me.wieku.circuits.save.SaveManager
 import me.wieku.circuits.world.ClassicWorld
-import me.wieku.circuits.world.elements.input.Controller
+import me.wieku.circuits.world.elements.io.Controller
 import kotlin.collections.HashMap
 
 class MemoryGate(pos: Vector2i): SaveableGate(pos) {
@@ -23,7 +23,7 @@ class MemoryGate(pos: Vector2i): SaveableGate(pos) {
 		if(calc) {
 			if(toUpdate) {
 				var calc2 = inputs.isActive()
-				state!!.setActive(calc2)
+				state!!.setActiveU(calc2)
 				toUpdate = false
 			}
 		} else {

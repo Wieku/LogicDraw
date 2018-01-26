@@ -6,5 +6,5 @@ interface Saveable {
 	fun save(manager: SaveManager)
 	fun load(world: ClassicWorld, manager: SaveManager)
 
-	fun afterLoad(world: ClassicWorld)
+	//fun afterLoad(world: ClassicWorld)
 }

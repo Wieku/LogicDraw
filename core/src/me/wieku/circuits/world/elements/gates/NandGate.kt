@@ -7,7 +7,7 @@ class NandGate(pos: Vector2i): SaveableGate(pos) {
 	override fun update(tick: Long) {
 		var calc = inputs.isAllActive()
 
-		state!!.setActive(!calc)
+		state!!.setActiveU(!calc)
 		setOut(!calc)
 	}
 

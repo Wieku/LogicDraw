@@ -47,9 +47,9 @@ class SaveManagerVer01 : SaveManager {
 		for (x in 0 until world.width) {
 			for (y in 0 until world.height) {
 				var element = world[x, y]
-				if (element != null && element is Saveable) {
-					(element as Saveable).afterLoad(world)
-				}
+				//if (element != null && element is Saveable) {
+					element?.afterLoad(world)
+				//}
 			}
 		}
 		return world

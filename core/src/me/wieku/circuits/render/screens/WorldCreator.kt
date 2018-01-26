@@ -89,6 +89,8 @@ class WorldCreator:Screen {
 
 		val view = ListView<LDMap>(adapter)
 
+		view.scrollPane.setScrollingDisabled(true, false)
+
 		view.mainTable.background = getTxRegion(Color(0.08f, 0.08f, 0.08f, 1f))
 
 		view.setItemClickListener {
