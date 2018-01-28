@@ -77,3 +77,21 @@ White, Red and Green pixels work just like regular Wire.
 
 ## How to run it
 To run the project, just type: `./gradlew desktop:run` (`gradlew desktop:run` on Windows CMD)
+
+## Example circuits
+
+BCD adder:
+
+![bcdadder](https://static.wieku.me/logicdraw/images/BCDAdder.gif)
+
+27 bit divider with 7 bit fraction:
+
+![divider](https://static.wieku.me/logicdraw/images/27BitDivider.gif)
+
+White 7 segment display with bcd decoders, showing result from the division above:
+
+![display](https://static.wieku.me/logicdraw/images/DisplayWDecoders.png)
+
+4 digit shift register (digits are typed by keyboard):
+
+![shift](https://static.wieku.me/logicdraw/images/4DigitShift.gif)
