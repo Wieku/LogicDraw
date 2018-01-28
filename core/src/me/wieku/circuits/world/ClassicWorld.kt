@@ -178,7 +178,6 @@ class ClassicWorld(val width: Int, val height: Int, val name: String):IWorld {
 	private fun removeElementNT(position: Vector2i) {
 		if(!position.isInBounds(0, 0, width-1, height-1)) return
 		var element: IElement? = map[position.x][position.y] ?: return
-
 		tickables.remove(position)
 		map[position.x][position.y] = null
 		element!!.onRemove(this)

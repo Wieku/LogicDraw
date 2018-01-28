@@ -20,7 +20,7 @@ class Inputs {
 	}
 
 	fun isAllActive() : Boolean {
-		var calc = true
+		var calc = size > 0
 		for(i in 0 until size)
 			calc = calc && array[i]!!.isActive()
 		return calc
