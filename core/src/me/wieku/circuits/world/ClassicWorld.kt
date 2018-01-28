@@ -1,6 +1,7 @@
 package me.wieku.circuits.world
 
 import com.google.common.eventbus.EventBus
+import me.wieku.circuits.api.collections.Array2D
 import me.wieku.circuits.api.element.IElement
 import me.wieku.circuits.api.element.ITickable
 import me.wieku.circuits.api.element.edit.Copyable
@@ -15,7 +16,7 @@ import java.util.*
 
 class ClassicWorld(val width: Int, val height: Int, val name: String):IWorld {
 	private val manager: ClassicStateManager = ClassicStateManager(width * height)
-	private val map: Array<Array<IElement?>> = Array(width) { Array<IElement?>(height) {null} }
+	private val map: Array2D<IElement?> = Array2D(width, height)
 	private val tickables = MappedArray<Vector2i, ITickable>(width * height)
 
 	private val tasks = ArrayDeque<Runnable>()
@@ -38,16 +39,16 @@ class ClassicWorld(val width: Int, val height: Int, val name: String):IWorld {
 	}
 
 	override fun placeElement(position: Vector2i, name: String) {
-		if(ElementRegistry.classes.containsKey(name)) {
-			placeElement(position, ElementRegistry.classes[name]!!)
+		if(ElementRegistry.contains(name)) {
+			placeElement(position, ElementRegistry.get(name)!!)
 		} else {
 			println("[ERROR] Element doesn't exist!")
 		}
 	}
 
 	private fun placeElementNT(position: Vector2i, name: String) {
-		if(ElementRegistry.classes.containsKey(name)) {
-			placeElementNT(position, ElementRegistry.classes[name]!!)
+		if(ElementRegistry.contains(name)) {
+			placeElementNT(position, ElementRegistry.get(name)!!)
 		} else {
 			println("[ERROR] Element doesn't exist!")
 		}
@@ -66,7 +67,7 @@ class ClassicWorld(val width: Int, val height: Int, val name: String):IWorld {
 				removeElementNT(position)
 			} else return
 		}
-		var el:IElement = clazz.getConstructor(Vector2i::class.java).newInstance(position)
+		var el:IElement = ElementRegistry.create(clazz, position)
 		map[position.x][position.y] = el
 		el.onPlace(this)
 		if(el is ITickable) {
@@ -75,9 +76,9 @@ class ClassicWorld(val width: Int, val height: Int, val name: String):IWorld {
 	}
 
 	fun forcePlace(x: Int, y: Int, name: String): IElement {
-		if(ElementRegistry.classes.containsKey(name)) {
+		if(ElementRegistry.contains(name)) {
 			var position = Vector2i(x, y)
-			var el:IElement = ElementRegistry.classes[name]!!.getConstructor(Vector2i::class.java).newInstance(position)
+			var el:IElement = ElementRegistry.create(name, position)
 			map[position.x][position.y] = el
 			if(el is ITickable) {
 				tickables.put(position, el)

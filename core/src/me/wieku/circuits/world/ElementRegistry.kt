@@ -30,6 +30,8 @@ object ElementRegistry {
 
 	fun get(name: String) = classes[name]
 
+	fun contains(name: String) = classes.contains(name)
+
 	private fun register(name: String, clazz: Class<out IElement>) {
 		classes.put(name, clazz)
 		names.put(clazz, name)
@@ -59,6 +61,18 @@ object ElementRegistry {
 			claz1 = claz1.superclass
 		}
 		println()
+	}
+
+	fun create(name: String, position: Vector2i): IElement {
+		val clazz = classes[name]
+		if(clazz != null) {
+			return create(clazz, position)
+		}
+		throw IllegalStateException("Element doesn't exist!") //TODO: To be replaced by ElementNotFoundException or similar named Exception
+	}
+
+	fun create(clazz: Class<out IElement>, position: Vector2i): IElement {
+		return clazz.getConstructor(Vector2i::class.java).newInstance(position.copy())
 	}
 
 	init {

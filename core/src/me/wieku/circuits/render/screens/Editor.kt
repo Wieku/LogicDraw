@@ -14,6 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.GdxRuntimeException
 import com.badlogic.gdx.utils.viewport.ScreenViewport
+import com.google.common.io.BaseEncoding
 import com.kotcrab.vis.ui.VisUI
 import com.kotcrab.vis.ui.util.ToastManager
 import com.kotcrab.vis.ui.util.dialog.Dialogs
@@ -471,7 +472,7 @@ class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 		try {
 			val client = GitHubClient()
 			var gist = Gist().setPublic(public).setDescription("")
-			val gistFile = GistFile().setContent(Base64.getEncoder().encodeToString(file.readBytes()))
+			val gistFile = GistFile().setContent(BaseEncoding.base64().encode(file.readBytes()))
 			gist.files = Collections.singletonMap(file.name+".b64", gistFile)
 			gist = GistService(client).createGist(gist)
 			val toast = MessageToast("Blueprint uploaded!")
@@ -492,13 +493,13 @@ class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 				if(file.key.endsWith(".ldbp.b64")) {
 					var binFile = File("blueprints/"+file.key.replace(".b64", ""))
 					if(!binFile.exists()) {
-						binFile.writeBytes(Base64.getDecoder().decode(file.value.content))
+						binFile.writeBytes(BaseEncoding.base64().decode(file.value.content))
 						toastManager.show(MessageToast("Blueprint ${binFile.name} imported!"), 5f)
 					} else {
 						Dialogs.showOptionDialog(this@Editor.stage, "Blueprint exists", "Blueprint with that name exists.\n Do you want to overwrite?", Dialogs.OptionDialogType.YES_NO_CANCEL, object: OptionDialogAdapter() {
 							@Override
 							override fun yes () {
-								binFile.writeBytes(Base64.getDecoder().decode(file.value.content))
+								binFile.writeBytes(BaseEncoding.base64().decode(file.value.content))
 								toastManager.show(MessageToast("Blueprint ${binFile.name} imported!"), 5f)
 							}
 
@@ -513,7 +514,7 @@ class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 									val okButton = textButton("OK").cell(growX = true)
 									okButton.onChange {
 										binFile = File("blueprints/"+textField.text+".ldbp")
-										binFile.writeBytes(Base64.getDecoder().decode(file.value.content))
+										binFile.writeBytes(BaseEncoding.base64().decode(file.value.content))
 										toastManager.show(MessageToast("Blueprint ${binFile.name} imported!"), 5f)
 										fadeOut()
 									}
