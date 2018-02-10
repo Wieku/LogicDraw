@@ -2,6 +2,7 @@ package me.wieku.circuits.world.elements.io
 
 import me.wieku.circuits.api.element.BasicInput
 import me.wieku.circuits.api.element.BasicWire
+import me.wieku.circuits.api.element.edit.Copyable
 import me.wieku.circuits.api.element.edit.Editable
 import me.wieku.circuits.api.math.Axis
 import me.wieku.circuits.api.math.Vector2i
@@ -11,7 +12,7 @@ import me.wieku.circuits.save.SaveManager
 import me.wieku.circuits.save.Saveable
 import me.wieku.circuits.world.ClassicWorld
 
-open class Input(pos: Vector2i):BasicInput(pos), Saveable, Editable {
+open class Input(pos: Vector2i):BasicInput(pos), Saveable, Editable, Copyable {
 
 	private var state: State? = null
 
@@ -19,7 +20,8 @@ open class Input(pos: Vector2i):BasicInput(pos), Saveable, Editable {
 	var size = 0
 
 	@Editable.Boolean("Inverted signal")
-	private var inverted = false
+	var inverted = false
+	private set
 
 	override fun isActive(): Boolean {
 		for(i in 0 until size) {
@@ -102,4 +104,18 @@ open class Input(pos: Vector2i):BasicInput(pos), Saveable, Editable {
 	override fun afterLoad(world: IWorld) {
 		updateI(world)
 	}
+
+	override fun copyData(): HashMap<String, Any> {
+		val map = HashMap<String, Any>()
+		map.put("state", state!!.isActive())
+		map.put("inverted", inverted)
+		return map
+	}
+
+	override fun pasteData(data: HashMap<String, Any>) {
+		val bool = data["state"] as Boolean
+		state?.setActive(bool)
+		inverted = data["inverted"] as Boolean
+	}
+
 }

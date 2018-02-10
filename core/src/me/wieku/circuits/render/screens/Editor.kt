@@ -665,6 +665,13 @@ class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 				if (el != null) {
 					renderer.color = color.set((el.getColor().shl(8)) + 0xFF)
 					renderer.rect(x.toFloat(), y.toFloat(), 1f, 1f)
+
+					//TODO: It's a temporary solution
+					if(el is me.wieku.circuits.world.elements.io.Input && el.inverted) {
+						renderer.color = Color.WHITE
+						renderer.rect(x.toFloat()+0.45f, y.toFloat()+0.2f, 0.1f, 0.6f)
+					}
+
 				}
 			}
 		}
