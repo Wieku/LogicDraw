@@ -1,6 +1,7 @@
 package me.wieku.circuits.world.elements.gates
 
 import me.wieku.circuits.api.element.BasicInput
+import me.wieku.circuits.api.element.BasicOutput
 import me.wieku.circuits.api.element.BasicWire
 import me.wieku.circuits.api.element.holders.Inputs
 import me.wieku.circuits.api.element.edit.Editable
@@ -12,6 +13,8 @@ import me.wieku.circuits.world.ClassicWorld
 import me.wieku.circuits.world.elements.io.Controller
 
 class ProgramInputGate(pos: Vector2i) : SaveableGate(pos), Editable {
+
+	private var carryOut: BasicOutput? = null
 
 	@Editable.Hex("Program")
 	private var bytes: ByteArray = ByteArray(1)
@@ -32,6 +35,7 @@ class ProgramInputGate(pos: Vector2i) : SaveableGate(pos), Editable {
 		if (calc) {
 			if (toUpdate) {
 				index = -1
+				state!!.setActiveU(false)
 			}
 		} else {
 			toUpdate = true
@@ -48,6 +52,8 @@ class ProgramInputGate(pos: Vector2i) : SaveableGate(pos), Editable {
 		} else {
 			toUpdate2 = true
 		}
+
+		carryOut?.setOut(index >= (bytes.size * 8) - 1)
 
 		setOut(state!!.isActiveD())
 	}
@@ -70,6 +76,7 @@ class ProgramInputGate(pos: Vector2i) : SaveableGate(pos), Editable {
 		inputs.clear()
 		outputs.clear()
 		controllers.clear()
+		carryOut = null
 
 		world.getNeighboursOf(this) {
 			when (it) {
@@ -78,6 +85,9 @@ class ProgramInputGate(pos: Vector2i) : SaveableGate(pos), Editable {
 				}
 				is BasicWire -> {
 					outputs += it.getState(Axis.getAxis(getPosition(), it.getPosition()))!!
+				}
+				is BasicOutput -> {
+					carryOut = it
 				}
 			}
 		}
