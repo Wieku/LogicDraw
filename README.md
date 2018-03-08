@@ -1,6 +1,6 @@
 ![banner](https://static.wieku.me/logicdraw/banner.png)
 
-[![Build Status](https://ci.starchasers.ovh/jenkins/buildStatus/icon?job=LogicDraw)](http://wieku.me:8090/job/LogicDraw/)
+[![Build Status](https://ci.starchasers.ovh/jenkins/buildStatus/icon?job=LogicDraw)](https://ci.starchasers.ovh/jenkins/view/Wieku/job/LogicDraw/)
 
 LogicDraw is an application to perform simulations of logic gates, in which you can paint your circuit like in raster graphics editor.
 
