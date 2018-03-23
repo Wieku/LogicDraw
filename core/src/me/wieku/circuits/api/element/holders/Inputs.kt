@@ -1,14 +1,17 @@
 package me.wieku.circuits.api.element.holders
 
+import me.wieku.circuits.api.collections.Array
 import me.wieku.circuits.api.element.BasicInput
 
-class Inputs {
+class Inputs (private val maxSize: Int) {
 
-	val array = Array<BasicInput?>(4) { null }
+	constructor(): this(4)
+
+	val array = Array<BasicInput?>(maxSize)
 	var size = 0
 
 	operator fun plusAssign(input: BasicInput) {
-		if(size >= 4) error("Registered too many inputs!")
+		if(size >= maxSize) error("Registered too many inputs!")
 		array[size++] = input
 	}
 

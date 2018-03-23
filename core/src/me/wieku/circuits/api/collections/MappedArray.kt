@@ -37,13 +37,29 @@ class MappedArray<in K, V>(arraySize: Int) {
 			indexes.remove(key)
 			array[index] = null
 			indexPool.add(index)
+			optimize()
 		}
 	}
 
 	fun contains(key: K) = indexes.containsKey(key)
 
+	fun optimize() {
+		while(indexPool.isNotEmpty()) {
+			val index = indexPool.poll()
+			val oldIndex = --size
+			array[index] = array[oldIndex]
+			array[oldIndex] = null
+			for((key, value) in indexes) {
+				if(value == oldIndex) {
+					indexes.put(key, index)
+					break
+				}
+			}
+		}
+	}
+
 	operator fun get(key: K): V? {
-		if(indexes.containsKey(key)) {
+		if(indexes.contains(key)) {
 			return array[indexes[key]!!] as V?
 		}
 		return null

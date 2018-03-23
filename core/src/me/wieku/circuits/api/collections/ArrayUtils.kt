@@ -2,13 +2,15 @@ package me.wieku.circuits.api.collections
 
 typealias Array2D<T> = Array<Array<T>>
 
-inline fun <reified T> Array2D(width: Int, height: Int) = Array(width) { Array<T?>(height) {null}}
+inline fun <reified T> Array2D(width: Int, height: Int) = Array(width) { Array<T?>(height)}
 
 val <T> Array2D<T>.width: Int
 	get() = size
 
 val <T> Array2D<T>.height: Int
 	get() = get(0).size
+
+inline fun <reified T:Any?> Array(size: Int) = kotlin.Array<T?>(size, {null})
 
 inline fun <reified T:Any?> Array<Array<T?>>.rotateRight(): Array<Array<T?>> {
 	val width = size

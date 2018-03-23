@@ -1,14 +1,17 @@
 package me.wieku.circuits.api.element.holders
 
+import me.wieku.circuits.api.collections.Array
 import me.wieku.circuits.api.state.State
 
-class Outputs {
+class Outputs (private val maxSize: Int) {
 
-	val array = Array<State?>(4) { null }
+	constructor(): this(4)
+
+	val array = Array<State?>(maxSize)
 	var size = 0
 
 	operator fun plusAssign(output: State) {
-		if(size >= 4) error("Registered too many outputs!")
+		if(size >= maxSize) error("Too many outputs registered!")
 		array[size++] = output
 	}
 
