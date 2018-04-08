@@ -886,5 +886,7 @@ class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 		manipulator.pause = true
 	}
 
-	override fun resume() {}
+	override fun resume() {
+		if(!Gdx.input.isTouched) manipulator.pause = false
+	}
 }
