@@ -142,6 +142,23 @@ class ClassicWorld(val width: Int, val height: Int, val name: String):IWorld {
 		})
 	}
 
+	fun stack(rectangle: Rectangle, direction: Direction, amount: Int) {
+		tasks.add(Runnable {
+			stackNT(rectangle, direction, amount)
+		})
+	}
+
+	fun stackNT(rectangle: Rectangle, direction: Direction, amount: Int) {
+		val clipboard = WorldClipboard.create(rectangle, this)
+		val vec = direction.asVector
+		val tmpVec = Vector2i()
+		for(d in 1..amount) {
+			tmpVec.set(vec).scl(rectangle.width, rectangle.height).scl(d.toFloat()).add(rectangle.x,rectangle.y)
+			if(!tmpVec.isInBounds(0, 0, width, height)) break
+			pasteNT(tmpVec, clipboard)
+		}
+	}
+
 	fun pasteNT(position: Vector2i, clipboard: WorldClipboard) {
 		clearNT(Rectangle(position, Vector2i(position.x+clipboard.width, position.y + clipboard.height)))
 		for(x in 0 until clipboard.width) {

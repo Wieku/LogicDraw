@@ -30,6 +30,7 @@ import ktx.vis.*
 import me.wieku.circuits.Main
 import me.wieku.circuits.api.element.IElement
 import me.wieku.circuits.api.element.edit.Editable
+import me.wieku.circuits.api.math.Direction
 import me.wieku.circuits.api.math.Rectangle
 import me.wieku.circuits.api.math.Vector2i
 import me.wieku.circuits.api.world.clock.AsyncClock
@@ -268,6 +269,15 @@ class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 				MenuManager.addDependent("selection", menuItem("Copy", Drawable(Gdx.files.internal("assets/icons/copy.png"))).onChange { manipulator.makeCopy() })
 				MenuManager.addDependent("clipboard", menuItem("Paste", Drawable(Gdx.files.internal("assets/icons/paste.png"))).onChange { manipulator.makePaste() })
 
+				MenuManager.addDependent("selection", menuItem("Stack") {
+					subMenu {
+						menuItem("Left").onChange { stackMenu(Direction.WEST) }
+						menuItem("Right").onChange { stackMenu(Direction.EAST) }
+						menuItem("Up").onChange { stackMenu(Direction.SOUTH) }
+						menuItem("Down").onChange { stackMenu(Direction.NORTH) }
+					}
+				})
+
 				MenuManager.addDependent("clipboard", menuItem("Transform") {
 					subMenu {
 						menuItem("Rotate right", Drawable(Gdx.files.internal("assets/icons/rotate-right.png"))).onChange { manipulator.clipboard = manipulator.clipboard!!.rotateRight() }
@@ -433,6 +443,28 @@ class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 		toastTable.setFillParent(true)
 		toastTable.addActor(tooltip.tooltipTable)
 		stage.addActor(toastTable)
+	}
+
+	private fun stackMenu(direction: Direction) {
+		this@Editor.stage.addActor(window("Stack"){
+			addCloseButton()
+			val sizeModel = IntSpinnerModel(1, 1, Math.max(world.width, world.height), 1)
+
+			label("Stack amount: ")
+
+			spinner("", sizeModel).cell(growX = true, padBottom = 2f)
+
+			row()
+
+			val okButton = textButton("OK").cell(growX = true, colspan = 2)
+			okButton.onChange {
+				world.stack(manipulator.rectangle!!, direction, sizeModel.value)
+				fadeOut()
+			}
+
+			pack()
+			centerWindow()
+		}.fadeIn())
 	}
 
 	private fun createBPMenu() : PopupMenu {
