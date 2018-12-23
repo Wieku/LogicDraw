@@ -100,6 +100,7 @@ object ElementRegistry {
 		register("pwm", PWMGate::class.java)
 		register("debug_stop", StopGate::class.java)
 		register("programmer", ProgramInputGate::class.java)
+		register("ram", RamGate::class.java)
 		register("key", KeyGate::class.java)
 	}
 }
