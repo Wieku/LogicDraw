@@ -35,7 +35,7 @@ class RamGate(pos: Vector2i): SaveableGate(pos), Editable {
 
 	private var baseAddr = 0
 	private var action = State.IDLE
-	private var cmdBuf: Long = 0
+	private var cmdBuf: Long = 0L
 	private var read = 0
 
 	override fun update(tick: Long) {
@@ -51,7 +51,7 @@ class RamGate(pos: Vector2i): SaveableGate(pos), Editable {
 			state!!.setActiveU(false)
 		} else if(action == State.READ) {
 			read++
-			cmdBuf += if (ins) {(1).shl(read)} else {0}
+			cmdBuf += if (ins) {(1L).shl(read)} else {0}
 			if(!ctl) {
 				action = State.RESPOND
 			}
@@ -148,14 +148,16 @@ class RamGate(pos: Vector2i): SaveableGate(pos), Editable {
 		if(addr >= memory.size) {
 			return false
 		}
-		val data = cmdBuf.ushr(2 + 5).and((1).shl(chunkSize * 8).toLong() - 1)
+		val data = cmdBuf.ushr(2 + 5).and((1L).shl(chunkSize * 8) - 1L)
 
 		for(i in 1..chunkSize) {
 			val a = i + addr - 1
 			if(a >= memory.size) {
 				break
 			}
-			memory[a.toInt()] = data.ushr((i - 1)*8).and(0xff).toByte()
+			val b = data.ushr((i - 1)*8).and(0xff).toByte()
+			//println("WR: A:${java.lang.Long.toHexString(a)} D:${java.lang.Integer.toHexString(b.toInt())}")
+			memory[a.toInt()] = b
 		}
 		return true
 	}
