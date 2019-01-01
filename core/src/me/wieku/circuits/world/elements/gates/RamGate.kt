@@ -1,7 +1,6 @@
 package me.wieku.circuits.world.elements.gates
 
 import me.wieku.circuits.api.element.BasicInput
-import me.wieku.circuits.api.element.BasicOutput
 import me.wieku.circuits.api.element.BasicWire
 import me.wieku.circuits.api.element.edit.Editable
 import me.wieku.circuits.api.element.holders.Inputs
@@ -11,7 +10,6 @@ import me.wieku.circuits.api.world.IWorld
 import me.wieku.circuits.save.SaveManager
 import me.wieku.circuits.world.ClassicWorld
 import me.wieku.circuits.world.elements.io.Controller
-import kotlin.collections.HashMap
 
 // spec: https://gist.github.com/magik6k/d1a739a5f032e93aba2742b9fa243a26
 class RamGate(pos: Vector2i): SaveableGate(pos), Editable {
@@ -107,7 +105,8 @@ class RamGate(pos: Vector2i): SaveableGate(pos), Editable {
 			if(a >= memory.size) {
 				break
 			}
-			cmdBuf = cmdBuf.shl(8) + memory[a.toInt()]
+			//println("rb:${Integer.toHexString(memory[a.toInt()].toInt().and(0xff))}")
+			cmdBuf = cmdBuf.shl(8) + memory[a.toInt()].toInt().and(0xff)
 			read -= 8
 		}
 		return true
