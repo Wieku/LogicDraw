@@ -10,6 +10,8 @@ import me.wieku.circuits.api.world.IWorld
 import me.wieku.circuits.save.SaveManager
 import me.wieku.circuits.world.ClassicWorld
 import me.wieku.circuits.world.elements.io.Controller
+import kotlin.collections.HashMap
+import kotlin.experimental.and
 
 // spec: https://gist.github.com/magik6k/d1a739a5f032e93aba2742b9fa243a26
 class RamGate(pos: Vector2i): SaveableGate(pos), Editable {
@@ -97,6 +99,7 @@ class RamGate(pos: Vector2i): SaveableGate(pos), Editable {
 	private fun read(): Boolean {
 		val subAddr = cmdBuf.ushr(1).and(0x1f)
 		val addr = baseAddr + subAddr
+		//println("read :${java.lang.Long.toHexString(addr)};$chunkSize")
 		if(addr >= memory.size) {
 			return false
 		}
