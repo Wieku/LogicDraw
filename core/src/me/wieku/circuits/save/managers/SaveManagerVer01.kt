@@ -98,6 +98,10 @@ class SaveManagerVer01 : SaveManager {
 		outputStream.writeInt(value)
 	}
 
+	override fun putLong(value: Long) {
+		outputStream.writeLong(value)
+	}
+
 	override fun putString(value: String) {
 		outputStream.writeUTF(value)
 	}
@@ -107,6 +111,8 @@ class SaveManagerVer01 : SaveManager {
 	override fun getByte(): Byte = inputStream.readByte()
 
 	override fun getInteger(): Int = inputStream.readInt()
+
+	override fun getLong(): Long = inputStream.readLong()
 
 	override fun getString(): String = inputStream.readUTF()
 
