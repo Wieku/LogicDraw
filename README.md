@@ -52,6 +52,8 @@ Flip-flops react to rising-edge signal (option to change it will be added in the
 |Stop gate|![](https://placehold.it/15/BF360C/000000?text=+)|![](https://placehold.it/15/D84315/000000?text=+)|
 |Key gate|![](https://placehold.it/15/3E2723/000000?text=+)|![](https://placehold.it/15/4E342E/000000?text=+)|
 |Programmer gate|![](https://placehold.it/15/21274F/000000?text=+)|![](https://placehold.it/15/424A64/000000?text=+)|
+|RAM gate|![](https://placehold.it/15/c7b365/000000?text=+)|![](https://placehold.it/15/c7b365/000000?text=+)|
+|IO gate|![](https://placehold.it/15/c99ffe/000000?text=+)|![](https://placehold.it/15/c99ffe/000000?text=+)|
 
 Stop gate is for circuit debug purposes, so it should not be generally used. It stops the world clock on rising-edge signal.
 
@@ -74,6 +76,26 @@ White, Red and Green pixels work just like regular Wire.
 |Element|Idle color|Active color|
 |-------|----------|------------|
 |Description|![](https://placehold.it/15/8D6E63/000000?text=+)|![](https://placehold.it/15/8D6E63/000000?text=+)|
+
+##### IO Gate
+
+IO Gate can be used to output and read to/from the console. It only has single input and 4 states:
+`IDLE`, `CMD`, `READ`, `RESPOND`. Normally (when input is low) gate is IDLE. States change in the following way:
+
+* `IDLE` && `high` -> `CMD`
+* `CMD` && `low` -> `READ`
+* `CMD` && `high` -> `RESPOND`
+
+After entering `READ`, the gate will form a byte from bits read over 8 ticks in a way that the least significant
+bit is read last. After all bits are read, it will output the byte to the console and back into `IDLE`.
+
+After entering `RESPOND`, the gate will check if there is data in console buffer, output low and go into `IDLE` if there
+isn't, or output high and 8 bits of the first character in console buffer, starting from the lowest bit, and then go
+into `IDLE`
+
+##### RAM Gate
+
+It's.. complicated. Try reading https://gist.github.com/magik6k/d1a739a5f032e93aba2742b9fa243a26
 
 ## How to run it
 To run the project, just type: `./gradlew desktop:run` (`gradlew desktop:run` on Windows CMD)
