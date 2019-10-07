@@ -3,7 +3,6 @@ package me.wieku.circuits.save
 import me.wieku.circuits.save.managers.SaveManagerVer01
 import me.wieku.circuits.save.managers.SaveManagerVer02
 import me.wieku.circuits.world.ClassicWorld
-import sun.plugin.dom.exception.InvalidStateException
 import java.io.*
 import java.util.zip.GZIPInputStream
 import java.util.zip.GZIPOutputStream
@@ -84,6 +83,6 @@ object SaveManagers {
 			return SaveManagerVer01()
 		} else if(version == 2) {
 			return SaveManagerVer02()
-		} else throw InvalidStateException("You have too old version of LogicDraw to open that world")
+		} else throw IllegalStateException("You have too old version of LogicDraw to open that world")
 	}
 }
