@@ -1,4 +1,6 @@
-![banner](https://static.wieku.me/logicdraw/banner.png)
+<p align="center">
+  <img alt="banner.png" src="android/assets/assets/logo/banner_inv_640.png"/>
+</p>
 
 [![Build Status](https://ci.starchasers.ovh/jenkins/buildStatus/icon?job=LogicDraw)](https://ci.starchasers.ovh/jenkins/view/Wieku/job/LogicDraw/)
 
