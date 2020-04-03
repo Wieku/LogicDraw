@@ -16,7 +16,7 @@ abstract class SaveableGate(pos: Vector2i): BasicGate(pos), Saveable, Copyable {
 
 	override fun onPlace(world: IWorld) {
 		super.onPlace(world)
-		state = world.getStateManager()()
+		state = world.getStateManager().createState()
 	}
 
 	override fun onRemove(world: IWorld) {
@@ -43,16 +43,36 @@ abstract class SaveableGate(pos: Vector2i): BasicGate(pos), Saveable, Copyable {
 		updateIO(world)
 	}
 
+	override fun updateIO(world: IWorld) {
+		if (state != null && state!!.isActiveD()) {
+			outputs.setActive(false)
+		}
+
+		super.updateIO(world)
+
+		if (state != null && state!!.isActiveD()) {
+			outputs.setActive(true)
+		}
+	}
+
+	override fun setOut(value: Boolean) {
+		if (value != state!!.isActive()) {
+			super.setOut(value)
+		}
+	}
+
 	override fun copyData(): HashMap<String, Any> {
 		val map = HashMap<String, Any>()
-		map.put("state", state!!.isActive())
+		map.put("state", state!!.activeNum)
 		return map
 	}
 
 	override fun pasteData(data: HashMap<String, Any>) {
-		val bool = data["state"] as Boolean
-		state?.setActive(bool)
-		setOut(state!!.isActiveD())
+		val num = data["state"] as Int
+		state?.activeNum = num
+		if (state!!.isActiveD()) {
+			setOut(true)
+		}
 	}
 
 }

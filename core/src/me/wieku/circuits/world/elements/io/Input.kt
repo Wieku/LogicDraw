@@ -47,7 +47,7 @@ open class Input(pos: Vector2i):BasicInput(pos), Saveable, Editable, Copyable {
 	}
 
 	override fun onPlace(world: IWorld) {
-		state = world.getStateManager()()
+		state = world.getStateManager().createState()
 		updateI(world)
 		world.updateNeighboursOf(pos)
 	}

@@ -14,7 +14,7 @@ open class Output(pos: Vector2i): BasicOutput(pos), Saveable {
 	private var state: State? = null
 
 	override fun onPlace(world: IWorld) {
-		state = world.getStateManager()()
+		state = world.getStateManager().createState()
 		updateIO(world)
 		world.updateNeighboursOf(pos)
 	}

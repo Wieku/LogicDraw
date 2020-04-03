@@ -14,7 +14,7 @@ class ClassicStateManager(managerSize: Int): StateManager(managerSize) {
 		}
 
 		for(i in 0 until lastIndex) {
-			input[i] = manager.getByte()
+			input[i] = manager.getInteger()
 			output[i] = input[i]
 			if(!indexPool.contains(i)) {
 				children[i] = State(i, this)
@@ -31,7 +31,7 @@ class ClassicStateManager(managerSize: Int): StateManager(managerSize) {
 		}
 
 		for(i in 0 until lastIndex) {
-			manager.putByte(input[i])
+			manager.putInteger(input[i])
 		}
 	}
 

@@ -38,20 +38,20 @@ open class Cross(pos: Vector2i): BasicWire(pos), Saveable {
 			stateH = if(ix >= 0) {
 				list[ix].getState(Axis.getAxis(pos, list[ix].getPosition()))!!
 			} else {
-				world.getStateManager()()
+				world.getStateManager().createState()
 			}
 
 			stateV = if(iy >= 0) {
 				list[iy].getState(Axis.getAxis(pos, list[iy].getPosition()))!!
 			} else {
-				world.getStateManager()()
+				world.getStateManager().createState()
 			}
 			stateH!!.register()
 			stateV!!.register()
 			world.updateNeighboursOf(pos)
 		} else {
-			stateH = world.getStateManager()()
-			stateV = world.getStateManager()()
+			stateH = world.getStateManager().createState()
+			stateV = world.getStateManager().createState()
 			stateH!!.register()
 			stateV!!.register()
 		}
@@ -63,7 +63,7 @@ open class Cross(pos: Vector2i): BasicWire(pos), Saveable {
 		if(axis==Axis.HORIZONTAL) {
 			if (world.getElement(position) == null) {
 				stateH!!.unregister()
-				stateH = world.getStateManager()()
+				stateH = world.getStateManager().createState()
 				stateH!!.register()
 				world.updateNeighboursOf(pos)
 			} else if (world.getElement(position) is BasicWire){
@@ -78,7 +78,7 @@ open class Cross(pos: Vector2i): BasicWire(pos), Saveable {
 		} else if(axis==Axis.VERTICAL) {
 			if (world.getElement(position) == null) {
 				stateV!!.unregister()
-				stateV = world.getStateManager()()
+				stateV = world.getStateManager().createState()
 				stateV!!.register()
 				world.updateNeighboursOf(pos)
 			} else if (world.getElement(position) is BasicWire){

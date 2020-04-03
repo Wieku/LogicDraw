@@ -19,7 +19,7 @@ abstract class BasicGate(pos: Vector2i): BasicElement(pos),ITickable {
 		updateIO(world)
 	}
 
-	protected fun setOut(value: Boolean) {
+	protected open fun setOut(value: Boolean) {
 		outputs.setActive(value)
 	}
 

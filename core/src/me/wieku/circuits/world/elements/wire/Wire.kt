@@ -29,12 +29,12 @@ open class Wire(pos: Vector2i): BasicWire(pos), Saveable {
 			state = if(ix >= 0) {
 				list[ix].getState(Axis.getAxis(pos, list[ix].getPosition()))!!
 			} else {
-				world.getStateManager()()
+				world.getStateManager().createState()
 			}
 			state!!.register()
 			world.updateNeighboursOf(pos)
 		} else {
-			state = world.getStateManager()()
+			state = world.getStateManager().createState()
 			state!!.register()
 		}
 
@@ -43,7 +43,7 @@ open class Wire(pos: Vector2i): BasicWire(pos), Saveable {
 	override fun onNeighbourChange(position: Vector2i, world: IWorld) {
 		if (world.getElement(position) == null) {
 			state!!.unregister()
-			state = world.getStateManager()()
+			state = world.getStateManager().createState()
 			state!!.register()
 			world.updateNeighboursOf(pos)
 		} else if (world.getElement(position) is BasicWire){
