@@ -9,6 +9,7 @@ import me.wieku.circuits.input.event.KeyDownEvent
 import me.wieku.circuits.input.event.KeyUpEvent
 import me.wieku.circuits.save.SaveManager
 import me.wieku.circuits.world.ClassicWorld
+import java.util.concurrent.atomic.AtomicBoolean
 
 class KeyGate(pos: Vector2i) : SaveableGate(pos), Editable {
 
@@ -20,6 +21,8 @@ class KeyGate(pos: Vector2i) : SaveableGate(pos), Editable {
 
     var locked = false
 
+    private var clicked = false
+
     override fun update(tick: Long) {
         val calc = inputsAll.isActive()
 
@@ -27,6 +30,7 @@ class KeyGate(pos: Vector2i) : SaveableGate(pos), Editable {
             state!!.setActiveU(false)
             true
         } else {
+            state!!.setActiveU(clicked)
             false
         }
 
@@ -42,8 +46,8 @@ class KeyGate(pos: Vector2i) : SaveableGate(pos), Editable {
         if (locked) return
         if (event.keycode == keycode) {
             if (bistable) {
-                state!!.setActiveU(!state!!.isActive())
-            } else state!!.setActiveU(true)
+                clicked = !clicked
+            } else clicked = true
         }
     }
 
@@ -51,7 +55,7 @@ class KeyGate(pos: Vector2i) : SaveableGate(pos), Editable {
     fun onKeyUp(event: KeyUpEvent) {
         if (locked) return
         if (event.keycode == keycode) {
-            if (!bistable) state!!.setActiveU(false)
+            if (!bistable) clicked = false
         }
     }
 
