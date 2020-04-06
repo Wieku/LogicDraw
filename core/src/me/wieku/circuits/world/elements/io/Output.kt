@@ -28,8 +28,10 @@ open class Output(pos: Vector2i): BasicOutput(pos), Saveable {
 	}
 
 	override fun setOut(value: Boolean) {
-		state!!.setActiveU(value)
-		super.setOut(value)
+		if (state!!.isActive() != value) {
+			state!!.setActiveU(value)
+			super.setOut(value)
+		}
 	}
 
 	override fun getIdleColor(): Int = 0xAEEA00
