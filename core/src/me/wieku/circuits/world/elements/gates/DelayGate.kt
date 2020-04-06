@@ -1,69 +1,65 @@
 package me.wieku.circuits.world.elements.gates
 
+//import me.wieku.circuits.api.element.BasicInput
 import com.badlogic.gdx.math.MathUtils
-import me.wieku.circuits.api.element.BasicInput
-import me.wieku.circuits.api.element.BasicWire
 import me.wieku.circuits.api.element.edit.Editable
-import me.wieku.circuits.api.math.Axis
 import me.wieku.circuits.api.math.Vector2i
-import me.wieku.circuits.api.world.IWorld
 import me.wieku.circuits.save.SaveManager
 import me.wieku.circuits.world.ClassicWorld
-import me.wieku.circuits.world.elements.io.Controller
 import java.util.*
 
-class DelayGate(pos: Vector2i): SaveableGate(pos), Editable {
+class DelayGate(pos: Vector2i) : SaveableGate(pos), Editable {
 
-	@Editable.Spinner("Delay", intArrayOf(1, 1, 10000, 1))
-	private var delay = 500
+    @Editable.Spinner("Delay", intArrayOf(1, 1, 10000, 1))
+    private var delay = 500
 
-	private var counter = 0
+    private var counter = 0
 
-	override fun update(tick: Long) {
-		var calc = inputs.isActive()
+    override fun update(tick: Long) {
+        val calc = inputsAll.isActive()
 
-		counter += if(calc) 1 else -1
-		counter = MathUtils.clamp(counter, 0, delay)
+        counter += if (calc) 1 else -1
+        counter = MathUtils.clamp(counter, 0, delay)
 
-		if(counter == 0) {
-			if(state!!.isActive()) {
-				state!!.setActiveU(false)
-			}
-		} else if (counter == delay) {
-			if(!state!!.isActive()) {
-				state!!.setActiveU(true)
-			}
-		}
+        if (counter == 0) {
+            if (state!!.isActive()) {
+                state!!.setActiveU(false)
+            }
+        } else if (counter == delay) {
+            if (!state!!.isActive()) {
+                state!!.setActiveU(true)
+            }
+        }
 
-		setOut(state!!.isActiveD())
-	}
+        setOut(state!!.isActiveD())
+    }
 
-	override fun getIdleColor(): Int = 0x827717
+    override fun getIdleColor(): Int = 0x827717
 
-	override fun getActiveColor(): Int = 0x9E9D24
+    override fun getActiveColor(): Int = 0x9E9D24
 
-	override fun load(world: ClassicWorld, manager: SaveManager) {
-		super.load(world, manager)
-		delay = manager.getInteger()
-		counter = manager.getInteger()
-	}
+    override fun load(world: ClassicWorld, manager: SaveManager) {
+        super.load(world, manager)
+        delay = manager.getInteger()
+        counter = manager.getInteger()
+    }
 
-	override fun save(manager: SaveManager) {
-		super.save(manager)
-		manager.putInteger(delay)
-		manager.putInteger(counter)
-	}
+    override fun save(manager: SaveManager) {
+        super.save(manager)
+        manager.putInteger(delay)
+        manager.putInteger(counter)
+    }
 
-	override fun copyData(): HashMap<String, Any> {
-		val map =  super.copyData()
-		map.put("delay", delay)
-		map.put("counter", counter)
-		return map
-	}
+    override fun copyData(): HashMap<String, Any> {
+        val map = super.copyData()
+        map.put("delay", delay)
+        map.put("counter", counter)
+        return map
+    }
 
-	override fun pasteData(data: HashMap<String, Any>) {
-		super.pasteData(data)
-		delay = data["delay"] as Int
-		counter = data["counter"] as Int
-	}
+    override fun pasteData(data: HashMap<String, Any>) {
+        super.pasteData(data)
+        delay = data["delay"] as Int
+        counter = data["counter"] as Int
+    }
 }

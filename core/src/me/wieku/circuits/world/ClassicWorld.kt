@@ -3,7 +3,7 @@ package me.wieku.circuits.world
 import com.google.common.eventbus.EventBus
 import me.wieku.circuits.api.collections.Array2D
 import me.wieku.circuits.api.element.IElement
-import me.wieku.circuits.api.element.ITickable
+import me.wieku.circuits.api.element.gates.ITickable
 import me.wieku.circuits.api.element.edit.Copyable
 import me.wieku.circuits.api.math.Direction
 import me.wieku.circuits.api.collections.MappedArray

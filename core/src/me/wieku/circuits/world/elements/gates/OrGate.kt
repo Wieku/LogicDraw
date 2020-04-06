@@ -2,17 +2,17 @@ package me.wieku.circuits.world.elements.gates
 
 import me.wieku.circuits.api.math.Vector2i
 
-class OrGate(pos: Vector2i): SaveableGate(pos) {
+class OrGate(pos: Vector2i) : SaveableGate(pos) {
 
-	override fun update(tick: Long) {
-		var calc = inputs.isActive()
+    override fun update(tick: Long) {
+        val calc = inputsAll.isActive()
 
-		state!!.setActiveU(calc)
-		setOut(calc)
-	}
+        state!!.setActiveU(calc)
+        setOut(calc)
+    }
 
-	override fun getIdleColor(): Int = 0xF57F17
+    override fun getIdleColor(): Int = 0xF57F17
 
-	override fun getActiveColor(): Int = 0xF9A825
+    override fun getActiveColor(): Int = 0xF9A825
 
 }

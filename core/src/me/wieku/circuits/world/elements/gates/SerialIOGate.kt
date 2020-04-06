@@ -5,7 +5,7 @@ import me.wieku.circuits.save.SaveManager
 import me.wieku.circuits.world.ClassicWorld
 
 
-class SerialIOGate(pos: Vector2i): SaveableGate(pos) {
+class SerialIOGate(pos: Vector2i) : SaveableGate(pos) {
     enum class State {
         IDLE, CMD, READ, RESPOND
     }
@@ -15,20 +15,20 @@ class SerialIOGate(pos: Vector2i): SaveableGate(pos) {
     private var b = 0
 
     override fun update(tick: Long) {
-        val ins = inputs.isActive()
+        val ins = inputsAll.isActive()
         state!!.setActiveU(false)
 
-        if(action == State.IDLE) {
-            if(ins) {
+        if (action == State.IDLE) {
+            if (ins) {
                 action = State.CMD
             }
         } else if (action == State.CMD) {
-            if(ins) { // 1 - write
+            if (ins) { // 1 - write
                 action = State.READ
                 n = 8
                 b = 0
             } else { // 0 - read
-                if(System.`in`.available() <= 0) {
+                if (System.`in`.available() <= 0) {
                     action = State.IDLE
                     return
                 }
@@ -38,9 +38,9 @@ class SerialIOGate(pos: Vector2i): SaveableGate(pos) {
                 b = System.`in`.read()
             }
         } else if (action == State.READ) {
-            b = b.shl(1) + if(ins) 1 else 0
+            b = b.shl(1) + if (ins) 1 else 0
             n--
-            if(n <= 0) {
+            if (n <= 0) {
                 action = State.IDLE
                 System.out.print(b.toChar())
                 System.out.flush()
@@ -49,7 +49,7 @@ class SerialIOGate(pos: Vector2i): SaveableGate(pos) {
             state!!.setActiveU(b.and(1) == 1)
             b = b.shr(1)
             n--
-            if(n <= 0) {
+            if (n <= 0) {
                 action = State.IDLE
             }
         }

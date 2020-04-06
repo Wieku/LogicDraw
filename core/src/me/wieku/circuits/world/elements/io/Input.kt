@@ -1,9 +1,10 @@
 package me.wieku.circuits.world.elements.io
 
-import me.wieku.circuits.api.element.BasicInput
+import me.wieku.circuits.api.element.BasicElement
 import me.wieku.circuits.api.element.BasicWire
 import me.wieku.circuits.api.element.edit.Copyable
 import me.wieku.circuits.api.element.edit.Editable
+import me.wieku.circuits.api.element.input.IInput
 import me.wieku.circuits.api.math.Axis
 import me.wieku.circuits.api.math.Vector2i
 import me.wieku.circuits.api.state.State
@@ -12,7 +13,7 @@ import me.wieku.circuits.save.SaveManager
 import me.wieku.circuits.save.Saveable
 import me.wieku.circuits.world.ClassicWorld
 
-open class Input(pos: Vector2i):BasicInput(pos), Saveable, Editable, Copyable {
+open class Input(pos: Vector2i): BasicElement(pos), IInput, Saveable, Editable, Copyable {
 
 	private var state: State? = null
 
