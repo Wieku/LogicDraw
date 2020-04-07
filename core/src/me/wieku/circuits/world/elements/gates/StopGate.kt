@@ -13,7 +13,6 @@ class StopGate(pos: Vector2i) : SaveableGate(pos), Editable {
     private var enabled = true
 
     private var toUpdate = true
-    private var world: ClassicWorld? = null
 
     override fun update(tick: Long) {
         var calc = inputsAll.isActive()
@@ -21,8 +20,8 @@ class StopGate(pos: Vector2i) : SaveableGate(pos), Editable {
         if (calc) {
             if (toUpdate) {
                 if (enabled) {
-                    if (world!!.clock != null) {
-                        world!!.clock!!.stop()
+                    if ((world as? ClassicWorld)?.clock != null) {
+                        (world as? ClassicWorld)?.clock?.stop()
                         state!!.setActiveU(true)
                     }
                 }

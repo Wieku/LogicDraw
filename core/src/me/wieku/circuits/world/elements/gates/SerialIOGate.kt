@@ -1,11 +1,12 @@
 package me.wieku.circuits.world.elements.gates
 
+import me.wieku.circuits.api.element.gates.ITickableAlways
 import me.wieku.circuits.api.math.Vector2i
 import me.wieku.circuits.save.SaveManager
 import me.wieku.circuits.world.ClassicWorld
 
 
-class SerialIOGate(pos: Vector2i) : SaveableGate(pos) {
+class SerialIOGate(pos: Vector2i) : SaveableGate(pos), ITickableAlways {
     enum class State {
         IDLE, CMD, READ, RESPOND
     }

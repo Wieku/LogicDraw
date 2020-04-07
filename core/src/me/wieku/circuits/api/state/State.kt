@@ -1,9 +1,13 @@
 package me.wieku.circuits.api.state
 
+import me.wieku.circuits.api.element.input.IInput
+
 open class State(val id: Int, private val manager: StateManager) {
 
 	var holders: Int = 0
 	private set
+
+	private var inputGates = ArrayList<IInput>()
 
 	var activeNum: Int
 		get() = manager.input[id]
@@ -14,10 +18,20 @@ open class State(val id: Int, private val manager: StateManager) {
 	private var destroyed = false
 
 	fun setActive(value: Boolean) {
+
 		if (value) {
 			manager.output[id]++
 		} else if (manager.output[id] > 0) {
 			manager.output[id]--
+		}
+
+		if (isActive() != isActiveD()) {
+			for (i in inputGates.indices) {
+				val tickables = inputGates[i].getGates()
+				for (j in tickables.indices) {
+					tickables[j].markForUpdate()
+				}
+			}
 		}
 	}
 
@@ -41,13 +55,13 @@ open class State(val id: Int, private val manager: StateManager) {
 
 	fun isActive() = manager[id]
 
-	fun numActive() = manager.input[id]
-
 	fun isActiveD() = manager.getDirty(id)
 
 	fun free() {
-		if(!destroyed)
+		if(!destroyed) {
 			manager.free(id)
+			inputGates.clear()
+		}
 		destroyed = true
 	}
 
@@ -55,11 +69,23 @@ open class State(val id: Int, private val manager: StateManager) {
 		++holders
 	}
 
-	fun unregister(wasActive: Boolean = false) {
+	fun unregister() {
 		--holders
 		if(holders <= 0) {
 			free()
 		}
+	}
+
+	fun addInput(input: IInput) {
+		inputGates.add(input)
+		val tickables = input.getGates()
+		for (j in tickables.indices) {
+			tickables[j].markForUpdate()
+		}
+	}
+
+	fun deleteInput(input: IInput) {
+		inputGates.remove(input)
 	}
 
 	@Suppress("UNUSED")

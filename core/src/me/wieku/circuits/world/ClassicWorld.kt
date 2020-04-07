@@ -7,6 +7,7 @@ import me.wieku.circuits.api.element.gates.ITickable
 import me.wieku.circuits.api.element.edit.Copyable
 import me.wieku.circuits.api.math.Direction
 import me.wieku.circuits.api.collections.MappedArray
+import me.wieku.circuits.api.element.gates.ITickableAlways
 import me.wieku.circuits.api.math.Rectangle
 import me.wieku.circuits.api.math.Vector2i
 import me.wieku.circuits.api.state.StateManager
@@ -17,7 +18,14 @@ import java.util.*
 class ClassicWorld(val width: Int, val height: Int, val name: String):IWorld {
 	private val manager: ClassicStateManager = ClassicStateManager(width * height)
 	private val map: Array2D<IElement?> = Array2D(width, height)
+
 	private val tickables = MappedArray<Vector2i, ITickable>(width * height)
+	private val constantTickables = MappedArray<Vector2i, ITickable>(width * height)
+
+	private val tickableQueueA = ArrayDeque<ITickable>(10000)
+	private val tickableQueueB = ArrayDeque<ITickable>(10000)
+	private var useB = false
+
 
 	private val tasks = ArrayDeque<Runnable>()
 	val eventBus = EventBus("buttons")
@@ -29,8 +37,19 @@ class ClassicWorld(val width: Int, val height: Int, val name: String):IWorld {
 	private set
 
 	override fun update(tick: Long) {
+		val queue = if (useB) tickableQueueA else tickableQueueB
+		for (t in queue) {
+			t.isAlreadyMarked = false
+		}
+
+		for(i in 0 until constantTickables.size) constantTickables[i]?.update(tick)
+
+		while (queue.isNotEmpty()) queue.poll().update(tick)
+
 		updateTasks()
-		for(i in 0 until tickables.size) tickables[i]?.update(tick)
+
+		useB = !useB
+
 		manager.swap()
 	}
 
@@ -72,6 +91,11 @@ class ClassicWorld(val width: Int, val height: Int, val name: String):IWorld {
 		el.onPlace(this)
 		if(el is ITickable) {
 			tickables.put(position, el)
+			if (el is ITickableAlways) {
+				constantTickables.put(position, el)
+			} else {
+				markForUpdate(el)
+			}
 		}
 	}
 
@@ -197,6 +221,7 @@ class ClassicWorld(val width: Int, val height: Int, val name: String):IWorld {
 		if(!position.isInBounds(0, 0, width-1, height-1)) return
 		var element: IElement? = map[position.x][position.y] ?: return
 		tickables.remove(position)
+		constantTickables.remove(position)
 		map[position.x][position.y] = null
 		element!!.onRemove(this)
 	}
@@ -233,6 +258,14 @@ class ClassicWorld(val width: Int, val height: Int, val name: String):IWorld {
 				}
 			}
 			first = true
+		}
+	}
+
+	override fun markForUpdate(tickable: ITickable) {
+		if (!tickable.isAlreadyMarked && tickable !is ITickableAlways) {
+			val queue = if (useB) tickableQueueB else tickableQueueA
+			tickable.isAlreadyMarked = true
+			queue.push(tickable)
 		}
 	}
 

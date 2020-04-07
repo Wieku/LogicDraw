@@ -22,6 +22,7 @@ abstract class SaveableGate(pos: Vector2i): BasicGate(pos), Saveable, Copyable {
 	override fun onRemove(world: IWorld) {
 		setOut(false)
 		state!!.unregister()
+		super.onRemove(world)
 	}
 
 	override fun setState(state: State, axis: Axis) {}

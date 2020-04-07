@@ -1,6 +1,7 @@
 package me.wieku.circuits.api.world
 
 import me.wieku.circuits.api.element.IElement
+import me.wieku.circuits.api.element.gates.ITickable
 import me.wieku.circuits.api.state.StateManager
 import me.wieku.circuits.api.math.Vector2i
 
@@ -14,5 +15,6 @@ interface IWorld {
 	fun getNeighboursOf(element: IElement): Array<IElement>
 	fun getNeighboursOf(element: IElement, consumer: (IElement) -> Unit)
 	fun updateNeighboursOf(pos: Vector2i)
+	fun markForUpdate(tickable: ITickable)
 	fun getStateManager() : StateManager
 }

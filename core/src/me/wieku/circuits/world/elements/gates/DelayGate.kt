@@ -3,12 +3,13 @@ package me.wieku.circuits.world.elements.gates
 //import me.wieku.circuits.api.element.BasicInput
 import com.badlogic.gdx.math.MathUtils
 import me.wieku.circuits.api.element.edit.Editable
+import me.wieku.circuits.api.element.gates.ITickableAlways
 import me.wieku.circuits.api.math.Vector2i
 import me.wieku.circuits.save.SaveManager
 import me.wieku.circuits.world.ClassicWorld
 import java.util.*
 
-class DelayGate(pos: Vector2i) : SaveableGate(pos), Editable {
+class DelayGate(pos: Vector2i) : SaveableGate(pos), Editable, ITickableAlways {
 
     @Editable.Spinner("Delay", intArrayOf(1, 1, 10000, 1))
     private var delay = 500

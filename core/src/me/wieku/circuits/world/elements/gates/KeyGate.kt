@@ -3,6 +3,7 @@ package me.wieku.circuits.world.elements.gates
 import com.badlogic.gdx.Input
 import com.google.common.eventbus.Subscribe
 import me.wieku.circuits.api.element.edit.Editable
+import me.wieku.circuits.api.element.gates.ITickableAlways
 import me.wieku.circuits.api.math.Vector2i
 import me.wieku.circuits.api.world.IWorld
 import me.wieku.circuits.input.event.KeyDownEvent
@@ -11,7 +12,7 @@ import me.wieku.circuits.save.SaveManager
 import me.wieku.circuits.world.ClassicWorld
 import java.util.concurrent.atomic.AtomicBoolean
 
-class KeyGate(pos: Vector2i) : SaveableGate(pos), Editable {
+class KeyGate(pos: Vector2i) : SaveableGate(pos), Editable, ITickableAlways {
 
     @Editable.Key("Key")
     var keycode = Input.Keys.L

@@ -4,6 +4,7 @@ import me.wieku.circuits.api.element.BasicElement
 import me.wieku.circuits.api.element.BasicWire
 import me.wieku.circuits.api.element.edit.Copyable
 import me.wieku.circuits.api.element.edit.Editable
+import me.wieku.circuits.api.element.gates.ITickable
 import me.wieku.circuits.api.element.input.IInput
 import me.wieku.circuits.api.math.Axis
 import me.wieku.circuits.api.math.Vector2i
@@ -17,7 +18,8 @@ open class Input(pos: Vector2i): BasicElement(pos), IInput, Saveable, Editable, 
 
 	private var state: State? = null
 
-	val array = Array<State?>(4) { null }
+	val inputs = Array<State?>(4) { null }
+	val outputs = ArrayList<ITickable>(4)
 	var size = 0
 
 	@Editable.Boolean("Inverted signal")
@@ -26,7 +28,10 @@ open class Input(pos: Vector2i): BasicElement(pos), IInput, Saveable, Editable, 
 
 	override fun isActive(): Boolean {
 		for(i in 0 until size) {
-			if(array[i]!!.isActive()) {
+			/*if (inputs[i] != null) {
+				println("state ${inputs[i]?.id} ${inputs[i]?.activeNum}")
+			}*/
+			if(inputs[i]!!.isActive()) {
 				val intSt = !inverted
 				state!!.setActiveU(intSt)
 				return intSt
@@ -40,7 +45,7 @@ open class Input(pos: Vector2i): BasicElement(pos), IInput, Saveable, Editable, 
 
 	private fun isActiveF(): Boolean {
 		for(i in 0 until size) {
-			if (array[i] != null && array[i]!!.isActive()) {
+			if (inputs[i] != null && inputs[i]!!.isActive()) {
 				return true
 			}
 		}
@@ -49,28 +54,42 @@ open class Input(pos: Vector2i): BasicElement(pos), IInput, Saveable, Editable, 
 
 	override fun onPlace(world: IWorld) {
 		state = world.getStateManager().createState()
-		updateI(world)
+		updateIO(world)
 		world.updateNeighboursOf(pos)
 	}
 
 	override fun onNeighbourChange(position: Vector2i, world: IWorld) {
-		updateI(world)
+		updateIO(world)
 	}
 
-	private fun updateI(world: IWorld) {
+	private fun updateIO(world: IWorld) {
 		size = 0
-		array.fill(null)
+		for (i in 0..3) {
+			inputs[i]?.deleteInput(this)
+		}
+		inputs.fill(null)
+		outputs.clear()
 
 		world.getNeighboursOf(this) {
 			when(it) {
 				is BasicWire -> {
 					var intSt = it.getState(Axis.getAxis(getPosition(), it.getPosition()))
-					if(intSt != null)
-						array[size++] = intSt
+					if(intSt != null) {
+						inputs[size++] = intSt
+					}
+				}
+				is ITickable -> {
+					outputs.add(it)
 				}
 			}
 		}
+
+		for (i in 0..3) {
+			inputs[i]?.addInput(this)
+		}
 	}
+
+	override fun getGates(): List<ITickable> = outputs
 
 	override fun onRemove(world: IWorld) {
 		state!!.unregister()
@@ -103,7 +122,7 @@ open class Input(pos: Vector2i): BasicElement(pos), IInput, Saveable, Editable, 
 	}
 
 	override fun afterLoad(world: IWorld) {
-		updateI(world)
+		updateIO(world)
 	}
 
 	override fun copyData(): HashMap<String, Any> {
