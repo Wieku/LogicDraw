@@ -1,5 +1,6 @@
 package me.wieku.circuits.api.world.clock
 
+import java.lang.RuntimeException
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.ScheduledFuture
@@ -42,7 +43,12 @@ class AsyncClock (private val updatable: Updatable<*>, tickRate: Int)  {
 				timeCheck = 0
 			}
 
-			(updatable as Updatable<Number>).update(if (delta) updateTime / 1000000000f else currentTick)
+			try {
+				(updatable as Updatable<Number>).update(if (delta) updateTime / 1000000000f else currentTick)
+			} catch (t: Throwable) {
+				t.printStackTrace()
+				throw RuntimeException()
+			}
 
 			++currentTick
 
