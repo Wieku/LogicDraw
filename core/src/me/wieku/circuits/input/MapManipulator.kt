@@ -5,6 +5,7 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.InputProcessor
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.math.Vector3
+import me.wieku.circuits.api.element.gates.ITickableAlways
 import me.wieku.circuits.api.math.Axis
 import me.wieku.circuits.api.math.Rectangle
 import me.wieku.circuits.api.math.Vector2i
@@ -149,7 +150,27 @@ class MapManipulator(val world:ClassicWorld, val camera: OrthographicCamera, val
 		if(element != null) {
 			var name = ElementRegistry.names[element.javaClass]!!
 			if(lastTooltip != position) {
-				editor.tooltip.showTooltip("$name {${element.getState(Axis.HORIZONTAL)?.activeNum}, ${element.getState(Axis.VERTICAL)?.activeNum}} \n {${element.getState(Axis.HORIZONTAL)?.id}, ${element.getState(Axis.VERTICAL)?.id}}")
+				var tooltipText = "Element: $name"
+
+				if (element is ITickableAlways) {
+					tooltipText += "\nTicks constantly"
+				}
+
+				val horizontalState = element.getState(Axis.HORIZONTAL)
+				val verticalState = element.getState(Axis.VERTICAL)
+				if (horizontalState != null || verticalState != null) {
+					tooltipText += "\nState data:"
+
+					if (horizontalState != null) {
+						tooltipText += "\n H: {${horizontalState.id}: ${horizontalState.activeNum}}"
+					}
+
+					if (verticalState != null) {
+						tooltipText += "\n V: {${verticalState.id}: ${verticalState.activeNum}}"
+					}
+				}
+
+				editor.tooltip.showTooltip(tooltipText)
 				lastTooltip.set(position)
 			} else {
 				editor.tooltip.update()
