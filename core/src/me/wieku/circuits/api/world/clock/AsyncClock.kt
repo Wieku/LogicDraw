@@ -10,7 +10,7 @@ class AsyncClock (private val updatable: Updatable<*>, tickRate: Int)  {
 	private var sleepTime: Long = 1000000000L/tickRate
 	var tickRate: Int = tickRate
 	set (value) {
-		if(value<0) IllegalStateException("Tick Rate has to be positive")
+		if(value < 0) throw IllegalStateException("Tick Rate has to be positive")
 		field = value
 		sleepTime = 1000000000L/value
 	}
@@ -23,7 +23,7 @@ class AsyncClock (private val updatable: Updatable<*>, tickRate: Int)  {
 
 	@Suppress("UNCHECKED_CAST")
 	fun start() {
-		if(task != null && (!task!!.isCancelled || !task!!.isDone) ) IllegalStateException("AsyncClock is already running!")
+		if(task != null && (!task!!.isCancelled || !task!!.isDone) ) throw IllegalStateException("AsyncClock is already running!")
 
 		var lastCheck = System.nanoTime()
 		var timeCheck = 0L
@@ -87,10 +87,10 @@ class AsyncClock (private val updatable: Updatable<*>, tickRate: Int)  {
 	}
 
 	init {
-		when (updatable) {
-			is Updatable.ByTick -> delta = false
-			is Updatable.ByDelta -> delta = true
-			else -> IllegalStateException("Updatable must be ByTick or ByDelta!")
+		delta = when (updatable) {
+			is Updatable.ByTick -> false
+			is Updatable.ByDelta -> true
+			else -> throw IllegalStateException("Updatable must be ByTick or ByDelta!")
 		}
 	}
 
