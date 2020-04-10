@@ -8,11 +8,14 @@ import me.wieku.circuits.api.element.edit.Copyable
 import me.wieku.circuits.api.math.Direction
 import me.wieku.circuits.api.collections.MappedArray
 import me.wieku.circuits.api.element.gates.ITickableAlways
+import me.wieku.circuits.api.math.Axis
 import me.wieku.circuits.api.math.Rectangle
 import me.wieku.circuits.api.math.Vector2i
 import me.wieku.circuits.api.state.StateManager
 import me.wieku.circuits.api.world.IWorld
 import me.wieku.circuits.api.world.clock.AsyncClock
+import me.wieku.circuits.render.map.WorldRenderer
+import me.wieku.circuits.world.state.ClassicStateManager
 import java.util.*
 
 class ClassicWorld(val width: Int, val height: Int, val name: String):IWorld {
@@ -35,6 +38,27 @@ class ClassicWorld(val width: Int, val height: Int, val name: String):IWorld {
 	var entities = 0
 	get() = tickables.currentElements
 	private set
+
+	var worldRenderer: WorldRenderer? = null
+		set(value) {
+			if (value != null) {
+				for (x in 0 until width) {
+					for (y in 0 until height) {
+						val el = map[x][y]
+						if (el != null) {
+							value.setElementData(x, y, el.getIdleColor(), el.getActiveColor())
+						} else {
+							value.setElementData(x, y, 0, 0)
+						}
+
+						elementStateUpdated(Vector2i(x, y))
+					}
+				}
+			}
+
+			manager.worldRenderer = value
+			field = value
+		}
 
 	override fun update(tick: Long) {
 		updateTasks()
@@ -86,7 +110,7 @@ class ClassicWorld(val width: Int, val height: Int, val name: String):IWorld {
 				removeElementNT(position)
 			} else return
 		}
-		var el:IElement = ElementRegistry.create(clazz, position)
+		val el:IElement = ElementRegistry.create(clazz, position)
 		map[position.x][position.y] = el
 		el.onPlace(this)
 		if(el is ITickable) {
@@ -97,12 +121,13 @@ class ClassicWorld(val width: Int, val height: Int, val name: String):IWorld {
 				markForUpdate(el)
 			}
 		}
+		worldRenderer?.setElementData(position.x, position.y, el.getIdleColor(), el.getActiveColor())
 	}
 
 	fun forcePlace(x: Int, y: Int, name: String): IElement {
 		if(ElementRegistry.contains(name)) {
-			var position = Vector2i(x, y)
-			var el:IElement = ElementRegistry.create(name, position)
+			val position = Vector2i(x, y)
+			val el:IElement = ElementRegistry.create(name, position)
 			map[position.x][position.y] = el
 			if(el is ITickable) {
 				tickables.put(position, el)
@@ -219,11 +244,12 @@ class ClassicWorld(val width: Int, val height: Int, val name: String):IWorld {
 
 	private fun removeElementNT(position: Vector2i) {
 		if(!position.isInBounds(0, 0, width-1, height-1)) return
-		var element: IElement? = map[position.x][position.y] ?: return
+		val element: IElement? = map[position.x][position.y] ?: return
 		tickables.remove(position)
 		constantTickables.remove(position)
 		map[position.x][position.y] = null
 		element!!.onRemove(this)
+		worldRenderer?.setElementData(position.x, position.y, 0, 0)
 	}
 
 	override fun getElement(position: Vector2i) = if(position.isInBounds(0, 0, width - 1, height - 1)) map[position.x][position.y] else null
@@ -252,12 +278,21 @@ class ClassicWorld(val width: Int, val height: Int, val name: String):IWorld {
 			first = false
 			while(stack.isNotEmpty()) {
 				val position = stack.pop()
-				for(i in 0 until Direction.VALID_DIRECTIONS.size) {
-					tempVector.set(position).add(Direction.VALID_DIRECTIONS[i].asVector)
+				for(element in Direction.VALID_DIRECTIONS) {
+					tempVector.set(position).add(element.asVector)
 					getElement(tempVector)?.onNeighbourChange(position, this)
 				}
 			}
 			first = true
+		}
+	}
+
+	override fun elementStateUpdated(pos: Vector2i) {
+		val it = getElement(pos)
+		if (it != null) {
+			val horizontal = it.getState(Axis.HORIZONTAL)
+			val vertical = it.getState(Axis.VERTICAL)
+			worldRenderer?.setElementStateData(pos.x, pos.y, horizontal?.id ?: 0, vertical?.id ?: 0)
 		}
 	}
 

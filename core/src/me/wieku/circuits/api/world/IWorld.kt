@@ -15,6 +15,7 @@ interface IWorld {
 	fun getNeighboursOf(element: IElement): Array<IElement>
 	fun getNeighboursOf(element: IElement, consumer: (IElement) -> Unit)
 	fun updateNeighboursOf(pos: Vector2i)
+	fun elementStateUpdated(pos: Vector2i)
 	fun markForUpdate(tickable: ITickable)
 	fun getStateManager() : StateManager
 }

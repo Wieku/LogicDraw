@@ -36,6 +36,7 @@ import me.wieku.circuits.api.math.Vector2i
 import me.wieku.circuits.api.world.clock.AsyncClock
 import me.wieku.circuits.api.world.clock.Updatable
 import me.wieku.circuits.input.MapManipulator
+import me.wieku.circuits.render.map.WorldRenderer
 import me.wieku.circuits.render.scene.*
 import me.wieku.circuits.render.scene.actors.TextTooltip
 import me.wieku.circuits.render.scene.editors.HexEditor
@@ -82,11 +83,14 @@ class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 
 	private lateinit var menuBar: MenuBar
 
+	private val worldRenderer = WorldRenderer(world.width, world.height)
+
 	constructor(world: ClassicWorld, file: File) : this(world) {
 		this.file = file
 	}
 
 	init {
+		world.worldRenderer = worldRenderer
 		camera = object : OrthographicCamera(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat()) {
 			override fun unproject(screenCoords: Vector3?): Vector3 {
 				return super.unproject(screenCoords, 0f, 0f, Gdx.graphics.width.toFloat(), Gdx.graphics.height - menuBar.table.height)
@@ -128,7 +132,7 @@ class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 
 		ElementRegistry.classes.forEach {
 			val color = Color(it.value.getConstructor(Vector2i::class.java).newInstance(Vector2i()).getIdleColor().shl(8) + 0xff)
-			val button = me.wieku.circuits.render.scene.ColorButton(color)
+			val button = ColorButton(color)
 			button.addListener(object : ClickListener() {
 				override fun clicked(event: InputEvent?, x: Float, y: Float) {
 					super.clicked(event, x, y)
@@ -147,7 +151,7 @@ class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 		}
 		elementTable.row()
 
-		var controls = Label(
+		val controls = Label(
 				"Controls:\n" +
 						"LMB: Pencil\n" +
 						"RMB: Eraser\n" +
@@ -688,25 +692,9 @@ class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 		Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
 		Gdx.gl.glViewport(0, 0, Gdx.graphics.width, (Gdx.graphics.height - menuBar.table.height).toInt())
 
+		worldRenderer.render(camera.combined)
+
 		renderer.begin(ShapeRenderer.ShapeType.Filled)
-		renderer.color = Color.BLACK
-		renderer.rect(0f, 0f, world.width.toFloat(), world.height.toFloat())
-		for (x in corner0.x..corner1.x) {
-			for (y in corner0.y..corner1.y) {
-				val el = world[x, y]
-				if (el != null) {
-					renderer.color = color.set((el.getColor().shl(8)) + 0xFF)
-					renderer.rect(x.toFloat(), y.toFloat(), 1f, 1f)
-
-					//TODO: It's a temporary solution
-					if(el is me.wieku.circuits.world.elements.io.Input && el.inverted) {
-						renderer.color = Color.WHITE
-						renderer.rect(x.toFloat()+0.45f, y.toFloat()+0.2f, 0.1f, 0.6f)
-					}
-
-				}
-			}
-		}
 
 		if (manipulator.pasteMode || manipulator.rectangle != null) {
 			if (manipulator.rectangle != null) {

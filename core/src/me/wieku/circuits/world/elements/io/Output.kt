@@ -17,6 +17,7 @@ open class Output(pos: Vector2i): BasicOutput(pos), Saveable {
 		state = world.getStateManager().createState()
 		updateIO(world)
 		world.updateNeighboursOf(pos)
+		world.elementStateUpdated(pos)
 	}
 
 	override fun onNeighbourChange(position: Vector2i, world: IWorld) {
@@ -51,6 +52,7 @@ open class Output(pos: Vector2i): BasicOutput(pos), Saveable {
 	override fun load(world: ClassicWorld, manager: SaveManager) {
 		state = world.getStateManager().getState(manager.getInteger())!!
 		state!!.register()
+		world.elementStateUpdated(pos)
 	}
 
 	override fun afterLoad(world: IWorld) {

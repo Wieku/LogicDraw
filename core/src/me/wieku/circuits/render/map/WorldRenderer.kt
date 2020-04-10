@@ -2,6 +2,7 @@ package me.wieku.circuits.render.map
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.*
+import com.badlogic.gdx.graphics.GL20.GL_TEXTURE0
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.math.Matrix4
 import me.wieku.circuits.render.gl.IPixelBufferObject
@@ -28,7 +29,7 @@ class WorldRenderer(val width: Int, val height: Int) {
                 0f, 0f, 0f, 0f, 0f,
                 width.toFloat(), 0f, 0f, 1f, 0f,
                 width.toFloat(), height.toFloat(), 0f, 1f, 1f,
-                0f, height.toFloat(), 0f, 0f, 1f));
+                0f, height.toFloat(), 0f, 0f, 1f))
         quad.setIndices(shortArrayOf(0, 1, 2, 2, 3, 0))
 
     }
@@ -39,9 +40,16 @@ class WorldRenderer(val width: Int, val height: Int) {
     }
 
     fun setElementStateData(x: Int, y: Int, idHorizontal: Int, idVertical: Int) {
+        setElementStateDataHorizontal(x, y, idHorizontal)
+        setElementStateDataVertical(x, y, idVertical)
+    }
+
+    fun setElementStateDataHorizontal(x: Int, y: Int, idHorizontal: Int) {
         elementStatePBO.setFloat( (y * width + x) * 16, (idHorizontal % width).toFloat() / width)
         elementStatePBO.setFloat( (y * width + x) * 16 + 4, (idHorizontal / width).toFloat() / height)
+    }
 
+    fun setElementStateDataVertical(x: Int, y: Int, idVertical: Int) {
         elementStatePBO.setFloat( (y * width + x) * 16 + 8, (idVertical % width).toFloat() / width)
         elementStatePBO.setFloat( (y * width + x) * 16 + 12, (idVertical / width).toFloat() / height)
     }
@@ -72,6 +80,8 @@ class WorldRenderer(val width: Int, val height: Int) {
         quad.render(mapShader, GL20.GL_TRIANGLES)
 
         mapShader.end()
+
+        Gdx.gl.glActiveTexture(GL_TEXTURE0)
     }
 
 }

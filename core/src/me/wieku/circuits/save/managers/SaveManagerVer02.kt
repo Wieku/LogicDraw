@@ -2,7 +2,7 @@ package me.wieku.circuits.save.managers
 
 import me.wieku.circuits.save.SaveManager
 import me.wieku.circuits.save.Saveable
-import me.wieku.circuits.world.ClassicStateManager
+import me.wieku.circuits.world.state.ClassicStateManager
 import me.wieku.circuits.world.ClassicWorld
 import me.wieku.circuits.world.ElementRegistry
 import java.io.DataInputStream

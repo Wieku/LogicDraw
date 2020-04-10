@@ -17,6 +17,7 @@ abstract class SaveableGate(pos: Vector2i): BasicGate(pos), Saveable, Copyable {
 	override fun onPlace(world: IWorld) {
 		super.onPlace(world)
 		state = world.getStateManager().createState()
+		world.elementStateUpdated(pos)
 	}
 
 	override fun onRemove(world: IWorld) {
@@ -38,6 +39,7 @@ abstract class SaveableGate(pos: Vector2i): BasicGate(pos), Saveable, Copyable {
 	override fun load(world: ClassicWorld, manager: SaveManager) {
 		state = world.getStateManager().getState(manager.getInteger())!!
 		state!!.register()
+		world.elementStateUpdated(pos)
 	}
 
 	override fun afterLoad(world: IWorld) {

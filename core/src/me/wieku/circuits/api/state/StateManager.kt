@@ -31,7 +31,7 @@ open class StateManager(private val managerSize: Int) {
 		}
 	}
 
-	fun swap() {
+	open fun swap() {
 		while (stateQueue.isNotEmpty()) {
 			val state = stateQueue.poll()
 			state.alreadyMarked = false

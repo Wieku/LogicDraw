@@ -56,6 +56,7 @@ open class Input(pos: Vector2i): BasicElement(pos), IInput, Saveable, Editable, 
 		state = world.getStateManager().createState()
 		updateIO(world)
 		world.updateNeighboursOf(pos)
+		world.elementStateUpdated(pos)
 	}
 
 	override fun onNeighbourChange(position: Vector2i, world: IWorld) {
@@ -73,7 +74,7 @@ open class Input(pos: Vector2i): BasicElement(pos), IInput, Saveable, Editable, 
 		world.getNeighboursOf(this) {
 			when(it) {
 				is BasicWire -> {
-					var intSt = it.getState(Axis.getAxis(getPosition(), it.getPosition()))
+					val intSt = it.getState(Axis.getAxis(getPosition(), it.getPosition()))
 					if(intSt != null) {
 						inputs[size++] = intSt
 					}
@@ -116,6 +117,7 @@ open class Input(pos: Vector2i): BasicElement(pos), IInput, Saveable, Editable, 
 	override fun load(world: ClassicWorld, manager: SaveManager) {
 		state = world.getStateManager().getState(manager.getInteger())!!
 		state!!.register()
+		world.elementStateUpdated(pos)
 		if(manager.getVersion() >= 2) {
 			inverted = manager.getBoolean()
 		}

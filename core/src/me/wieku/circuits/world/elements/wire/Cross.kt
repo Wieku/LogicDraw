@@ -55,7 +55,7 @@ open class Cross(pos: Vector2i): BasicWire(pos), Saveable {
 			stateH!!.register()
 			stateV!!.register()
 		}
-
+		world.elementStateUpdated(pos)
 	}
 
 	override fun onNeighbourChange(position: Vector2i, world: IWorld) {
@@ -66,6 +66,7 @@ open class Cross(pos: Vector2i): BasicWire(pos), Saveable {
 				stateH = world.getStateManager().createState()
 				stateH!!.register()
 				world.updateNeighboursOf(pos)
+				world.elementStateUpdated(pos)
 			} else if (world.getElement(position) is BasicWire){
 				var stateU = world.getElement(position)!!.getState(axis)
 				if(stateH != stateU) {
@@ -73,6 +74,7 @@ open class Cross(pos: Vector2i): BasicWire(pos), Saveable {
 					stateH = stateU!!
 					stateH!!.register()
 					world.updateNeighboursOf(pos)
+					world.elementStateUpdated(pos)
 				}
 			}
 		} else if(axis==Axis.VERTICAL) {
@@ -81,6 +83,7 @@ open class Cross(pos: Vector2i): BasicWire(pos), Saveable {
 				stateV = world.getStateManager().createState()
 				stateV!!.register()
 				world.updateNeighboursOf(pos)
+				world.elementStateUpdated(pos)
 			} else if (world.getElement(position) is BasicWire){
 				var stateU = world.getElement(position)!!.getState(axis)
 				if(stateV != stateU) {
@@ -88,6 +91,7 @@ open class Cross(pos: Vector2i): BasicWire(pos), Saveable {
 					stateV = stateU!!
 					stateV!!.register()
 					world.updateNeighboursOf(pos)
+					world.elementStateUpdated(pos)
 				}
 			}
 		}
@@ -131,6 +135,7 @@ open class Cross(pos: Vector2i): BasicWire(pos), Saveable {
 		stateH!!.register()
 		stateV = world.getStateManager().getState(manager.getInteger())!!
 		stateV!!.register()
+		world.elementStateUpdated(pos)
 	}
 
 	override fun afterLoad(world: IWorld) {}
