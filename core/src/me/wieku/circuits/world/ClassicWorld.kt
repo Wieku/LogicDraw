@@ -37,6 +37,8 @@ class ClassicWorld(val width: Int, val height: Int, val name: String):IWorld {
 	private set
 
 	override fun update(tick: Long) {
+		updateTasks()
+
 		val queue = if (useB) tickableQueueA else tickableQueueB
 		for (t in queue) {
 			t.isAlreadyMarked = false
@@ -45,8 +47,6 @@ class ClassicWorld(val width: Int, val height: Int, val name: String):IWorld {
 		for(i in 0 until constantTickables.size) constantTickables[i]?.update(tick)
 
 		while (queue.isNotEmpty()) queue.poll().update(tick)
-
-		updateTasks()
 
 		useB = !useB
 

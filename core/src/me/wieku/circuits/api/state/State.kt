@@ -18,11 +18,12 @@ open class State(val id: Int, private val manager: StateManager) {
 	private var destroyed = false
 
 	fun setActive(value: Boolean) {
+		if (destroyed) return
 
 		if (value) {
-			manager.output[id]++
-		} else if (manager.output[id] > 0) {
-			manager.output[id]--
+			high()
+		} else if (manager.getDirty(id)) {
+			low()
 		}
 
 		if (isActive() != isActiveD()) {
@@ -44,6 +45,8 @@ open class State(val id: Int, private val manager: StateManager) {
 	}
 
 	fun setActiveU(value: Boolean) {
+		if (destroyed) return
+
 		if (value != manager.getDirty(id)) {
 			if (value) {
 				high()
