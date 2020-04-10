@@ -5,6 +5,7 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.InputProcessor
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.math.Vector3
+import me.wieku.circuits.api.math.Axis
 import me.wieku.circuits.api.math.Rectangle
 import me.wieku.circuits.api.math.Vector2i
 import me.wieku.circuits.input.event.KeyDownEvent
@@ -43,7 +44,7 @@ class MapManipulator(val world:ClassicWorld, val camera: OrthographicCamera, val
 	var pasteMode = false
 	var lineMode = false
 
-	private var lastTooltip = ""
+	private var lastTooltip = Vector2i(-1, -1)
 
 	private var brushState = STATE.NONE
 
@@ -112,9 +113,9 @@ class MapManipulator(val world:ClassicWorld, val camera: OrthographicCamera, val
 				}
 			}
 		} else if(brushState == STATE.SELECTION && ((keycode == Input.Keys.CONTROL_LEFT && !Gdx.input.isKeyPressed(Input.Keys.CONTROL_RIGHT)) || (!Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT) && keycode == Input.Keys.CONTROL_RIGHT))) {
-			if (lastTooltip != "") {
+			if (lastTooltip != Vector2i(-1, -1)) {
 				editor.tooltip.hide()
-				lastTooltip = ""
+				lastTooltip.set(-1, -1)
 			}
 			if (brushState == STATE.SELECTION && !Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
 				brushState = STATE.NONE
@@ -147,15 +148,15 @@ class MapManipulator(val world:ClassicWorld, val camera: OrthographicCamera, val
 		var element = world.getElement(position)
 		if(element != null) {
 			var name = ElementRegistry.names[element.javaClass]!!
-			if(lastTooltip != name) {
-				editor.tooltip.showTooltip(name)
-				lastTooltip = name
+			if(lastTooltip != position) {
+				editor.tooltip.showTooltip("$name {${element.getState(Axis.HORIZONTAL)?.activeNum}, ${element.getState(Axis.VERTICAL)?.activeNum}} \n {${element.getState(Axis.HORIZONTAL)?.id}, ${element.getState(Axis.VERTICAL)?.id}}")
+				lastTooltip.set(position)
 			} else {
 				editor.tooltip.update()
 			}
-		} else if(lastTooltip != "") {
+		} else if(lastTooltip != Vector2i(-1, -1)) {
 			editor.tooltip.hide()
-			lastTooltip = ""
+			lastTooltip.set(-1, -1)
 		}
 	}
 
