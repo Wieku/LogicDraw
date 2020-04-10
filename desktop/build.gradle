@@ -1,4 +1,8 @@
-apply plugin: "kotlin"
+plugins {
+    id "kotlin"
+    id "application"
+    id 'com.github.johnrengelman.shadow' version '5.2.0'
+}
 
 sourceCompatibility = 1.6
 sourceSets.main.java.srcDirs = [ "src/" ]
@@ -6,13 +10,15 @@ sourceSets.main.java.srcDirs = [ "src/" ]
 project.ext.mainClassName = "me.wieku.circuits.desktop.DesktopLauncherKt"
 project.ext.assetsDir = new File("../android/assets")
 
-task run(dependsOn: classes, type: JavaExec) {
+tasks.run.workingDir = project.assetsDir
+
+/*task run(dependsOn: classes, type: JavaExec) {
     main = project.mainClassName
     classpath = sourceSets.main.runtimeClasspath
     standardInput = System.in
     workingDir = project.assetsDir
     ignoreExitValue = true
-}
+}*/
 
 task debug(dependsOn: classes, type: JavaExec) {
     main = project.mainClassName
@@ -23,7 +29,12 @@ task debug(dependsOn: classes, type: JavaExec) {
     debug = true
 }
 
-task dist(type: Jar) {
+application {
+    applicationName = 'LogicDraw'
+    mainClassName = project.mainClassName
+}
+
+/*task dist(type: Jar) {
     baseName = "LogicDraw"
     from files(sourceSets.main.output.classesDir)
     from files(sourceSets.main.output.resourcesDir)
@@ -33,9 +44,9 @@ task dist(type: Jar) {
     manifest {
         attributes 'Main-Class': project.mainClassName
     }
-}
+}*/
 
-dist.dependsOn classes
+//dist.dependsOn classes
 
 eclipse {
     project {

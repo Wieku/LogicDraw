@@ -1,2 +1,2 @@
-include 'desktop', 'android', 'ios', 'core', 'version'
+include 'desktop', /*'android',*/ 'ios', 'core', 'version'
 

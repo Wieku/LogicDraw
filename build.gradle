@@ -1,17 +1,17 @@
 buildscript {
-    ext.kotlinVersion = '1.1.1'
+    ext.kotlinVersion = '1.3.61'
 
     repositories {
         mavenLocal()
         mavenCentral()
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/"}
         jcenter()
+        google()
     }
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
-        classpath 'com.android.tools.build:gradle:2.2.0'
+        classpath 'com.android.tools.build:gradle:3.4.1'
         classpath 'com.mobidevelop.robovm:robovm-gradle-plugin:2.3.1'
-
     }
 }
 
@@ -72,7 +72,7 @@ project(":desktop") {
     }
 }
 
-project(":android") {
+/*project(":android") {
     apply plugin: "android"
     apply plugin: "kotlin-android"
 
@@ -94,7 +94,7 @@ project(":android") {
         natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-x86_64"
         
     }
-}
+}*/
 
 project(":ios") {
     apply plugin: "kotlin"
@@ -124,6 +124,7 @@ project(":core") {
         compile "org.eclipse.mylyn.github:org.eclipse.egit.github.core:2.1.5"
         compile "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
         compile "com.google.guava:guava:$guavaVersion-android"
+        compile "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
     }
 }
 
