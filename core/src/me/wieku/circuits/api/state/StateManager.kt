@@ -9,8 +9,11 @@ open class StateManager(private val managerSize: Int) {
 
 	protected val indexPool: Queue<Int> = ArrayDeque<Int>()
 	protected var lastIndex = 0
+
 	var usedNodes = 0
 	protected set
+
+	protected val stateQueue = ArrayDeque<State>(managerSize / 8)
 
 	fun free(index: Int) {
 		input[index] = 0
@@ -29,7 +32,12 @@ open class StateManager(private val managerSize: Int) {
 	}
 
 	fun swap() {
-		System.arraycopy(output, 0, input, 0, lastIndex)
+		while (stateQueue.isNotEmpty()) {
+			val state = stateQueue.poll()
+			state.alreadyMarked = false
+			input[state.id] = output[state.id]
+		}
+
 		usedNodes = lastIndex - indexPool.size
 	}
 
@@ -41,6 +49,11 @@ open class StateManager(private val managerSize: Int) {
 		}
 		children[state.id] = state
 		return state
+	}
+
+	fun markForUpdate(state: State) {
+		stateQueue.push(state)
+		state.alreadyMarked = true
 	}
 
 	operator fun get(index: Int) = input[index] > 0

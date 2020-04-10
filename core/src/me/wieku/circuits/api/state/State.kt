@@ -9,13 +9,20 @@ open class State(val id: Int, private val manager: StateManager) {
 
 	private var inputGates = ArrayList<IInput>()
 
+	var alreadyMarked = false
+
 	var activeNum: Int
 		get() = manager.input[id]
 		set(value) {
 			manager.output[id] = value
+			if (!alreadyMarked) manager.markForUpdate(this)
 		}
 
 	private var destroyed = false
+
+	init {
+		if (!alreadyMarked) manager.markForUpdate(this)
+	}
 
 	fun setActive(value: Boolean) {
 		if (destroyed) return
@@ -37,10 +44,12 @@ open class State(val id: Int, private val manager: StateManager) {
 	}
 
 	fun high() {
+		if (!alreadyMarked) manager.markForUpdate(this)
 		manager.output[id]++
 	}
 
 	fun low() {
+		if (!alreadyMarked) manager.markForUpdate(this)
 		manager.output[id]--
 	}
 
