@@ -17,10 +17,15 @@ out vec4 color;
 void main()
 {
     vec4 pixel = texelFetch(texture_element_states, ivec2(v_texCoords * size));
-    bool first = texelFetch(texture_states, ivec2(pixel.xy * size)).r > 0.5;
-    bool second = texelFetch(texture_states, ivec2(pixel.zw * size)).r > 0.5;
 
-    color = vec4(texelFetch(!first && !second ? texture_idle : texture_active, ivec2(v_texCoords * size)).rgb, 1);
+    if(pixel.r < 0.0 || pixel.b < 0.0) {
+        color = vec4(texelFetch(texture_idle, ivec2(v_texCoords * size)).rgb, 1);
+    } else {
+        bool first = texelFetch(texture_states, ivec2(pixel.xy * size)).r > 0.5;
+        bool second = texelFetch(texture_states, ivec2(pixel.zw * size)).r > 0.5;
 
-    color *= first && second ? 1.2 : 1;
+        color = vec4(texelFetch(!first && !second ? texture_idle : texture_active, ivec2(v_texCoords * size)).rgb, 1);
+
+        color.rgb *= (first && second) || (!first && !second) ? 1 : 0.83;
+    }
 }
