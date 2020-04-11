@@ -61,8 +61,6 @@ class ClassicWorld(val width: Int, val height: Int, val name: String):IWorld {
 		}
 
 	override fun update(tick: Long) {
-		updateTasks()
-
 		val queue = if (useB) tickableQueueA else tickableQueueB
 		for (t in queue) {
 			t.isAlreadyMarked = false
@@ -73,6 +71,8 @@ class ClassicWorld(val width: Int, val height: Int, val name: String):IWorld {
 		while (queue.isNotEmpty()) queue.poll().update(tick)
 
 		useB = !useB
+
+		updateTasks()
 
 		manager.swap()
 	}
