@@ -63,7 +63,7 @@ class MapManipulator(val world:ClassicWorld, val camera: OrthographicCamera, val
 				Input.Keys.C -> makeCopy()
 				Input.Keys.X -> makeCut()
 				Input.Keys.V -> makePaste()
-				Input.Keys.S -> editor.saveFile()
+				//Input.Keys.S -> editor.saveFile()
 			}
 		}
 

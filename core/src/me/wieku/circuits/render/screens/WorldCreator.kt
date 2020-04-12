@@ -27,6 +27,7 @@ import me.wieku.circuits.utils.Version
 import me.wieku.circuits.world.ClassicWorld
 import java.io.File
 import java.util.*
+import kotlin.collections.ArrayList
 
 
 class WorldCreator:Screen {
@@ -42,12 +43,12 @@ class WorldCreator:Screen {
 		File("blueprints/").mkdir()
 		mainTable.top().left()
 
-		val maps: ArrayList<LDMap>? = File("maps/").listFiles().filter{!it.isDirectory && it.extension == "ldmap"}.mapNotNull {
+		val maps: ArrayList<LDMap>? = ArrayList()/*File("maps/").listFiles().filter{!it.isDirectory && it.extension == "ldmap"}.mapNotNull {
 			val array = SaveManagers.getHeader(it)
 			if(array != null) {
 				LDMap(it, array)
 			} else null
-		}.toMutableList() as ArrayList<LDMap>
+		}.toMutableList() as ArrayList<LDMap>*/
 
 		val adapter = object: ArrayListAdapter<LDMap, VisTable>(maps) {
 			private val bg = VisUI.getSkin().getDrawable("window-bg")

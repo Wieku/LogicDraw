@@ -198,11 +198,13 @@ class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 
 		menuBar = menuBar {
 			menu("File") {
-				menuItem("Save file", Drawable(Gdx.files.internal("assets/icons/save.png"))).setShortcut(Input.Keys.CONTROL_LEFT, Input.Keys.S).addListener(object : ChangeListener() {
+				val saveButton = menuItem("Save file", Drawable(Gdx.files.internal("assets/icons/save.png"))).setShortcut(Input.Keys.CONTROL_LEFT, Input.Keys.S)
+				saveButton.isDisabled = true
+				/*saveButton.addListener(object : ChangeListener() {
 					override fun changed(event: ChangeEvent?, actor: Actor?) {
 						saveFile()
 					}
-				})
+				})*/
 
 				menuItem("Export as image").onChange {
 					this@Editor.stage.addActor(window("Export image"){
@@ -304,7 +306,7 @@ class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 				}
 
 				var window: VisWindow? = null
-				MenuManager.addDependent("clipboard", menuItem("Save blueprint", Drawable(Gdx.files.internal("assets/icons/download.png"))).onChange {
+				/*MenuManager.addDependent("clipboard", menuItem("Save blueprint", Drawable(Gdx.files.internal("assets/icons/download.png"))).onChange {
 					if (window == null || !this@Editor.stage.actors.contains(window)) {
 						window = window("Save blueprint") {
 							addCloseButton()
@@ -340,7 +342,7 @@ class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 						}
 						this@Editor.stage.addActor(window!!.fadeIn())
 					}
-				})
+				})*/
 
 				var menu = popupMenu {  }
 				var load: MenuItem = menuItem("Blueprints") {
@@ -478,7 +480,7 @@ class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 			dir.listFiles().filter { it.extension == "ldbp" }.forEach {
 				menuItem(it.nameWithoutExtension).subMenu {
 
-					menuItem("Convert").onChange {
+					/*menuItem("Convert").onChange {
 						try {
 							val blueprint = SaveManagers.loadBlueprint(it)
 							SaveManagers.saveBlueprint(blueprint, it)
@@ -486,7 +488,7 @@ class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 						} catch (e: Exception) {
 							toastManager.show(MessageToast("Error converting blueprint!"), 5f)
 						}
-					}
+					}*/
 
 					menuItem("Load", Drawable(Gdx.files.internal("assets/icons/upload.png"))).onChange { loadBlueprint(it) }
 
