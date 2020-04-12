@@ -73,6 +73,7 @@ open class State(val id: Int, private val manager: StateManager) {
 		if(!destroyed) {
 			manager.free(id)
 			inputGates.clear()
+			manager.markForUpdate(this)
 		}
 		destroyed = true
 	}

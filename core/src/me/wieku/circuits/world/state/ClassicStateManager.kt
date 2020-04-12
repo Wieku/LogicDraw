@@ -19,6 +19,11 @@ class ClassicStateManager(managerSize: Int): StateManager(managerSize) {
 		field = value
 	}
 
+	override fun free(index: Int) {
+		super.free(index)
+		worldRenderer?.setStateData(index, false)
+	}
+
 	override fun swap() {
 		while (stateQueue.isNotEmpty()) {
 			val state = stateQueue.poll()

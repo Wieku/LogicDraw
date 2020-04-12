@@ -15,7 +15,7 @@ open class StateManager(private val managerSize: Int) {
 
 	protected val stateQueue = ArrayDeque<State>(managerSize / 8)
 
-	fun free(index: Int) {
+	open fun free(index: Int) {
 		input[index] = 0
 		output[index] = 0
 		children[index] = null
