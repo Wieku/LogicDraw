@@ -12,7 +12,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.utils.Align
-import com.badlogic.gdx.utils.GdxRuntimeException
 import com.badlogic.gdx.utils.viewport.ScreenViewport
 import com.google.common.io.BaseEncoding
 import com.kotcrab.vis.ui.VisUI
@@ -783,6 +782,7 @@ class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 
 					val spinners = HashMap<Spinner, Field>()
 					val radioButtons = HashMap<VisRadioButton, Field>()
+					val texts = HashMap<VisTextField, Field>()
 
 					val keyStore = HashMap<VisTextButton, Int>()
 					val keySelectors = HashMap<VisTextButton, Field>()
@@ -817,6 +817,18 @@ class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 							jField.isAccessible = true
 
 							radioButtons.put(radioButton(field.annotation.name) {isChecked = jField.getBoolean(element)}, jField)
+
+							row()
+						}
+
+						if(field.annotation is Editable.Text) {
+							val jField = field.field
+							jField.isAccessible = true
+
+							table(true) {
+								label(field.annotation.name + ": ")
+								texts.put(textField(field.annotation.name) {text = jField.get(element) as String}, jField)
+							}.cell(pad = 2f)
 
 							row()
 						}
@@ -861,10 +873,11 @@ class Editor(val world: ClassicWorld) : Screen, Updatable.ByTick {
 
 					val okButton = textButton("OK").cell(growX = true)
 					okButton.onClickS {
-						spinners.forEach { t, u -> u.setInt(element, (t.model as IntSpinnerModel).value) }
-						radioButtons.forEach { t, u -> u.setBoolean(element, t.isChecked) }
-						keySelectors.forEach { t, u -> u.setInt(element, keyStore[t]!!) }
-						hexEditors.forEach { t, u -> u.set(element, t.saveToBytes()) }
+						spinners.forEach { (t, u) -> u.setInt(element, (t.model as IntSpinnerModel).value) }
+						radioButtons.forEach { (t, u) -> u.setBoolean(element, t.isChecked) }
+						texts.forEach { (t, u) -> u.set(element, t.text) }
+						keySelectors.forEach { (t, u) -> u.setInt(element, keyStore[t]!!) }
+						hexEditors.forEach { (t, u) -> u.set(element, t.saveToBytes()) }
 						fadeOut()
 					}
 

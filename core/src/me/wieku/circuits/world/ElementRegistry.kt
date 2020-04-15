@@ -1,7 +1,6 @@
 package me.wieku.circuits.world
 
 import com.badlogic.gdx.graphics.Color
-import me.wieku.circuits.api.element.BasicElement
 import me.wieku.circuits.api.element.IElement
 import me.wieku.circuits.api.element.edit.Editable
 import me.wieku.circuits.api.math.Vector2i
@@ -47,6 +46,7 @@ object ElementRegistry {
 							is Editable.Spinner,
 							is Editable.Boolean,
 							is Editable.Key,
+							is Editable.Text,
 							is Editable.Hex ->{
 								println(annotation)
 								if(!editors.containsKey(clazz))

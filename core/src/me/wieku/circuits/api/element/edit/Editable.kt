@@ -12,6 +12,9 @@ interface Editable {
 	annotation class Key(val name: String)
 
 	@Target(AnnotationTarget.FIELD)
+	annotation class Text(val name: String)
+
+	@Target(AnnotationTarget.FIELD)
 	annotation class Hex(val name: String)
 
 }
