@@ -1,7 +1,5 @@
-package me.wieku.circuits.save.managers
+package me.wieku.circuits.save.legacy
 
-import me.wieku.circuits.save.SaveManager
-import me.wieku.circuits.save.Saveable
 import me.wieku.circuits.world.state.ClassicStateManager
 import me.wieku.circuits.world.ClassicWorld
 import me.wieku.circuits.world.ElementRegistry

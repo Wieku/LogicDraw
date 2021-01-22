@@ -4,7 +4,7 @@ package me.wieku.circuits.world.elements.gates
 import me.wieku.circuits.api.element.edit.Editable
 import me.wieku.circuits.api.element.gates.ITickableAlways
 import me.wieku.circuits.api.math.Vector2i
-import me.wieku.circuits.save.SaveManager
+import me.wieku.circuits.save.legacy.SaveManager
 import me.wieku.circuits.world.ClassicWorld
 
 // spec: https://gist.github.com/magik6k/d1a739a5f032e93aba2742b9fa243a26

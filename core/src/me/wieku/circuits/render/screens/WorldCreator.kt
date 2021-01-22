@@ -22,11 +22,10 @@ import me.wieku.circuits.Main
 import me.wieku.circuits.render.scene.Drawable
 import me.wieku.circuits.render.scene.getTxRegion
 import me.wieku.circuits.render.scene.onChange
-import me.wieku.circuits.save.SaveManagers
+import me.wieku.circuits.save.legacy.SaveManagers
 import me.wieku.circuits.utils.Version
 import me.wieku.circuits.world.ClassicWorld
 import java.io.File
-import java.util.*
 import kotlin.collections.ArrayList
 
 

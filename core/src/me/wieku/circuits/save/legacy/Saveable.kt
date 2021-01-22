@@ -1,4 +1,4 @@
-package me.wieku.circuits.save
+package me.wieku.circuits.save.legacy
 
 import me.wieku.circuits.world.ClassicWorld
 

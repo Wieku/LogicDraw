@@ -40,7 +40,7 @@ import me.wieku.circuits.render.scene.*
 import me.wieku.circuits.render.scene.actors.TextTooltip
 import me.wieku.circuits.render.scene.editors.HexEditor
 import me.wieku.circuits.render.utils.About
-import me.wieku.circuits.save.SaveManagers
+import me.wieku.circuits.save.legacy.SaveManagers
 import me.wieku.circuits.utils.*
 import me.wieku.circuits.world.ClassicWorld
 import me.wieku.circuits.world.ElementRegistry

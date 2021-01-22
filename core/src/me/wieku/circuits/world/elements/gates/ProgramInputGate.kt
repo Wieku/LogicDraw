@@ -5,7 +5,7 @@ import me.wieku.circuits.api.element.BasicOutput
 import me.wieku.circuits.api.element.edit.Editable
 import me.wieku.circuits.api.math.Vector2i
 import me.wieku.circuits.api.world.IWorld
-import me.wieku.circuits.save.SaveManager
+import me.wieku.circuits.save.legacy.SaveManager
 import me.wieku.circuits.world.ClassicWorld
 
 class ProgramInputGate(pos: Vector2i) : SaveableGate(pos), Editable {

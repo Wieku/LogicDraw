@@ -3,7 +3,7 @@ package me.wieku.circuits.world.state
 import me.wieku.circuits.api.state.State
 import me.wieku.circuits.api.state.StateManager
 import me.wieku.circuits.render.map.WorldRenderer
-import me.wieku.circuits.save.SaveManager
+import me.wieku.circuits.save.legacy.SaveManager
 class ClassicStateManager(managerSize: Int): StateManager(managerSize) {
 
 	var worldRenderer: WorldRenderer? = null

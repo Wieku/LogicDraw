@@ -5,7 +5,7 @@ import com.badlogic.gdx.math.MathUtils
 import me.wieku.circuits.api.element.edit.Editable
 import me.wieku.circuits.api.element.gates.ITickableAlways
 import me.wieku.circuits.api.math.Vector2i
-import me.wieku.circuits.save.SaveManager
+import me.wieku.circuits.save.legacy.SaveManager
 import me.wieku.circuits.world.ClassicWorld
 import java.util.*
 

@@ -5,8 +5,8 @@ import me.wieku.circuits.api.math.Axis
 import me.wieku.circuits.api.math.Vector2i
 import me.wieku.circuits.api.state.State
 import me.wieku.circuits.api.world.IWorld
-import me.wieku.circuits.save.SaveManager
-import me.wieku.circuits.save.Saveable
+import me.wieku.circuits.save.legacy.SaveManager
+import me.wieku.circuits.save.legacy.Saveable
 import me.wieku.circuits.world.ClassicWorld
 
 open class Output(pos: Vector2i): BasicOutput(pos), Saveable {

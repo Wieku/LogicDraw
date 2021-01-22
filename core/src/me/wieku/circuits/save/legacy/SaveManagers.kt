@@ -1,7 +1,5 @@
-package me.wieku.circuits.save
+package me.wieku.circuits.save.legacy
 
-import me.wieku.circuits.save.managers.SaveManagerVer01
-import me.wieku.circuits.save.managers.SaveManagerVer02
 import me.wieku.circuits.world.ClassicWorld
 import java.io.*
 import java.util.zip.GZIPInputStream
